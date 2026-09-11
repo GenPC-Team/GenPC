@@ -1,5 +1,31 @@
 # Accepted project state
 
+## 2026-09-11 10:49:35 CST — consolidated best Redwood10 and Custom10 delivery
+
+**User request.** Preserve the best previous Redwood and Custom experiments,
+including all intermediate artifacts, in one new directory. The selected route
+is the shared exact Camera-1 structural-transport configuration documented in
+`PLAN.md`; offline means are CD-L1/EMD x100 `1.5380/2.4848` for Redwood10 and
+`1.9921/2.5377` for Custom10.
+
+**Independent delivery.** The complete physical-copy root is
+`workspace/best_redwood_custom_camera1_transport_20260911`. It contains, for
+both datasets, partial/depth/semantic/camera inputs, GPT prompts and images,
+Pixal3D GLBs and 100k priors, native MoGe artifacts, every initial registration
+stage, the selected Camera-1 continuation, four-view residual evidence,
+Partial OT and posterior fields, final 100k outputs, GT, and offline metrics.
+No delivered file is hard-linked to the superseded experiment roots. Internal
+text manifests were relocated to the new paths. All twenty
+`final/<sample>/complete_100k.ply` files were checked at exactly 100,000 points
+and SHA-256 matched against their selected posterior source before cleanup.
+
+**Cleanup result.** After successful verification, the superseded source roots
+`workspace/from_scratch_01184_debug_20260910` and
+`workspace/custom_from_scratch_integrated_tuning_20260911` were removed from
+the worktree and placed in the recoverable repository trash directory
+`.codex-trash/20260911_best_redwood_custom_consolidation`. Omni, scene,
+dataset, and unrelated experiment directories were not touched.
+
 ## 2026-09-11 00:04:06 CST — integrated PosteriorAdapter observation fusion
 
 **User approval.** “确实 效果好特别多.” The approved experiment integrates
@@ -985,3 +1011,80 @@ all exact transforms and stage settings are serialized under
 localized residual transport is insufficient; this is not a verifier rollback.
 Offline-only CD-L1x100/EMDx100 are `1.34141147/2.33711749` and are not exposed
 to generation, registration, OT, or stopping.
+
+## 2026-09-11 14:30 CST — accepted 01027 single-scan CLIP-view depth-only GPT semantic
+
+**User approval.** The user judged the direct depth-only completion “这样效果很好”.
+Preserve this exact semantic image and its strict depth-authority prompt. Do not
+replace it with the preceding unconstrained GPT result or the malformed Qwen
+completion, and do not loosen the wheel-position, pose, scale, or camera
+constraints without asking.
+
+**Exact artifacts.** Input partial is
+`data/Omni-Comp3D/Omni-Comp3D/redwood_preprocessed/01027/partial_data/single_scan/partial_0.ply`.
+The CLIP-selected input depth and camera are
+`workspace/omni_redwood_single_scan_clip_view_probe_20260911/01027_partial_0/depth.png`
+and `camera.pth`; SHA-256 values are
+`db1db578692e3a1e8a89ba9c6b8a7f8162004630cac780afd8a93cf3fb3b5d38`
+and `e9b42a4c5a6c84a06c804d95256827c3d2a3f85c3ba9995d0af55efd10498216`.
+The accepted output is
+`workspace/omni_redwood_single_scan_clip_view_probe_20260911/01027_partial_0/gpt_semantic_depth_only_accepted.png`
+(SHA-256 `39fd86124a9bd39e6863ccf537b555a45b4ddf111f7de9f787ef7d3bcec0765a`),
+and the exact prompt is beside it as
+`gpt_semantic_depth_only_accepted_prompt.txt`.
+
+**Generation record.** The built-in image generation editor was given only the
+512-square `depth.png` as its edit target; no previous generated RGB image was
+included. It returned a 1254-square PNG. The full positive and negative
+instructions are copied verbatim in the prompt artifact. Exact GPT image model
+checkpoint, seed, inference steps, CFG/guidance scale, scheduler, and native
+resize policy are `UNKNOWN`, so this result is not exactly reproducible without
+the saved output. No RMBG, resize, MoGe, Pixal3D, registration, or point-cloud
+postprocessing has yet been applied to this accepted image.
+
+**View selection.** The reusable selector is frozen CLIP ViT-L/14@336 after
+geometry pruning, with model files at
+`/opt/data/private/cr/lab/GenPC/models/clip-vit-large-patch14-336`. The selected
+azimuth/elevation/roll are `0/15/270`; the full category-conditioned prompt
+ensemble, geometry scores and camera parameters are recorded in
+`clip_view_ranking.json`. No GT, CD, or EMD was used.
+
+## 2026-09-11 16:55 CST — accepted experimental upright 01027 CLIP-view GPT semantic
+
+**User approval and scope.** The user approved saving the code after reviewing
+the 180-degree-corrected depth and its GPT completion. This CLIP view selector
+remains an opt-in feasibility probe and must not replace or alter the default
+mainline. Preserve the upright Camera-1 export and semantic candidate; do not
+apply the fixed raster correction to unrelated camera pipelines without an
+explicit coordinate-contract check.
+
+**Exact inputs and outputs.** Input partial is
+`data/Omni-Comp3D/Omni-Comp3D/redwood_preprocessed/01027/partial_data/single_scan/partial_0.ply`.
+The experimental output root is
+`workspace/omni_redwood_single_scan_clip_gpt_20260911/01027_partial_0`.
+The accepted input depth, camera and semantic are `depth.png`, `camera.pth` and
+`gpt_semantic_upright_v2.png`, with SHA-256 values
+`de96b6237e5e59dd85dd09add90c2dc68cbf75ea363d662d73088375425e5548`,
+`47a53065005a85596926509deaea6d39787c633e2839618128283acb3b98a857` and
+`78659fef017fa4e217115a2a0959fc6693a142ce7104c3dc136739566ee874b9`.
+The exact prompt is beside the image as `gpt_semantic_upright_v2_prompt.txt`;
+the visual audit is `upright_depth_gpt_comparison.png`. Pre-correction camera,
+depth, mask, UV and point-depth artifacts are retained with the
+`_before_upright` suffix.
+
+**View and camera contract.** The frozen CLIP model is
+`/opt/data/private/cr/lab/GenPC/models/clip-vit-large-patch14-336`. Geometry
+pruning plus the category-conditioned prompt ensemble selected azimuth,
+elevation and roll `0/15/270` degrees. Final export applies one systematic
+image-coordinate roll offset of `180` degrees, yielding roll `90` degrees.
+Depth, mask, `point_uv.npy`, `camera_point_depth.npy`, `viewpoint.npy`,
+`target.npy` and `camera.pth` were all re-rendered together; this was not a
+PNG-only rotation. The complete parameters are serialized in
+`clip_view_ranking.json` under `output_view`.
+
+**Generation record.** Built-in GPT image generation received only the
+512-by-512 corrected `depth.png`; no earlier semantic/RGB image was provided.
+It returned a 1254-by-1254 RGB PNG. Exact model checkpoint, seed, steps,
+guidance/CFG, scheduler and native resize policy are `UNKNOWN`, so the saved
+output is required for exact replay. No RMBG, Pixal3D, MoGe, registration,
+fusion or point-cloud postprocessing has been run. No GT, CD or EMD was used.

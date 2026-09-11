@@ -155,3 +155,102 @@ mainline work.
   `1.9921/2.5377` on Custom10 and `1.5380/2.4848` on Redwood10; the known
   mirrorless-camera, drill, and 05452 regressions remain documented rather than
   hidden behind category-specific branches.
+
+## Omni-Comp3D Redwood single-scan evaluation
+
+- [x] Resolve the ten Redwood IDs from the official Redwood scan metadata and
+  stage both `single_scan/partial_0.ply` and `partial_1.ply` as twenty
+  independent no-GT inference cases.
+- [x] Run the current Camera-1 transport mainline from saved-view depth through
+  direct-GPT semantic completion, Pixal3D prior generation, registration,
+  four-view evidence, PosteriorAdapter and observation-anchored carrier fusion.
+- [x] Preserve every intermediate and final artifact under
+  `workspace/omni_redwood_single_scan_camera1_mainline_20260911`; all final
+  predictions contain 100k points, add no connected component and retain at
+  least 95% hidden coverage.
+- [x] Evaluate only after inference. Final CD-L1/EMD x100 is
+  `9.6951/11.3174` over twenty cases. The poor mean is dominated by the `sign`
+  and one `chair` case; their mismatch is already visible at semantic-prior and
+  global-registration stages, rather than being introduced by final fusion.
+- [ ] Before treating Omni as a paper result, improve the category-independent
+  view/semantic-prior reliability check for sparse, open and ambiguous partial
+  scans; eleven semantic masks currently retain explicit audit warnings.
+- [x] Run the frozen geometry-pruned CLIP selector on the Omni 01027
+  `single_scan/partial_0` for direct comparison with random-crop. It selects
+  azimuth/elevation/roll `0/15/270` (geometry rank 2); the saved camera, depth,
+  complete ranking and Top-12 board are under
+  `workspace/omni_redwood_single_scan_clip_view_probe_20260911/01027_partial_0`.
+  The two-wheel layout is more legible than the random-crop input, although
+  disconnected sparse scan fragments remain visible and CLIP still does not
+  reliably choose the cleanest candidate by human judgement.
+- [x] Extend the same frozen selector to all twenty Omni Redwood single-scan
+  inputs (`partial_0/1` for ten IDs) in one model-reusing batch. Each sample
+  uses its own dataset category text while sharing the candidate lattice,
+  prompt templates and score weights. All depths, cameras, Top-12 boards and
+  rankings are under `workspace/omni_redwood_single_scan_clip_gpt_20260911`;
+  `clip_selected_depths_20.png` is the complete review board. Stop before GPT
+  completion pending visual approval of these cameras.
+- [x] Probe direct-GPT completion on bicycle, open-top trash container, sofa
+  and chair. Pixel-hard completion preserves sparse support but can inherit
+  scan outliers; globally relaxed prompts recover plausible shape but
+  canonicalize the camera. Replace the reusable prompt contract with a robust
+  coherent-support constraint plus category-normal topology and test an
+  optional minimal second-pass repair that keeps the first pass as its camera
+  and geometry base. Artifacts and the three-way comparison board are under
+  `workspace/omni_redwood_single_scan_clip_gpt_20260911`. This probe is not yet
+  accepted for the remaining sixteen samples.
+- [x] Correct the systematic 180-degree Camera-1 raster orientation at export
+  time and re-render `01027_partial_0` together with its camera, UV, depth and
+  mask metadata. A direct-GPT retry from the upright depth produces one
+  coherent bicycle with normal proportions; the selected candidate is saved
+  as `gpt_semantic_upright_v2.png`. The original camera artifacts remain beside
+  it with the `_before_upright` suffix. Batch rollout remains pending review.
+
+## Omni-Comp3D Redwood random-crop evaluation
+
+- [ ] Stage both `random_crop/partial_0.ply` and `partial_1.ply` for the same
+  ten official Redwood IDs as twenty independent inference cases.
+- [x] Add and test an isolated category-free completion-aware camera probe that
+  ranks a deterministic 120-view lattice by visible support, projection
+  collision, depth information, connectivity, footprint and perturbation
+  stability. The first 01027 probe is stored at
+  `workspace/omni_redwood_random_crop_completion_view_probe_20260911/01027_partial_0`.
+  Geometry alone selects azimuth/elevation `225/30`; visual inspection still
+  finds semantic ambiguity, so this probe is not promoted without a Top-K
+  semantic/depth self-consistency stage.
+- [x] Run a three-view Qwen comparison for 01027 using the unchanged 40-step
+  Qwen-Image-Edit-2511/Nunchaku configuration and the canonical occluded-depth
+  prompt. Outputs are under
+  `workspace/omni_redwood_random_crop_semantic_verify_20260911/01027_partial_0`.
+  The highest geometry-ranked view completes a plausible bicycle but drifts
+  from the depth camera; the other two preserve more observed geometry but
+  remain incomplete or malformed. This confirms that neither geometry score
+  nor semantic plausibility alone is sufficient for view selection.
+- [x] Add an isolated frozen-CLIP view-ranking probe for 01027. Geometry first
+  prunes the 120-view lattice to 36 candidates; CLIP ViT-L/14@336 then scores
+  four in-plane rolls and three render modalities with a shared category-text
+  prompt ensemble. The generic canonical-view revision selects azimuth,
+  elevation and roll `210/-30/90`; outputs, the complete ranking and reusable
+  camera are stored under
+  `workspace/omni_redwood_random_crop_clip_view_probe_v2_20260911/01027_partial_0`.
+  The view is recognizable but the Top-12 board shows that CLIP ranking alone
+  still prefers a somewhat foreshortened projection over several visually
+  clearer candidates, so this remains an opt-in diagnostic rather than a
+  promoted mainline selector.
+- [x] Complete the CLIP-selected 01027 depth with the built-in GPT image editor
+  using a strict camera/mask-preservation prompt. The resulting semantic image
+  and verbatim prompt are saved beside the selected depth as
+  `gpt_semantic.png` and `gpt_semantic_prompt.txt`. The result is a coherent
+  bicycle and broadly follows the selected oblique pose, but exact silhouette
+  fidelity has not yet been accepted or promoted.
+- [x] Run the frozen local Qwen baseline on the identical CLIP-selected raw
+  depth (`40` steps, CFG `4.0`, 512 input/output). Its output and verbatim
+  settings are stored as `qwen_semantic.png` and `qwen_semantic_prompt.txt` in
+  the same directory. Qwen follows the visible large-wheel silhouette more
+  literally than GPT but leaves the bicycle incomplete and introduces malformed
+  attachments, so this particular view does not make Qwen completion reliable.
+- [ ] Run the unchanged Camera-1 transport mainline from partial-only depth and
+  direct-GPT semantic completion through Pixal3D, two-camera registration,
+  four-view evidence, PosteriorAdapter, and observation-anchored fusion.
+- [ ] Preserve bridge-only and fully refined registration artifacts for direct
+  visual comparison, then compute CD/EMD only in the offline evaluator.

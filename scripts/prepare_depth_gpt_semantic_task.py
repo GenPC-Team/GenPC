@@ -21,6 +21,9 @@ def main() -> None:
     parser.add_argument("--depth", type=Path, required=True)
     parser.add_argument("--object", required=True, dest="object_description")
     parser.add_argument("--constraint", action="append", default=[])
+    parser.add_argument(
+        "--observation-mode", choices=("single_scan", "random_crop"), default="single_scan",
+    )
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if not args.depth.is_file():
@@ -28,6 +31,7 @@ def main() -> None:
     prompt = build_depth_semantic_prompt(
         args.object_description,
         structural_constraints=tuple(args.constraint),
+        observation_mode=args.observation_mode,
     )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(prompt + "\n", encoding="utf-8")
@@ -38,6 +42,7 @@ def main() -> None:
         "depth": str(args.depth.resolve()),
         "object_description": args.object_description,
         "structural_constraints": args.constraint,
+        "observation_mode": args.observation_mode,
         "prompt": prompt,
         "output_contract": {
             "semantic_image": "img.png",

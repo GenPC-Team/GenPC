@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-"""Render an orbit atlas, then save a GPT-visually-selected partial camera.
+"""Render an orbit atlas and export a completion-friendly partial camera.
 
-The atlas is only an inspection surface for the agent; it is not scored or
-ranked by geometry.  A subsequent invocation supplies the continuous azimuth
-and elevation chosen by the visual agent and writes a Camera-1-compatible
-camera, depth raster, and projection metadata.
+The original manual/GPT selection remains available.  ``--auto-select`` uses
+only category-free partial geometry to rank a deterministic camera lattice,
+then writes a Camera-1-compatible camera, depth raster, and audit metadata.
 """
 
 from __future__ import annotations
@@ -137,6 +136,120 @@ def write_orbit_atlas(points: np.ndarray, output: Path, resolution: int) -> None
     sheet.save(output)
 
 
+def _normalised_rank(values: np.ndarray) -> np.ndarray:
+    """Return stable [0, 1] ranks without dataset- or category-scale constants."""
+    values = np.asarray(values, dtype=np.float64)
+    order = np.argsort(values, kind="stable")
+    ranks = np.empty(len(values), dtype=np.float64)
+    ranks[order] = np.arange(len(values), dtype=np.float64)
+    return ranks / max(len(values) - 1, 1)
+
+
+def _view_features(points: np.ndarray, azimuth: float, elevation: float,
+                   resolution: int, fov_degrees: float) -> dict[str, float]:
+    """Measure view informativeness using partial geometry alone.
+
+    The terms deliberately avoid object labels and preferred world axes.  They
+    reward visible support, low projection collision, depth ordering, coherent
+    projected support and a non-degenerate image footprint.
+    """
+    parameters = camera_parameters(points, azimuth, elevation, fov_degrees)
+    _, uv, point_depth, _, _ = project(points, parameters, resolution)
+    pixels = uv * float(resolution - 1)
+    rendered, mask, indices = zbuffer_depth_with_indices(
+        pixels, point_depth, (resolution, resolution), splat_radius=1,
+    )
+    visible_ids = np.unique(indices[mask])
+    visible_ratio = float(len(visible_ids) / max(len(points), 1))
+
+    # Projection collision is distinct from visibility: it penalises views in
+    # which otherwise visible structures collapse onto the same image cells.
+    _, point_mask, point_indices = zbuffer_depth_with_indices(
+        pixels, point_depth, (resolution, resolution), splat_radius=0,
+    )
+    collision_free = float(len(np.unique(point_indices[point_mask])) / max(len(points), 1))
+    projected_area = float(mask.mean())
+
+    values = rendered[mask]
+    if len(values) > 1 and float(np.ptp(values)) > 1e-12:
+        histogram, _ = np.histogram(values, bins=16)
+        probability = histogram[histogram > 0].astype(np.float64)
+        probability /= probability.sum()
+        depth_entropy = float(-(probability * np.log(probability)).sum() / np.log(16.0))
+        depth_span = float(np.quantile(values, .95) - np.quantile(values, .05))
+    else:
+        depth_entropy = 0.0
+        depth_span = 0.0
+    object_extent = max(float(np.linalg.norm(np.ptp(points, axis=0))), 1e-12)
+    depth_span /= object_extent
+
+    support = cv2.dilate(mask.astype(np.uint8), np.ones((5, 5), np.uint8), iterations=1)
+    count, labels, stats, _ = cv2.connectedComponentsWithStats(support, connectivity=8)
+    foreground_sizes = stats[1:, cv2.CC_STAT_AREA] if count > 1 else np.empty(0)
+    connectivity = float(foreground_sizes.max() / max(foreground_sizes.sum(), 1)) if len(foreground_sizes) else 0.0
+
+    centred = pixels[visible_ids] - pixels[visible_ids].mean(axis=0, keepdims=True)
+    covariance = centred.T @ centred / max(len(centred), 1)
+    eigenvalues = np.linalg.eigvalsh(covariance)
+    footprint_balance = float(np.sqrt(max(eigenvalues[0], 0.0) / max(eigenvalues[-1], 1e-12)))
+    return {
+        "azimuth_degrees": float(azimuth),
+        "elevation_degrees": float(elevation),
+        "visible_ratio": visible_ratio,
+        "collision_free_ratio": collision_free,
+        "projected_area": projected_area,
+        "depth_entropy": depth_entropy,
+        "normalised_depth_span": depth_span,
+        "support_connectivity": connectivity,
+        "footprint_balance": footprint_balance,
+    }
+
+
+def select_completion_aware_view(points: np.ndarray, *, resolution: int = 160,
+                                 fov_degrees: float = 49.1) -> tuple[dict, list[dict]]:
+    """Select a category-free view that is informative and perturbation-stable."""
+    azimuths = np.arange(0.0, 360.0, 15.0)
+    elevations = (-30.0, -15.0, 0.0, 15.0, 30.0)
+    records = [
+        _view_features(points, float(azimuth), float(elevation), resolution, fov_degrees)
+        for elevation in elevations for azimuth in azimuths
+    ]
+    terms = (
+        ("visible_ratio", .26),
+        ("collision_free_ratio", .22),
+        ("depth_entropy", .16),
+        ("normalised_depth_span", .12),
+        ("support_connectivity", .12),
+        ("projected_area", .07),
+        ("footprint_balance", .05),
+    )
+    base = np.zeros(len(records), dtype=np.float64)
+    for name, weight in terms:
+        base += weight * _normalised_rank(np.asarray([record[name] for record in records]))
+
+    # A good completion view should survive a small camera perturbation.  The
+    # lattice neighbours provide this stability check without new thresholds.
+    lookup = {
+        (record["azimuth_degrees"], record["elevation_degrees"]): index
+        for index, record in enumerate(records)
+    }
+    stable = np.empty_like(base)
+    for index, record in enumerate(records):
+        neighbours = []
+        for delta_azimuth, delta_elevation in ((-15., 0.), (15., 0.), (0., -15.), (0., 15.)):
+            key = ((record["azimuth_degrees"] + delta_azimuth) % 360.,
+                   record["elevation_degrees"] + delta_elevation)
+            if key in lookup:
+                neighbours.append(base[lookup[key]])
+        stable[index] = .7 * base[index] + .3 * float(np.mean(neighbours or [base[index]]))
+        records[index]["base_score"] = float(base[index])
+        records[index]["completion_view_score"] = float(stable[index])
+    ranked = sorted(records, key=lambda item: item["completion_view_score"], reverse=True)
+    for rank, record in enumerate(ranked, 1):
+        record["rank"] = rank
+    return ranked[0], ranked
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--partial", type=Path, required=True)
@@ -147,15 +260,18 @@ def main() -> None:
     parser.add_argument("--atlas-resolution", type=int, default=192)
     parser.add_argument("--fov-degrees", type=float, default=49.1)
     parser.add_argument("--render-atlas-only", action="store_true")
+    parser.add_argument("--auto-select", action="store_true",
+                        help="Select a category-free completion-friendly view from partial geometry.")
     parser.add_argument("--reuse-atlas", action="store_true",
                         help="Reuse an existing visual-review atlas when exporting the selected view.")
     parser.add_argument("--rationale", default="")
     args = parser.parse_args()
     if args.resolution < 32 or args.atlas_resolution < 64:
         raise ValueError("image resolutions are too small")
-    if args.render_atlas_only == (args.azimuth_degrees is not None or args.elevation_degrees is not None):
-        raise ValueError("use --render-atlas-only, or specify both selected view angles")
-    if args.azimuth_degrees is None and not args.render_atlas_only:
+    explicit = args.azimuth_degrees is not None or args.elevation_degrees is not None
+    if sum((bool(args.render_atlas_only), bool(args.auto_select), bool(explicit))) != 1:
+        raise ValueError("choose exactly one of --render-atlas-only, --auto-select, or explicit angles")
+    if args.azimuth_degrees is None and explicit:
         raise ValueError("both --azimuth-degrees and --elevation-degrees are required")
     if args.azimuth_degrees is not None and args.elevation_degrees is None:
         raise ValueError("both --azimuth-degrees and --elevation-degrees are required")
@@ -174,6 +290,18 @@ def main() -> None:
         print(json.dumps({"partial": str(partial), "atlas": str(atlas), "selection": "pending_gpt_visual_review"}, indent=2))
         return
 
+    ranking = None
+    if args.auto_select:
+        selected, ranking = select_completion_aware_view(
+            points, resolution=min(int(args.atlas_resolution), 192),
+            fov_degrees=float(args.fov_degrees),
+        )
+        args.azimuth_degrees = selected["azimuth_degrees"]
+        args.elevation_degrees = selected["elevation_degrees"]
+        (output / "completion_view_ranking.json").write_text(
+            json.dumps(ranking, indent=2) + "\n", encoding="utf-8",
+        )
+
     parameters = camera_parameters(points, float(args.azimuth_degrees), float(args.elevation_degrees), float(args.fov_degrees))
     camera, uv, _, xy_center, xy_scale = project(points, parameters, int(args.resolution))
     raw, depth, valid, local_support, inpaint_mask, _, point_depth, _, _ = render_depth(
@@ -191,7 +319,11 @@ def main() -> None:
     torch.save(camera, output / "camera.pth")
     record = {
         "partial": str(partial),
-        "selection_source": "GPT-5.6 Terra visual inspection of gpt_orbit_atlas.png; no geometry-score ranking",
+        "selection_source": (
+            "category-free completion-aware partial geometry score"
+            if args.auto_select else
+            "GPT-5.6 Terra visual inspection of gpt_orbit_atlas.png; no geometry-score ranking"
+        ),
         "rationale": str(args.rationale),
         "azimuth_degrees": float(args.azimuth_degrees) % 360.,
         "elevation_degrees": float(args.elevation_degrees),
