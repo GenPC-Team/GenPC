@@ -1,0 +1,109 @@
+{
+  "method": "partial_anchored_dual_3dgs_collision_free_decode",
+  "strict_zero_shot": true,
+  "ground_truth_cd_emd_used": false,
+  "fusion": "all editable Pixal Gaussian slots retained; one-to-one hard partial-anchor replacement",
+  "inputs": {
+    "edited_prior": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/gaussian/01184/edit/partial_anchored_gaussian_edit_editable_prior_100k.ply",
+    "partial": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/inputs/partial/01184.ply",
+    "camera": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/inputs/camera/01184/camera.pth",
+    "semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/inputs/camera/01184/img.png"
+  },
+  "pairing": {
+    "saved_camera": {
+      "partial_visible_pixels": 42922,
+      "prior_visible_pixels": 52894,
+      "nearby_pixel_pairs": 42901,
+      "mutual_pixel_pairs": 20539,
+      "max_pixel_distance": 1.0,
+      "pair_subsample_limit": 71372
+    },
+    "virtual_positive_overlap": {
+      "virtual_views": 6,
+      "virtual_resolution": 384,
+      "virtual_max_pixel_distance": 1.0,
+      "virtual_mutual_pairs": 135098,
+      "per_view": [
+        {
+          "view": 0,
+          "pca_depth_axis": 0,
+          "depth_sign": -1,
+          "partial_visible_points": 15497,
+          "prior_visible_points": 36731,
+          "mutual_pairs": 12960
+        },
+        {
+          "view": 1,
+          "pca_depth_axis": 0,
+          "depth_sign": 1,
+          "partial_visible_points": 15497,
+          "prior_visible_points": 36731,
+          "mutual_pairs": 12960
+        },
+        {
+          "view": 2,
+          "pca_depth_axis": 1,
+          "depth_sign": -1,
+          "partial_visible_points": 37926,
+          "prior_visible_points": 56520,
+          "mutual_pairs": 25731
+        },
+        {
+          "view": 3,
+          "pca_depth_axis": 1,
+          "depth_sign": 1,
+          "partial_visible_points": 37926,
+          "prior_visible_points": 56520,
+          "mutual_pairs": 25731
+        },
+        {
+          "view": 4,
+          "pca_depth_axis": 2,
+          "depth_sign": -1,
+          "partial_visible_points": 42045,
+          "prior_visible_points": 52917,
+          "mutual_pairs": 28858
+        },
+        {
+          "view": 5,
+          "pca_depth_axis": 2,
+          "depth_sign": 1,
+          "partial_visible_points": 42045,
+          "prior_visible_points": 52917,
+          "mutual_pairs": 28858
+        }
+      ],
+      "evidence_policy": "positive_overlap_only; missing_partial_pixels_are_unconstrained"
+    },
+    "combined_pairs": 155637
+  },
+  "decoder": {
+    "pixel_pairs": 155637,
+    "within_metric_limit": 124416,
+    "collision_free_pairs": 33696,
+    "max_residual": 0.0712201738360973,
+    "residual_median": 6.938893903907228e-18,
+    "residual_p90": 0.013242611440107684,
+    "prior_points": 100000,
+    "decoded_points": 100000,
+    "all_prior_slots_preserved": true,
+    "partial_anchor_fraction": 0.33696,
+    "decoder": "collision_free_saved_view_hard_anchor_replacement"
+  },
+  "parameters": {
+    "max_pixel_distance": 1.0,
+    "max_anchor_residual_ratio": 0.075,
+    "virtual_positive_views": 6,
+    "virtual_render_size": 384,
+    "virtual_max_pixel_distance": 1.0,
+    "view_reference": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/gaussian/01184/camera_axis_scale/camera_axis_scaled_prior_100k.ply"
+  },
+  "outputs": {
+    "prediction": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/gaussian/01184/decoded/partial_anchored_gaussian_decoded_100k.ply",
+    "comparison": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/gaussian/01184/decoded/partial_anchored_gaussian_partial_gray_decoded_red.ply",
+    "saved_view": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/gaussian/01184/decoded/partial_anchored_gaussian_saved_view_projection.png",
+    "virtual_view_board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/gaussian/01184/decoded/partial_anchored_gaussian_virtual_view_board.png",
+    "anchor_pairs": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/gaussian/01184/decoded/partial_anchored_gaussian_anchor_pairs.npy",
+    "positive_pairs": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/gaussian/01184/decoded/partial_anchored_gaussian_positive_pixel_pairs.npy"
+  }
+}

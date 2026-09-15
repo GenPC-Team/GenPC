@@ -1,0 +1,7 @@
+{
+  "state_sha256": "43d0f87b8082bedf9c495ad541d5fd1050f0cc101c96dcf51b32fbc7c4f4b112",
+  "action": {"name": "ADAPT_LOCAL", "arguments": {}},
+  "rationale": "After successful global alignment, 96.4% of observed points lie within the fixed 2% trust region and the remaining residual is local. Apply the shared partial-anchored Gaussian adapter while preserving the complete carrier; no GT metric is used.",
+  "planner": "Codex GPT-5.6 Terra",
+  "ground_truth_used": false
+}

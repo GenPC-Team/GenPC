@@ -1,0 +1,30 @@
+{
+  "sample": "09639",
+  "selection": "qwen",
+  "selection_rule": "lexicographic(iou, depth_coverage, -semantic_leakage)",
+  "ground_truth_used": false,
+  "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/inputs/camera/09639/depth.png",
+  "candidates": {
+    "qwen": {
+      "path": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/inputs/camera/09639/img.png",
+      "sha256": "4ec4c805aaa8188ca93d87c09cbe00b6f894af6de3b403bfd0eab82e59bdd559",
+      "foreground_vs_depth": {
+        "iou": 0.8262744604769007,
+        "depth_coverage": 0.9747737052975219,
+        "semantic_leakage": 0.15567103064578322
+      }
+    },
+    "gpt_clarity": {
+      "path": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/inputs/pixal/09639/gpt_clarity_candidate.png",
+      "sha256": "37bbc67a9303b8646c3acfb36f3324d8e1ae3e0733f5dac25de05aa325282b77",
+      "foreground_vs_depth": {
+        "iou": 0.8212690867185249,
+        "depth_coverage": 0.9668666398151485,
+        "semantic_leakage": 0.15494784429251662
+      }
+    }
+  },
+  "installed_path": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/inputs/pixal/09639/gpt_image.png",
+  "installed_sha256": "4ec4c805aaa8188ca93d87c09cbe00b6f894af6de3b403bfd0eab82e59bdd559",
+  "prompt_path": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/inputs/pixal/09639/gpt_clarity_prompt.txt"
+}

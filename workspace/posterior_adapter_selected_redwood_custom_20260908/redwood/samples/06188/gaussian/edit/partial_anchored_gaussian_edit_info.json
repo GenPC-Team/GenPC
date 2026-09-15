@@ -1,0 +1,146 @@
+{
+  "method": "partial_anchored_graph_gaussian_mean_edit",
+  "strict_zero_shot": true,
+  "ground_truth_cd_emd_used": false,
+  "fusion": "dual Gaussian populations; partial anchors immutable and prior means compactly editable",
+  "inputs": {
+    "prior": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/gaussian/06188/camera_axis_scale/camera_axis_scaled_prior_100k.ply",
+    "partial": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/inputs/partial/06188.ply",
+    "camera": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/inputs/camera/06188/camera.pth",
+    "semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/inputs/camera/06188/img.png"
+  },
+  "pairing": {
+    "saved_camera": {
+      "partial_visible_pixels": 48608,
+      "prior_visible_pixels": 56276,
+      "nearby_pixel_pairs": 45938,
+      "mutual_pixel_pairs": 20073,
+      "max_pixel_distance": 1.0,
+      "pair_subsample_limit": 92332
+    },
+    "virtual_positive_overlap": {
+      "virtual_views": 6,
+      "virtual_resolution": 384,
+      "virtual_max_pixel_distance": 1.0,
+      "virtual_mutual_pairs": 132494,
+      "per_view": [
+        {
+          "view": 0,
+          "pca_depth_axis": 0,
+          "depth_sign": -1,
+          "partial_visible_points": 34669,
+          "prior_visible_points": 47272,
+          "mutual_pairs": 23603
+        },
+        {
+          "view": 1,
+          "pca_depth_axis": 0,
+          "depth_sign": 1,
+          "partial_visible_points": 34669,
+          "prior_visible_points": 47272,
+          "mutual_pairs": 23603
+        },
+        {
+          "view": 2,
+          "pca_depth_axis": 1,
+          "depth_sign": -1,
+          "partial_visible_points": 32426,
+          "prior_visible_points": 49332,
+          "mutual_pairs": 20647
+        },
+        {
+          "view": 3,
+          "pca_depth_axis": 1,
+          "depth_sign": 1,
+          "partial_visible_points": 32426,
+          "prior_visible_points": 49332,
+          "mutual_pairs": 20647
+        },
+        {
+          "view": 4,
+          "pca_depth_axis": 2,
+          "depth_sign": -1,
+          "partial_visible_points": 35261,
+          "prior_visible_points": 45541,
+          "mutual_pairs": 21997
+        },
+        {
+          "view": 5,
+          "pca_depth_axis": 2,
+          "depth_sign": 1,
+          "partial_visible_points": 35261,
+          "prior_visible_points": 45541,
+          "mutual_pairs": 21997
+        }
+      ],
+      "evidence_policy": "positive_overlap_only; missing_partial_pixels_are_unconstrained"
+    },
+    "combined_pairs": 152567
+  },
+  "edit": {
+    "pixel_pairs": 152567,
+    "within_metric_limit": 79218,
+    "collision_free_pairs": 33643,
+    "max_residual": 0.07700826085557942,
+    "residual_median": 0.018813489565463498,
+    "residual_p90": 0.05825918246130232,
+    "active": true,
+    "controls": 33643,
+    "max_displacement": 0.07700826085557942,
+    "neighbours": 8,
+    "edge_ratio": 1.8,
+    "screening": 0.0015,
+    "prior_protection_views": 6,
+    "prior_protection_weight": 0.01,
+    "protection_exclusion_radius": 0.10642908212302438,
+    "prior_protection_gaussians": 892,
+    "remote_gain": 1.0,
+    "remote_gain_radius": 0.0851432656984195,
+    "remote_displacement_cap": 0.07700826085557942,
+    "graph_edges": 399205,
+    "graph_components": 5,
+    "control_components": 3,
+    "graph_reachable_prior_gaussians": 99998,
+    "edited_prior_gaussians": 99998,
+    "untouched_prior_gaussians": 2,
+    "mean_displacement": 0.02798474945267431,
+    "p95_displacement": 0.062189183933152585,
+    "max_observed_displacement": 0.07700603861002239,
+    "mean_noncontrol_displacement": 0.03058269797491895,
+    "cg_status": [
+      0,
+      0,
+      0
+    ],
+    "field": "boundary_conditioned_surface_graph_with_multiview_prior_protection"
+  },
+  "parameters": {
+    "max_pixel_distance": 1.0,
+    "virtual_positive_views": 6,
+    "virtual_render_size": 384,
+    "virtual_max_pixel_distance": 1.0,
+    "max_anchor_residual_ratio": 0.075,
+    "support_radius_ratio": 0.08,
+    "max_displacement_ratio": 0.075,
+    "neighbours": 8,
+    "edit_method": "graph",
+    "graph_edge_ratio": 1.8,
+    "graph_screening": 0.0015,
+    "prior_protection_views": 6,
+    "prior_protection_weight": 0.01,
+    "protection_exclusion_ratio": 0.1,
+    "remote_gain": 1.0,
+    "remote_gain_radius_ratio": 0.08,
+    "remote_displacement_cap_multiplier": 1.0,
+    "graph_cg_tolerance": 1e-05,
+    "graph_cg_max_iterations": 240
+  },
+  "outputs": {
+    "editable_prior": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/gaussian/06188/edit/partial_anchored_gaussian_edit_editable_prior_100k.ply",
+    "comparison": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/gaussian/06188/edit/partial_anchored_gaussian_edit_partial_gray_prior_red.ply",
+    "saved_view": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/gaussian/06188/edit/partial_anchored_gaussian_edit_saved_view_projection.png",
+    "virtual_view_board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/gaussian/06188/edit/partial_anchored_gaussian_edit_virtual_view_board.png",
+    "positive_pairs": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/gaussian/06188/edit/partial_anchored_gaussian_edit_positive_pixel_pairs.npy",
+    "field": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/gaussian/06188/edit/partial_anchored_gaussian_edit_field.npz"
+  }
+}

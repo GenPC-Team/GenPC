@@ -1,0 +1,86 @@
+{
+  "output": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/gaussian/09639/camera_axis_scale/camera_axis_scaled_prior_100k.ply",
+  "estimate": {
+    "pixel_pairs": 18469,
+    "within_metric_limit": 17679,
+    "collision_free_pairs": 17679,
+    "max_residual": 0.08382398506363643,
+    "residual_median": 0.00901309546837943,
+    "residual_p90": 0.028085292488056586,
+    "active": false,
+    "reason": "no_supported_anisotropic_residual",
+    "controls": 17679,
+    "relative_scale": [
+      1.0071986743203487,
+      1.0055024239452042,
+      0.9874195751019629
+    ],
+    "anisotropy_log": 0.012660228458237143,
+    "isotropic_error": 0.0073710266950714875,
+    "anisotropic_error": 0.006950117300319311,
+    "axis_supported": [
+      true,
+      true,
+      true
+    ],
+    "source_axis_spread": [
+      0.11970129928833387,
+      0.23153444504650622,
+      0.13822999478295991
+    ],
+    "target_axis_spread": [
+      0.11972357718210876,
+      0.23118753051602267,
+      0.13554069208094108
+    ],
+    "residual_reduction": 0.05710322485110664,
+    "minimum_residual_reduction": 0.03,
+    "trace": [
+      {
+        "kept": 13259,
+        "raw_scale": [
+          0.996992373575635,
+          0.9949729129285672,
+          0.9677083888967491
+        ],
+        "clipped_scale": [
+          0.996992373575635,
+          0.9949729129285672,
+          0.9677083888967491
+        ],
+        "residual_median": 0.009107955790241155,
+        "residual_trim_limit": 0.016040155811061413
+      },
+      {
+        "kept": 13259,
+        "raw_scale": [
+          0.9995252772222337,
+          0.9978036090953986,
+          0.9747614821038996
+        ],
+        "clipped_scale": [
+          0.9995252772222337,
+          0.9978036090953986,
+          0.9747614821038996
+        ],
+        "residual_median": 0.008634325196530237,
+        "residual_trim_limit": 0.01570362401337482
+      },
+      {
+        "kept": 13259,
+        "raw_scale": [
+          0.9999879474382453,
+          0.9982973180375427,
+          0.9784051835954444
+        ],
+        "clipped_scale": [
+          0.9999879474382453,
+          0.9982973180375427,
+          0.9784051835954444
+        ],
+        "residual_median": 0.008500516079788915,
+        "residual_trim_limit": 0.01569449442621512
+      }
+    ]
+  }
+}

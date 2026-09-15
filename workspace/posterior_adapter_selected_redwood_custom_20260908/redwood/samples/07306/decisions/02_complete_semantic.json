@@ -1,0 +1,12 @@
+{
+  "state_sha256": "ef89b21ea34374fa931365ada7e117ae64c4d051ab15cc91cbc7880f029eff30",
+  "action": {
+    "name": "COMPLETE_SEMANTIC",
+    "arguments": {
+      "strategy": "qwen"
+    }
+  },
+  "rationale": "The selected antipodal observation resolves the open-rim interpretation better than the nearly axis-ambiguous base view. Generate a semantic completion in that exact camera frame without using ground truth or offline metrics.",
+  "planner": "Codex GPT-5.6 Terra",
+  "ground_truth_used": false
+}

@@ -1,0 +1,445 @@
+{
+  "schema_version": 1,
+  "sample_id": "07136",
+  "phase": "adaptation_diagnosis",
+  "budget_remaining": 9,
+  "history": [
+    {
+      "step": 1,
+      "previous_state_sha256": "08c30b9ed09aa4eb17de06275534871752ff2d477739e47091ac30da3ec6e298",
+      "decision": {
+        "state_sha256": "08c30b9ed09aa4eb17de06275534871752ff2d477739e47091ac30da3ec6e298",
+        "action": {
+          "name": "SELECT_VIEW",
+          "arguments": {
+            "candidate": "opposite_180"
+          }
+        },
+        "rationale": "This antipodal partial-only observation has the highest visible support and presents the seat and back as two broad connected surfaces, avoiding the support-block ambiguity of the previous oblique candidate. No prior, GT, CD, or EMD is used.",
+        "planner": "Codex GPT-5.6 Terra",
+        "ground_truth_used": false
+      },
+      "tool_outputs": {
+        "candidate": "opposite_180",
+        "camera": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/inputs/camera/07136/camera.pth",
+        "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/inputs/camera/07136/depth.png",
+        "tried_view_candidates": "opposite_180"
+      },
+      "ground_truth_cd_emd_used": false
+    },
+    {
+      "step": 2,
+      "previous_state_sha256": "d85b780e5de240ac3c9021c02f7e6ffd9df5cd54b51cc8879b2a63abdda182bc",
+      "decision": {
+        "state_sha256": "d85b780e5de240ac3c9021c02f7e6ffd9df5cd54b51cc8879b2a63abdda182bc",
+        "action": {
+          "name": "COMPLETE_SEMANTIC",
+          "arguments": {
+            "strategy": "qwen"
+          }
+        },
+        "rationale": "Generate a camera-conditioned semantic completion from the selected high-support antipodal observation; no ground truth or offline metric is consulted.",
+        "planner": "Codex GPT-5.6 Terra",
+        "ground_truth_used": false
+      },
+      "tool_outputs": {
+        "semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/inputs/camera/07136/img.png",
+        "source_mask": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/inputs/camera/07136/07136_moge_to_raw_partial_object_mask.png",
+        "pixal_input_semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/inputs/pixal/07136/gpt_image.png"
+      },
+      "ground_truth_cd_emd_used": false
+    },
+    {
+      "step": 3,
+      "previous_state_sha256": "651af912f19a7b637735fabfec5c120046ff675268bc583e9795bdac5cf201a0",
+      "decision": {
+        "state_sha256": "651af912f19a7b637735fabfec5c120046ff675268bc583e9795bdac5cf201a0",
+        "action": {
+          "name": "GENERATE_PRIOR",
+          "arguments": {}
+        },
+        "rationale": "The completion is structurally plausible, preserves 98.7% of observed depth support, and exposes the missing long-axis information. Generate a native prior and defer acceptance to geometric verification; no GT metric is used.",
+        "planner": "Codex GPT-5.6 Terra",
+        "ground_truth_used": false
+      },
+      "tool_outputs": {
+        "prior": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/inputs/pixal/07136/pixal3d_sampled_100k.ply",
+        "metadata": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/inputs/pixal/07136/pixal3d_metadata.json",
+        "pixal_input": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/inputs/pixal/07136/pixal3d_input.png",
+        "shared_execution_cache": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/_shared_pixal_execution/replanned_views/output/07136"
+      },
+      "ground_truth_cd_emd_used": false
+    },
+    {
+      "step": 4,
+      "previous_state_sha256": "390cbd03ea258014f70b8137a473fc21e059d92ca942f8f622222e80edffd424",
+      "decision": {
+        "state_sha256": "390cbd03ea258014f70b8137a473fc21e059d92ca942f8f622222e80edffd424",
+        "action": {
+          "name": "ALIGN_GLOBAL",
+          "arguments": {}
+        },
+        "rationale": "The native prior is available; estimate its proper Sim(3) through the fixed cross-camera visible-evidence solver before any local adaptation. No GT metric is used.",
+        "planner": "Codex GPT-5.6 Terra",
+        "ground_truth_used": false
+      },
+      "tool_outputs": {
+        "global_registered_prior": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/registration/07136/joint/two_camera_joint_registered_100k.ply"
+      },
+      "ground_truth_cd_emd_used": false
+    },
+    {
+      "step": 5,
+      "previous_state_sha256": "5e490553bb8a71f87ebc1cd9b193623cdb1a3434f66a25a29bff710b0042d894",
+      "decision": {
+        "state_sha256": "5e490553bb8a71f87ebc1cd9b193623cdb1a3434f66a25a29bff710b0042d894",
+        "action": {
+          "name": "REFINE_ALIGNMENT",
+          "arguments": {}
+        },
+        "rationale": "Positive visible correspondences exist and the remaining discrepancy is global, so run the fixed broad-to-narrow Camera-1 Sim(3) continuation before any local adaptation. No GT metric is used.",
+        "planner": "Codex GPT-5.6 Terra",
+        "ground_truth_used": false
+      },
+      "tool_outputs": {
+        "refined_registered_prior": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/registration/07136/final/camera1_amplified_registered_100k.ply"
+      },
+      "ground_truth_cd_emd_used": false
+    }
+  ],
+  "artifacts": {
+    "partial": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/inputs/partial/07136.ply",
+    "candidate_manifest": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/view_candidates/candidate_manifest.json",
+    "diagnostic_board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/diagnostics/step_05_adaptation_diagnosis/diagnostic_board.png",
+    "verifier": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/diagnostics/step_05_adaptation_diagnosis/verifier.json",
+    "candidate": "opposite_180",
+    "camera": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/inputs/camera/07136/camera.pth",
+    "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/inputs/camera/07136/depth.png",
+    "tried_view_candidates": "opposite_180",
+    "semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/inputs/camera/07136/img.png",
+    "source_mask": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/inputs/camera/07136/07136_moge_to_raw_partial_object_mask.png",
+    "pixal_input_semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/inputs/pixal/07136/gpt_image.png",
+    "prior": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/inputs/pixal/07136/pixal3d_sampled_100k.ply",
+    "metadata": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/inputs/pixal/07136/pixal3d_metadata.json",
+    "pixal_input": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/inputs/pixal/07136/pixal3d_input.png",
+    "shared_execution_cache": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/_shared_pixal_execution/replanned_views/output/07136",
+    "global_registered_prior": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/registration/07136/joint/two_camera_joint_registered_100k.ply",
+    "refined_registered_prior": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/registration/07136/final/camera1_amplified_registered_100k.ply"
+  },
+  "diagnostics": {
+    "strict_zero_shot": true,
+    "ground_truth_cd_emd_used": false,
+    "state_phase": "adaptation_diagnosis",
+    "current_prior": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/registration/07136/final/camera1_amplified_registered_100k.ply",
+    "semantic_vs_depth": {
+      "iou": 0.6999780026396832,
+      "depth_coverage": 0.9872793273556514,
+      "semantic_leakage": 0.2936514983351831
+    },
+    "pixal_clarity_check": null,
+    "registered_prior_vs_partial": {
+      "objective": 0.10447459430664137,
+      "visible_3d": 0.009759226179841806,
+      "visible_pair_count": 37025,
+      "silhouette_iou": 0.7339257212282917,
+      "coverage": 0.9931656995486783,
+      "leakage": 0.26234885669819225,
+      "depth_error_normalized": 0.0006908165308598255
+    },
+    "extent": {
+      "partial_extent": [
+        0.3780363910515826,
+        0.5936651348699389,
+        0.533376927296277
+      ],
+      "prior_extent": [
+        0.3271340229300137,
+        0.6113430516983224,
+        0.635795510711385
+      ],
+      "axis_ratio": [
+        0.8653506135216931,
+        1.029777589738795,
+        1.1920191485114937
+      ],
+      "log_scale_residual": 0.11653733331954112
+    },
+    "observed_surface_support": {
+      "partial_to_prior_mean_ratio": 0.005553639879904035,
+      "partial_to_prior_p90_ratio": 0.011772309924295914,
+      "partial_to_prior_p95_ratio": 0.01433086613884217,
+      "coverage_within_1pct": 0.8524423513791065,
+      "coverage_within_2pct": 0.9934753067850586,
+      "local_action_recommendation": "ADAPT_LOCAL",
+      "recommendation_reason": "The residual is local and remains inside the fixed 2% local-edit trust region.",
+      "ground_truth_cd_emd_used": false
+    },
+    "candidate_visible_axis_scale": {
+      "pixel_pairs": 23209,
+      "within_metric_limit": 19498,
+      "collision_free_pairs": 19498,
+      "max_residual": 0.06623144441569649,
+      "residual_median": 0.0072269026154915435,
+      "residual_p90": 0.023481209574079936,
+      "active": true,
+      "controls": 19498,
+      "trimmed_controls": 14623,
+      "principal_axes": [
+        [
+          0.829128623008728,
+          -5.253213419820213e-10,
+          -0.5590579509735107
+        ],
+        [
+          0.010961920954287052,
+          0.9998077750205994,
+          0.016257423907518387
+        ],
+        [
+          0.5589504241943359,
+          -0.019607843831181526,
+          0.8289691805839539
+        ]
+      ],
+      "visible_scale": [
+        1.0016384031882772,
+        1.0042638417872314,
+        1.0687974176751
+      ],
+      "relative_scale": [
+        0.9777464266264563,
+        0.9803092409118148,
+        1.0433035041319028
+      ],
+      "applied_scale": [
+        0.9777464266264563,
+        0.9803092409118148,
+        1.0433035041319028
+      ],
+      "retain_isotropic_component": false,
+      "isotropic_scale_removed": 1.0244357595294478,
+      "anisotropy_log": 0.04239212518633096,
+      "isotropic_error": 0.007059226165901817,
+      "anisotropic_error": 0.00514821405029719,
+      "axis_supported": [
+        true,
+        true,
+        true
+      ],
+      "source_axis_spread": [
+        0.10925002175372543,
+        0.12661117356564242,
+        0.09206616507859228
+      ],
+      "target_axis_spread": [
+        0.10942901733768609,
+        0.127151023578222,
+        0.0984000794912489
+      ],
+      "minimum_axis_spread_ratio": 0.08,
+      "axis_frame": "saved_camera",
+      "residual_reduction": 0.2707112749603334,
+      "max_log_stretch": 0.16,
+      "minimum_anisotropy": 0.025,
+      "minimum_residual_reduction": 0.03,
+      "singular_values": [
+        18.57222211570619,
+        12.174489326438158,
+        6.304577679103591
+      ],
+      "trace": [
+        {
+          "kept": 14623,
+          "raw_scale": [
+            1.0002916767593153,
+            1.0055621655018883,
+            1.0749992674732616
+          ],
+          "clipped_scale": [
+            1.0002916767593153,
+            1.0055621655018883,
+            1.0749992674732616
+          ],
+          "residual_median": 0.0069431462820080695,
+          "residual_trim_limit": 0.01226921134052977
+        },
+        {
+          "kept": 14623,
+          "raw_scale": [
+            1.0008082949821084,
+            1.0036998288859336,
+            1.0690981348612638
+          ],
+          "clipped_scale": [
+            1.0008082949821084,
+            1.0036998288859336,
+            1.0690981348612638
+          ],
+          "residual_median": 0.006424206200434837,
+          "residual_trim_limit": 0.012177365042214658
+        },
+        {
+          "kept": 14623,
+          "raw_scale": [
+            1.001356074875984,
+            1.0040495860447152,
+            1.0681136372254472
+          ],
+          "clipped_scale": [
+            1.001356074875984,
+            1.0040495860447152,
+            1.0681136372254472
+          ],
+          "residual_median": 0.006320910526777842,
+          "residual_trim_limit": 0.012229856590530257
+        }
+      ],
+      "field": "camera1_supported_relative_axis_scale_carrier"
+    },
+    "applied_visible_axis_scale": null,
+    "prior_protection": null,
+    "edited_vs_registered": null,
+    "agent_recommendation": {
+      "source": "fixed_no_gt_diagnostic_policy",
+      "must_be_verified_by": "state-bound MLLM or human planner",
+      "ground_truth_cd_emd_used": false,
+      "action": "ADAPT_AXIS_SCALE",
+      "arguments": {},
+      "hypothesis": "The observed Camera-1 surface supports a relative-axis extent correction; apply its coherent whole-carrier initialization before the fixed local Gaussian edit.",
+      "camera_axis_evidence": {
+        "pixel_pairs": 23209,
+        "within_metric_limit": 19498,
+        "collision_free_pairs": 19498,
+        "max_residual": 0.06623144441569649,
+        "residual_median": 0.0072269026154915435,
+        "residual_p90": 0.023481209574079936,
+        "active": true,
+        "controls": 19498,
+        "trimmed_controls": 14623,
+        "principal_axes": [
+          [
+            0.829128623008728,
+            -5.253213419820213e-10,
+            -0.5590579509735107
+          ],
+          [
+            0.010961920954287052,
+            0.9998077750205994,
+            0.016257423907518387
+          ],
+          [
+            0.5589504241943359,
+            -0.019607843831181526,
+            0.8289691805839539
+          ]
+        ],
+        "visible_scale": [
+          1.0016384031882772,
+          1.0042638417872314,
+          1.0687974176751
+        ],
+        "relative_scale": [
+          0.9777464266264563,
+          0.9803092409118148,
+          1.0433035041319028
+        ],
+        "applied_scale": [
+          0.9777464266264563,
+          0.9803092409118148,
+          1.0433035041319028
+        ],
+        "retain_isotropic_component": false,
+        "isotropic_scale_removed": 1.0244357595294478,
+        "anisotropy_log": 0.04239212518633096,
+        "isotropic_error": 0.007059226165901817,
+        "anisotropic_error": 0.00514821405029719,
+        "axis_supported": [
+          true,
+          true,
+          true
+        ],
+        "source_axis_spread": [
+          0.10925002175372543,
+          0.12661117356564242,
+          0.09206616507859228
+        ],
+        "target_axis_spread": [
+          0.10942901733768609,
+          0.127151023578222,
+          0.0984000794912489
+        ],
+        "minimum_axis_spread_ratio": 0.08,
+        "axis_frame": "saved_camera",
+        "residual_reduction": 0.2707112749603334,
+        "max_log_stretch": 0.16,
+        "minimum_anisotropy": 0.025,
+        "minimum_residual_reduction": 0.03,
+        "singular_values": [
+          18.57222211570619,
+          12.174489326438158,
+          6.304577679103591
+        ],
+        "trace": [
+          {
+            "kept": 14623,
+            "raw_scale": [
+              1.0002916767593153,
+              1.0055621655018883,
+              1.0749992674732616
+            ],
+            "clipped_scale": [
+              1.0002916767593153,
+              1.0055621655018883,
+              1.0749992674732616
+            ],
+            "residual_median": 0.0069431462820080695,
+            "residual_trim_limit": 0.01226921134052977
+          },
+          {
+            "kept": 14623,
+            "raw_scale": [
+              1.0008082949821084,
+              1.0036998288859336,
+              1.0690981348612638
+            ],
+            "clipped_scale": [
+              1.0008082949821084,
+              1.0036998288859336,
+              1.0690981348612638
+            ],
+            "residual_median": 0.006424206200434837,
+            "residual_trim_limit": 0.012177365042214658
+          },
+          {
+            "kept": 14623,
+            "raw_scale": [
+              1.001356074875984,
+              1.0040495860447152,
+              1.0681136372254472
+            ],
+            "clipped_scale": [
+              1.001356074875984,
+              1.0040495860447152,
+              1.0681136372254472
+            ],
+            "residual_median": 0.006320910526777842,
+            "residual_trim_limit": 0.012229856590530257
+          }
+        ],
+        "field": "camera1_supported_relative_axis_scale_carrier"
+      }
+    },
+    "verifier_energy": 0.10318254461675944,
+    "diagnostic_board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/diagnostics/step_05_adaptation_diagnosis/diagnostic_board.png"
+  },
+  "strict_zero_shot": true,
+  "ground_truth_cd_emd_used": false,
+  "state_sha256": "31ce41a08decf78b69fe724589f735eb24b28d50f92e37e25f4826aa50e87b44",
+  "allowed_actions": [
+    "REPLAN_VIEW",
+    "RESTORE_ATTEMPT",
+    "ADAPT_AXIS_SCALE",
+    "ADAPT_LOCAL",
+    "ACCEPT"
+  ]
+}

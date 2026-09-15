@@ -1,0 +1,7 @@
+{
+  "state_sha256": "73b8aff18e75fb56b7e44452977fa3ff83b8e913479ad46fb17a1b95ca9063a8",
+  "action": {"name": "REFINE_ALIGNMENT", "arguments": {}},
+  "rationale": "The antipodal prior yields substantially lower no-GT global energy than the oblique candidate and has dense positive visible support. Apply the same fixed broad-to-narrow Camera-1 continuation before any posterior adaptation.",
+  "planner": "Codex GPT-5.6 Terra",
+  "ground_truth_used": false
+}

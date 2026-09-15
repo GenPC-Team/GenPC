@@ -1,0 +1,108 @@
+{
+  "pairing": {
+    "saved_camera": {
+      "partial_visible_pixels": 29207,
+      "prior_visible_pixels": 32689,
+      "nearby_pixel_pairs": 29152,
+      "mutual_pixel_pairs": 16560,
+      "max_pixel_distance": 1.0,
+      "pair_subsample_limit": 52400
+    },
+    "virtual_positive_overlap": {
+      "virtual_views": 6,
+      "virtual_resolution": 384,
+      "virtual_max_pixel_distance": 1.0,
+      "virtual_mutual_pairs": 108498,
+      "per_view": [
+        {
+          "view": 0,
+          "pca_depth_axis": 0,
+          "depth_sign": -1,
+          "partial_visible_points": 26150,
+          "prior_visible_points": 46862,
+          "mutual_pairs": 20201
+        },
+        {
+          "view": 1,
+          "pca_depth_axis": 0,
+          "depth_sign": 1,
+          "partial_visible_points": 26150,
+          "prior_visible_points": 46862,
+          "mutual_pairs": 20201
+        },
+        {
+          "view": 2,
+          "pca_depth_axis": 1,
+          "depth_sign": -1,
+          "partial_visible_points": 9307,
+          "prior_visible_points": 18824,
+          "mutual_pairs": 8406
+        },
+        {
+          "view": 3,
+          "pca_depth_axis": 1,
+          "depth_sign": 1,
+          "partial_visible_points": 9307,
+          "prior_visible_points": 18824,
+          "mutual_pairs": 8406
+        },
+        {
+          "view": 4,
+          "pca_depth_axis": 2,
+          "depth_sign": -1,
+          "partial_visible_points": 38304,
+          "prior_visible_points": 59940,
+          "mutual_pairs": 25642
+        },
+        {
+          "view": 5,
+          "pca_depth_axis": 2,
+          "depth_sign": 1,
+          "partial_visible_points": 38304,
+          "prior_visible_points": 59940,
+          "mutual_pairs": 25642
+        }
+      ],
+      "evidence_policy": "positive_overlap_only; missing_partial_pixels_are_unconstrained"
+    },
+    "combined_pairs": 125058
+  },
+  "edit": {
+    "pixel_pairs": 125058,
+    "within_metric_limit": 97184,
+    "collision_free_pairs": 37905,
+    "max_residual": 0.08044999172784154,
+    "residual_median": 0.019257050588239545,
+    "residual_p90": 0.05150380198071426,
+    "active": true,
+    "controls": 37905,
+    "max_displacement": 0.08044999172784154,
+    "neighbours": 8,
+    "edge_ratio": 1.8,
+    "screening": 0.0015,
+    "prior_protection_views": 6,
+    "prior_protection_weight": 0.01,
+    "protection_exclusion_radius": 0.12006665612299257,
+    "prior_protection_gaussians": 2028,
+    "remote_gain": 1.0,
+    "remote_gain_radius": 0.09605332489839405,
+    "remote_displacement_cap": 0.08044999172784154,
+    "graph_edges": 399787,
+    "graph_components": 2,
+    "control_components": 2,
+    "graph_reachable_prior_gaussians": 100000,
+    "edited_prior_gaussians": 99885,
+    "untouched_prior_gaussians": 115,
+    "mean_displacement": 0.02162682385768468,
+    "p95_displacement": 0.04885204499839683,
+    "max_observed_displacement": 0.08042415784775622,
+    "mean_noncontrol_displacement": 0.02286224708959413,
+    "cg_status": [
+      0,
+      0,
+      0
+    ],
+    "field": "boundary_conditioned_surface_graph_with_multiview_prior_protection"
+  },
+  "output_dir": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/gaussian/05452/edit"
+}

@@ -1,0 +1,129 @@
+{
+  "strict_zero_shot": true,
+  "ground_truth_cd_emd_used": false,
+  "state_phase": "view_candidates",
+  "view_candidates": {
+    "base": {
+      "candidate": "base",
+      "viewpoint": [
+        -0.8943207263946533,
+        -0.0313725508749485,
+        -1.3263506889343262
+      ],
+      "raw_depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/view_candidates/base/camera/07136/raw_depth.png",
+      "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/view_candidates/base/camera/07136/depth.png",
+      "camera": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/view_candidates/base/camera/07136/camera.pth",
+      "point_uv": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/view_candidates/base/camera/07136/point_uv.npy",
+      "nonzero_depth_pixels": 52093,
+      "source": "provided partial camera",
+      "ground_truth_used": false
+    },
+    "opposite_180": {
+      "candidate": "opposite_180",
+      "viewpoint": [
+        0.8943207263946533,
+        -0.0313725508749485,
+        1.3263506889343262
+      ],
+      "raw_depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/view_candidates/opposite_180/camera/07136/raw_depth.png",
+      "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/view_candidates/opposite_180/camera/07136/depth.png",
+      "camera": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/view_candidates/opposite_180/camera/07136/camera.pth",
+      "point_uv": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/view_candidates/opposite_180/camera/07136/point_uv.npy",
+      "nonzero_depth_pixels": 64734,
+      "source": "partial-only fixed yaw around base",
+      "ground_truth_used": false
+    },
+    "yaw_plus_30": {
+      "candidate": "yaw_plus_30",
+      "viewpoint": [
+        -1.4376797676086426,
+        -0.0313725508749485,
+        -0.7014930248260498
+      ],
+      "raw_depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/view_candidates/yaw_plus_30/camera/07136/raw_depth.png",
+      "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/view_candidates/yaw_plus_30/camera/07136/depth.png",
+      "camera": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/view_candidates/yaw_plus_30/camera/07136/camera.pth",
+      "point_uv": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/view_candidates/yaw_plus_30/camera/07136/point_uv.npy",
+      "nonzero_depth_pixels": 41362,
+      "source": "partial-only fixed yaw around base",
+      "ground_truth_used": false
+    },
+    "yaw_minus_30": {
+      "candidate": "yaw_minus_30",
+      "viewpoint": [
+        -0.11132913827896118,
+        -0.0313725508749485,
+        -1.5958137512207031
+      ],
+      "raw_depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/view_candidates/yaw_minus_30/camera/07136/raw_depth.png",
+      "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/view_candidates/yaw_minus_30/camera/07136/depth.png",
+      "camera": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/view_candidates/yaw_minus_30/camera/07136/camera.pth",
+      "point_uv": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/view_candidates/yaw_minus_30/camera/07136/point_uv.npy",
+      "nonzero_depth_pixels": 53109,
+      "source": "partial-only fixed yaw around base",
+      "ground_truth_used": false
+    },
+    "yaw_plus_60": {
+      "candidate": "yaw_plus_60",
+      "viewpoint": [
+        -1.5958137512207031,
+        -0.0313725508749485,
+        0.11132913827896118
+      ],
+      "raw_depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/view_candidates/yaw_plus_60/camera/07136/raw_depth.png",
+      "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/view_candidates/yaw_plus_60/camera/07136/depth.png",
+      "camera": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/view_candidates/yaw_plus_60/camera/07136/camera.pth",
+      "point_uv": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/view_candidates/yaw_plus_60/camera/07136/point_uv.npy",
+      "nonzero_depth_pixels": 26472,
+      "source": "partial-only fixed yaw around base",
+      "ground_truth_used": false
+    },
+    "yaw_minus_60": {
+      "candidate": "yaw_minus_60",
+      "viewpoint": [
+        0.7014930248260498,
+        -0.0313725508749485,
+        -1.4376797676086426
+      ],
+      "raw_depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/view_candidates/yaw_minus_60/camera/07136/raw_depth.png",
+      "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/view_candidates/yaw_minus_60/camera/07136/depth.png",
+      "camera": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/view_candidates/yaw_minus_60/camera/07136/camera.pth",
+      "point_uv": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/view_candidates/yaw_minus_60/camera/07136/point_uv.npy",
+      "nonzero_depth_pixels": 40377,
+      "source": "partial-only fixed yaw around base",
+      "ground_truth_used": false
+    },
+    "yaw_plus_90": {
+      "candidate": "yaw_plus_90",
+      "viewpoint": [
+        -1.3263506889343262,
+        -0.0313725508749485,
+        0.8943207263946533
+      ],
+      "raw_depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/view_candidates/yaw_plus_90/camera/07136/raw_depth.png",
+      "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/view_candidates/yaw_plus_90/camera/07136/depth.png",
+      "camera": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/view_candidates/yaw_plus_90/camera/07136/camera.pth",
+      "point_uv": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/view_candidates/yaw_plus_90/camera/07136/point_uv.npy",
+      "nonzero_depth_pixels": 33696,
+      "source": "partial-only fixed yaw around base",
+      "ground_truth_used": false
+    },
+    "yaw_minus_90": {
+      "candidate": "yaw_minus_90",
+      "viewpoint": [
+        1.3263506889343262,
+        -0.0313725508749485,
+        -0.8943207263946533
+      ],
+      "raw_depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/view_candidates/yaw_minus_90/camera/07136/raw_depth.png",
+      "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/view_candidates/yaw_minus_90/camera/07136/depth.png",
+      "camera": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/view_candidates/yaw_minus_90/camera/07136/camera.pth",
+      "point_uv": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/view_candidates/yaw_minus_90/camera/07136/point_uv.npy",
+      "nonzero_depth_pixels": 33069,
+      "source": "partial-only fixed yaw around base",
+      "ground_truth_used": false
+    }
+  },
+  "diagnostic_board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/diagnostics/view_candidates.png",
+  "verifier_energy": null
+}

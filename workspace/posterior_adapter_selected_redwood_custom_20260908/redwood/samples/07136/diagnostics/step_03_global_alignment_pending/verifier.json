@@ -1,0 +1,29 @@
+{
+  "strict_zero_shot": true,
+  "ground_truth_cd_emd_used": false,
+  "state_phase": "global_alignment_pending",
+  "current_prior": null,
+  "semantic_vs_depth": {
+    "iou": 0.6999780026396832,
+    "depth_coverage": 0.9872793273556514,
+    "semantic_leakage": 0.2936514983351831
+  },
+  "pixal_clarity_check": null,
+  "registered_prior_vs_partial": null,
+  "extent": null,
+  "observed_surface_support": null,
+  "candidate_visible_axis_scale": null,
+  "applied_visible_axis_scale": null,
+  "prior_protection": null,
+  "edited_vs_registered": null,
+  "agent_recommendation": {
+    "source": "fixed_no_gt_diagnostic_policy",
+    "must_be_verified_by": "state-bound MLLM or human planner",
+    "ground_truth_cd_emd_used": false,
+    "action": "ALIGN_GLOBAL",
+    "arguments": {},
+    "hypothesis": "Estimate the native and cross-camera initialization before judging residual error."
+  },
+  "verifier_energy": null,
+  "diagnostic_board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/diagnostics/step_03_global_alignment_pending/diagnostic_board.png"
+}

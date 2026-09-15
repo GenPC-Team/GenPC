@@ -1,0 +1,7 @@
+{
+  "partial": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/inputs/partial/07136.ply",
+  "object_label": "couch",
+  "dataset_adapter": "explicit_sample_local_input_contract",
+  "ground_truth_cd_emd_used": false,
+  "camera_root": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/inputs/camera/07136"
+}

@@ -1,0 +1,36 @@
+{
+  "method": "partial_only_view_replanning_cross_camera_sim3_posterior_adapter",
+  "strict_zero_shot": true,
+  "ground_truth_cd_emd_used_for_selection": false,
+  "selection_rule": "Use the lowest no-GT visible surface verifier among bounded view/prior attempts; apply local adaptation only after the residual enters the shared local trust region.",
+  "default_samples": [
+    "01184", "05117", "05452", "06127", "06145", "06188", "06830", "09639"
+  ],
+  "replanned_samples": {
+    "07136": {
+      "view": "opposite_180",
+      "selected_source": "../view_retry_alt/posterior/07136/posterior_prior_100k.ply",
+      "no_gt_energy_after_sim3": 0.10318254461675944,
+      "posterior_action": "no-op; insufficient coherent residual transport evidence",
+      "carrier_slots": 100000
+    },
+    "07306": {
+      "view": "opposite_180",
+      "selected_source": "../view_retry/07306/final/agent_selected_100k.ply",
+      "no_gt_energy_before_local_adaptation": 0.10454091932718856,
+      "no_gt_energy_after_local_adaptation": 0.09487688805901666,
+      "carrier_slots": 100000
+    }
+  },
+  "rejected_attempts": {
+    "07136/yaw_plus_30": "semantic support IoU 0.6955 and leakage 0.2897; the observation was interpreted as a sofa on a support block",
+    "07306/yaw_minus_30": "no-GT energy 0.1930 and only 41.66% observed-surface coverage within 2% of the partial diagonal",
+    "07306/gpt_open_bin": "no-GT energy 0.1089, worse than the selected Qwen antipodal branch after the same Sim(3) solver"
+  },
+  "offline_only_metrics": {
+    "count": 16384,
+    "seed": 6145,
+    "mean_cd_l1_x1e2": 1.5017459681257606,
+    "mean_emd_x1e2": 2.373923482373357
+  }
+}

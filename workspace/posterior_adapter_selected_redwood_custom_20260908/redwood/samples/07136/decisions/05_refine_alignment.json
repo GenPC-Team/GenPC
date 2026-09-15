@@ -1,0 +1,7 @@
+{
+  "state_sha256": "5e490553bb8a71f87ebc1cd9b193623cdb1a3434f66a25a29bff710b0042d894",
+  "action": {"name": "REFINE_ALIGNMENT", "arguments": {}},
+  "rationale": "Positive visible correspondences exist and the remaining discrepancy is global, so run the fixed broad-to-narrow Camera-1 Sim(3) continuation before any local adaptation. No GT metric is used.",
+  "planner": "Codex GPT-5.6 Terra",
+  "ground_truth_used": false
+}

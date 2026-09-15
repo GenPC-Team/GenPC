@@ -1,0 +1,306 @@
+{
+  "strict_zero_shot": true,
+  "ground_truth_cd_emd_used": false,
+  "state_phase": "adaptation_diagnosis",
+  "current_prior": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/registration/07136/final/camera1_amplified_registered_100k.ply",
+  "semantic_vs_depth": {
+    "iou": 0.6999780026396832,
+    "depth_coverage": 0.9872793273556514,
+    "semantic_leakage": 0.2936514983351831
+  },
+  "pixal_clarity_check": null,
+  "registered_prior_vs_partial": {
+    "objective": 0.10447459430664137,
+    "visible_3d": 0.009759226179841806,
+    "visible_pair_count": 37025,
+    "silhouette_iou": 0.7339257212282917,
+    "coverage": 0.9931656995486783,
+    "leakage": 0.26234885669819225,
+    "depth_error_normalized": 0.0006908165308598255
+  },
+  "extent": {
+    "partial_extent": [
+      0.3780363910515826,
+      0.5936651348699389,
+      0.533376927296277
+    ],
+    "prior_extent": [
+      0.3271340229300137,
+      0.6113430516983224,
+      0.635795510711385
+    ],
+    "axis_ratio": [
+      0.8653506135216931,
+      1.029777589738795,
+      1.1920191485114937
+    ],
+    "log_scale_residual": 0.11653733331954112
+  },
+  "observed_surface_support": {
+    "partial_to_prior_mean_ratio": 0.005553639879904035,
+    "partial_to_prior_p90_ratio": 0.011772309924295914,
+    "partial_to_prior_p95_ratio": 0.01433086613884217,
+    "coverage_within_1pct": 0.8524423513791065,
+    "coverage_within_2pct": 0.9934753067850586,
+    "local_action_recommendation": "ADAPT_LOCAL",
+    "recommendation_reason": "The residual is local and remains inside the fixed 2% local-edit trust region.",
+    "ground_truth_cd_emd_used": false
+  },
+  "candidate_visible_axis_scale": {
+    "pixel_pairs": 23209,
+    "within_metric_limit": 19498,
+    "collision_free_pairs": 19498,
+    "max_residual": 0.06623144441569649,
+    "residual_median": 0.0072269026154915435,
+    "residual_p90": 0.023481209574079936,
+    "active": true,
+    "controls": 19498,
+    "trimmed_controls": 14623,
+    "principal_axes": [
+      [
+        0.829128623008728,
+        -5.253213419820213e-10,
+        -0.5590579509735107
+      ],
+      [
+        0.010961920954287052,
+        0.9998077750205994,
+        0.016257423907518387
+      ],
+      [
+        0.5589504241943359,
+        -0.019607843831181526,
+        0.8289691805839539
+      ]
+    ],
+    "visible_scale": [
+      1.0016384031882772,
+      1.0042638417872314,
+      1.0687974176751
+    ],
+    "relative_scale": [
+      0.9777464266264563,
+      0.9803092409118148,
+      1.0433035041319028
+    ],
+    "applied_scale": [
+      0.9777464266264563,
+      0.9803092409118148,
+      1.0433035041319028
+    ],
+    "retain_isotropic_component": false,
+    "isotropic_scale_removed": 1.0244357595294478,
+    "anisotropy_log": 0.04239212518633096,
+    "isotropic_error": 0.007059226165901817,
+    "anisotropic_error": 0.00514821405029719,
+    "axis_supported": [
+      true,
+      true,
+      true
+    ],
+    "source_axis_spread": [
+      0.10925002175372543,
+      0.12661117356564242,
+      0.09206616507859228
+    ],
+    "target_axis_spread": [
+      0.10942901733768609,
+      0.127151023578222,
+      0.0984000794912489
+    ],
+    "minimum_axis_spread_ratio": 0.08,
+    "axis_frame": "saved_camera",
+    "residual_reduction": 0.2707112749603334,
+    "max_log_stretch": 0.16,
+    "minimum_anisotropy": 0.025,
+    "minimum_residual_reduction": 0.03,
+    "singular_values": [
+      18.57222211570619,
+      12.174489326438158,
+      6.304577679103591
+    ],
+    "trace": [
+      {
+        "kept": 14623,
+        "raw_scale": [
+          1.0002916767593153,
+          1.0055621655018883,
+          1.0749992674732616
+        ],
+        "clipped_scale": [
+          1.0002916767593153,
+          1.0055621655018883,
+          1.0749992674732616
+        ],
+        "residual_median": 0.0069431462820080695,
+        "residual_trim_limit": 0.01226921134052977
+      },
+      {
+        "kept": 14623,
+        "raw_scale": [
+          1.0008082949821084,
+          1.0036998288859336,
+          1.0690981348612638
+        ],
+        "clipped_scale": [
+          1.0008082949821084,
+          1.0036998288859336,
+          1.0690981348612638
+        ],
+        "residual_median": 0.006424206200434837,
+        "residual_trim_limit": 0.012177365042214658
+      },
+      {
+        "kept": 14623,
+        "raw_scale": [
+          1.001356074875984,
+          1.0040495860447152,
+          1.0681136372254472
+        ],
+        "clipped_scale": [
+          1.001356074875984,
+          1.0040495860447152,
+          1.0681136372254472
+        ],
+        "residual_median": 0.006320910526777842,
+        "residual_trim_limit": 0.012229856590530257
+      }
+    ],
+    "field": "camera1_supported_relative_axis_scale_carrier"
+  },
+  "applied_visible_axis_scale": null,
+  "prior_protection": null,
+  "edited_vs_registered": null,
+  "agent_recommendation": {
+    "source": "fixed_no_gt_diagnostic_policy",
+    "must_be_verified_by": "state-bound MLLM or human planner",
+    "ground_truth_cd_emd_used": false,
+    "action": "ADAPT_AXIS_SCALE",
+    "arguments": {},
+    "hypothesis": "The observed Camera-1 surface supports a relative-axis extent correction; apply its coherent whole-carrier initialization before the fixed local Gaussian edit.",
+    "camera_axis_evidence": {
+      "pixel_pairs": 23209,
+      "within_metric_limit": 19498,
+      "collision_free_pairs": 19498,
+      "max_residual": 0.06623144441569649,
+      "residual_median": 0.0072269026154915435,
+      "residual_p90": 0.023481209574079936,
+      "active": true,
+      "controls": 19498,
+      "trimmed_controls": 14623,
+      "principal_axes": [
+        [
+          0.829128623008728,
+          -5.253213419820213e-10,
+          -0.5590579509735107
+        ],
+        [
+          0.010961920954287052,
+          0.9998077750205994,
+          0.016257423907518387
+        ],
+        [
+          0.5589504241943359,
+          -0.019607843831181526,
+          0.8289691805839539
+        ]
+      ],
+      "visible_scale": [
+        1.0016384031882772,
+        1.0042638417872314,
+        1.0687974176751
+      ],
+      "relative_scale": [
+        0.9777464266264563,
+        0.9803092409118148,
+        1.0433035041319028
+      ],
+      "applied_scale": [
+        0.9777464266264563,
+        0.9803092409118148,
+        1.0433035041319028
+      ],
+      "retain_isotropic_component": false,
+      "isotropic_scale_removed": 1.0244357595294478,
+      "anisotropy_log": 0.04239212518633096,
+      "isotropic_error": 0.007059226165901817,
+      "anisotropic_error": 0.00514821405029719,
+      "axis_supported": [
+        true,
+        true,
+        true
+      ],
+      "source_axis_spread": [
+        0.10925002175372543,
+        0.12661117356564242,
+        0.09206616507859228
+      ],
+      "target_axis_spread": [
+        0.10942901733768609,
+        0.127151023578222,
+        0.0984000794912489
+      ],
+      "minimum_axis_spread_ratio": 0.08,
+      "axis_frame": "saved_camera",
+      "residual_reduction": 0.2707112749603334,
+      "max_log_stretch": 0.16,
+      "minimum_anisotropy": 0.025,
+      "minimum_residual_reduction": 0.03,
+      "singular_values": [
+        18.57222211570619,
+        12.174489326438158,
+        6.304577679103591
+      ],
+      "trace": [
+        {
+          "kept": 14623,
+          "raw_scale": [
+            1.0002916767593153,
+            1.0055621655018883,
+            1.0749992674732616
+          ],
+          "clipped_scale": [
+            1.0002916767593153,
+            1.0055621655018883,
+            1.0749992674732616
+          ],
+          "residual_median": 0.0069431462820080695,
+          "residual_trim_limit": 0.01226921134052977
+        },
+        {
+          "kept": 14623,
+          "raw_scale": [
+            1.0008082949821084,
+            1.0036998288859336,
+            1.0690981348612638
+          ],
+          "clipped_scale": [
+            1.0008082949821084,
+            1.0036998288859336,
+            1.0690981348612638
+          ],
+          "residual_median": 0.006424206200434837,
+          "residual_trim_limit": 0.012177365042214658
+        },
+        {
+          "kept": 14623,
+          "raw_scale": [
+            1.001356074875984,
+            1.0040495860447152,
+            1.0681136372254472
+          ],
+          "clipped_scale": [
+            1.001356074875984,
+            1.0040495860447152,
+            1.0681136372254472
+          ],
+          "residual_median": 0.006320910526777842,
+          "residual_trim_limit": 0.012229856590530257
+        }
+      ],
+      "field": "camera1_supported_relative_axis_scale_carrier"
+    }
+  },
+  "verifier_energy": 0.10318254461675944,
+  "diagnostic_board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry_alt/07136/diagnostics/step_05_adaptation_diagnosis/diagnostic_board.png"
+}

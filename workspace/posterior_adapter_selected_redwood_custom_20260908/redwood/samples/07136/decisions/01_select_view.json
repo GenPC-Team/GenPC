@@ -1,0 +1,7 @@
+{
+  "state_sha256": "08c30b9ed09aa4eb17de06275534871752ff2d477739e47091ac30da3ec6e298",
+  "action": {"name": "SELECT_VIEW", "arguments": {"candidate": "opposite_180"}},
+  "rationale": "This antipodal partial-only observation has the highest visible support and presents the seat and back as two broad connected surfaces, avoiding the support-block ambiguity of the previous oblique candidate. No prior, GT, CD, or EMD is used.",
+  "planner": "Codex GPT-5.6 Terra",
+  "ground_truth_used": false
+}

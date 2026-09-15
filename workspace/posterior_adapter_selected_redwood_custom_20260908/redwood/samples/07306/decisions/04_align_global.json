@@ -1,0 +1,7 @@
+{
+  "state_sha256": "73c8a386d17513d69dfd325291e27508a4324188add8e883368c1316dc3e4d02",
+  "action": {"name": "ALIGN_GLOBAL", "arguments": {}},
+  "rationale": "Align the fresh antipodal prior with the fixed cross-camera visible-evidence solver so it can be compared against the oblique candidate using the same no-GT verifier.",
+  "planner": "Codex GPT-5.6 Terra",
+  "ground_truth_used": false
+}

@@ -1,0 +1,7 @@
+{
+  "state_sha256": "c99e28c399dccfa5d77d1beec7891492e4528830cafc3fc89e5d9ed762cbaf30",
+  "action": {"name": "ACCEPT", "arguments": {"candidate": "adapted"}},
+  "rationale": "The adapted complete carrier lowers the no-GT verifier energy from 0.1045 to 0.0949, raises both 1% and 2% observed-surface coverage to 100%, preserves all 100k slots, and remains a single connected component. Accept it without consulting GT, CD, or EMD.",
+  "planner": "Codex GPT-5.6 Terra",
+  "ground_truth_used": false
+}

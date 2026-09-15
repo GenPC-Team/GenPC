@@ -1,0 +1,41 @@
+{
+  "method": "multiview_positive_overlap_boundary_conditioned_gaussian_edit",
+  "strict_zero_shot": true,
+  "ground_truth_cd_emd_used": false,
+  "registration_root": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry/07306/registration",
+  "parameters": {
+    "saved_camera_max_pixel_distance": 1.0,
+    "virtual_positive_views": 6,
+    "virtual_render_size": 384,
+    "virtual_max_pixel_distance": 1.0,
+    "max_anchor_residual_ratio": 0.075,
+    "support_radius_ratio": 0.08,
+    "max_displacement_ratio": 0.075,
+    "graph_neighbours": 8,
+    "graph_edge_ratio": 1.8,
+    "graph_screening": 0.0015,
+    "prior_protection_views": 6,
+    "prior_protection_weight": 0.01,
+    "protection_exclusion_ratio": 0.1,
+    "remote_gain": 1.0,
+    "remote_gain_radius_ratio": 0.08,
+    "remote_displacement_cap_multiplier": 1.0,
+    "camera_axis_scale": false,
+    "axis_scale_max_log": 0.16,
+    "axis_scale_minimum_pairs": 512,
+    "axis_scale_minimum_anisotropy": 0.025,
+    "axis_scale_minimum_residual_reduction": 0.03,
+    "axis_scale_trim_quantile": 0.75,
+    "axis_scale_iterations": 3,
+    "axis_scale_retain_isotropic_component": false,
+    "graph_cg_tolerance": 1e-05,
+    "graph_cg_max_iterations": 240
+  },
+  "samples": {
+    "07306": {
+      "state": "complete",
+      "prediction": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry/07306/gaussian/07306/decoded/partial_anchored_gaussian_decoded_100k.ply",
+      "edit_prior": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry/07306/registration/07306/final/camera1_amplified_registered_100k.ply"
+    }
+  }
+}

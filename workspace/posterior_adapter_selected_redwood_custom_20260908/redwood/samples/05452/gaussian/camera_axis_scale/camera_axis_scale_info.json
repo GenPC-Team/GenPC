@@ -1,0 +1,160 @@
+{
+  "method": "camera1_supported_global_relative_axis_scale",
+  "strict_zero_shot": true,
+  "ground_truth_cd_emd_used": false,
+  "inputs": {
+    "prior": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/registration/05452/final/camera1_amplified_registered_100k.ply",
+    "partial": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/inputs/partial/05452.ply",
+    "camera": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/inputs/camera/05452/camera.pth"
+  },
+  "fit_mode": "matched_relative_axis",
+  "pairing": {
+    "partial_visible_pixels": 29207,
+    "prior_visible_pixels": 31943,
+    "nearby_pixel_pairs": 29099,
+    "mutual_pixel_pairs": 16605,
+    "max_pixel_distance": 1.0,
+    "pair_subsample_limit": 52400
+  },
+  "estimate": {
+    "pixel_pairs": 16605,
+    "within_metric_limit": 16287,
+    "collision_free_pairs": 16287,
+    "max_residual": 0.08044999172784154,
+    "residual_median": 0.0121170029777289,
+    "residual_p90": 0.0447437637882458,
+    "active": true,
+    "controls": 16287,
+    "trimmed_controls": 12215,
+    "principal_axes": [
+      [
+        0.9890118837356567,
+        -2.635787421656488e-10,
+        0.14783640205860138
+      ],
+      [
+        -0.0017392515437677503,
+        0.9999308586120605,
+        0.0116354338824749
+      ],
+      [
+        -0.1478261649608612,
+        -0.0117647061124444,
+        0.9889433979988098
+      ]
+    ],
+    "visible_scale": [
+      1.0013111719090406,
+      1.000153703998664,
+      0.9634703483031413
+    ],
+    "relative_scale": [
+      1.01331469502666,
+      1.0121433516166287,
+      0.9750202430046537
+    ],
+    "applied_scale": [
+      1.01331469502666,
+      1.0121433516166287,
+      0.9750202430046537
+    ],
+    "retain_isotropic_component": false,
+    "isotropic_scale_removed": 0.9881542000954565,
+    "anisotropy_log": 0.02529704614376327,
+    "isotropic_error": 0.010093950068056584,
+    "anisotropic_error": 0.00951815366081695,
+    "axis_supported": [
+      true,
+      true,
+      true
+    ],
+    "source_axis_spread": [
+      0.13811214666625257,
+      0.12758631838784848,
+      0.11644464473050423
+    ],
+    "target_axis_spread": [
+      0.13829323543325867,
+      0.1276059289151595,
+      0.11219096241653445
+    ],
+    "minimum_axis_spread_ratio": 0.08,
+    "axis_frame": "saved_camera",
+    "residual_reduction": 0.0570437146367313,
+    "max_log_stretch": 0.16,
+    "minimum_anisotropy": 0.025,
+    "minimum_residual_reduction": 0.03,
+    "singular_values": [
+      17.48909567345906,
+      14.590835868064234,
+      8.871654857801973
+    ],
+    "trace": [
+      {
+        "kept": 12215,
+        "raw_scale": [
+          0.9957496241928644,
+          0.9931615892483323,
+          0.9699266249547291
+        ],
+        "clipped_scale": [
+          0.9957496241928644,
+          0.9931615892483323,
+          0.9699266249547291
+        ],
+        "residual_median": 0.01311924064626098,
+        "residual_trim_limit": 0.024317447643857723
+      },
+      {
+        "kept": 12215,
+        "raw_scale": [
+          0.999074408342643,
+          0.9985675337029503,
+          0.9705629727743068
+        ],
+        "clipped_scale": [
+          0.999074408342643,
+          0.9985675337029503,
+          0.9705629727743068
+        ],
+        "residual_median": 0.011654005344214756,
+        "residual_trim_limit": 0.024066379248979274
+      },
+      {
+        "kept": 12215,
+        "raw_scale": [
+          1.000701639758152,
+          0.9997033656441521,
+          0.9662941640797681
+        ],
+        "clipped_scale": [
+          1.000701639758152,
+          0.9997033656441521,
+          0.9662941640797681
+        ],
+        "residual_median": 0.01144437356490383,
+        "residual_trim_limit": 0.024362138128059367
+      }
+    ],
+    "field": "camera1_supported_relative_axis_scale_carrier"
+  },
+  "parameters": {
+    "max_pixel_distance": 1.0,
+    "max_anchor_residual_ratio": 0.075,
+    "max_log_stretch": 0.16,
+    "minimum_pairs": 512,
+    "minimum_anisotropy": 0.025,
+    "minimum_residual_reduction": 0.03,
+    "trim_quantile": 0.75,
+    "iterations": 3,
+    "retain_isotropic_component": false,
+    "extent_quantile": 0.01,
+    "extent_minimum_visible_points": 512,
+    "extent_minimum_log_expansion": 0.025,
+    "extent_max_log_expansion": 0.25,
+    "principal_minimum_axis_anisotropy": 1.15,
+    "principal_anchor_tolerance": 0.03
+  },
+  "output": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/gaussian/05452/camera_axis_scale/camera_axis_scaled_prior_100k.ply",
+  "carrier_slots_preserved": true
+}
