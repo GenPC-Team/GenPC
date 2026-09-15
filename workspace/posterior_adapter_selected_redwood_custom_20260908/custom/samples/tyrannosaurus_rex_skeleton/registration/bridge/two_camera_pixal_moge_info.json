@@ -1,0 +1,383 @@
+{
+  "method": "two_camera_pixel_bridge_plus_analytic_pixal_native_moge_sim3",
+  "strict_zero_shot": true,
+  "ground_truth_cd_emd_used": false,
+  "fusion_run": false,
+  "partial": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/inputs/partial/tyrannosaurus_rex_skeleton.ply",
+  "point_uv": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/inputs/camera/tyrannosaurus_rex_skeleton/point_uv.npy",
+  "camera1": {
+    "semantic_mask": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/inputs/camera/tyrannosaurus_rex_skeleton/tyrannosaurus_rex_skeleton_moge_to_raw_partial_object_mask.png",
+    "saved_camera": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/inputs/camera/tyrannosaurus_rex_skeleton/camera.pth"
+  },
+  "camera2": {
+    "pixal_mask": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/registration/tyrannosaurus_rex_skeleton/native/pixal_input_object_mask.png",
+    "native_moge": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/registration/tyrannosaurus_rex_skeleton/native/pixal_native_moge_points.ply",
+    "pixal_native_info": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/registration/tyrannosaurus_rex_skeleton/native/pixal_native_moge_info.json",
+    "moge_contract": "Pixal3D preprocessed pixal3d_input.png + MoGeModel.infer, matching Pixal camera estimation"
+  },
+  "camera1_to_camera2": {
+    "transform": [
+      [
+        2.0831024930747923,
+        0.0,
+        -118.14958448753464
+      ],
+      [
+        0.0,
+        2.060344827586207,
+        -112.88793103448273
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "foreground_iou": 0.7893985168909641,
+    "contract": "foreground bbox crop/resize only; no 3-D pose search"
+  },
+  "pixel_matches": {
+    "valid_partial_pixels": 16384,
+    "matched_partial_pixels": 16115,
+    "match_ratio": 0.98358154296875,
+    "max_pixel_distance": 3.0,
+    "fit_matches": 16115
+  },
+  "native_moge_to_partial": {
+    "unique_pixel_pairs": 14277,
+    "inlier_threshold": 0.03470231024437281,
+    "inliers": 10322,
+    "inlier_ratio": 0.722981018421237,
+    "mean_residual": 0.026438541578387986,
+    "p90_residual": 0.05433207904439188,
+    "scale": 0.18458542283742635
+  },
+  "all_match_residual": {
+    "mean": 0.026438541578387986,
+    "median": 0.018490212023096947,
+    "p90": 0.05433207904439188,
+    "count": 14277
+  },
+  "pixal_to_native_moge": [
+    [
+      -4.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      -4.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      4.0,
+      3.2615630626678467
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "pixal_to_partial": [
+    [
+      0.017431977788186427,
+      0.25905859881807847,
+      0.6911824807631846,
+      -0.2673700669750305
+    ],
+    [
+      -0.08960805565577892,
+      0.6870044555277953,
+      -0.255232693109038,
+      0.08390552585408637
+    ],
+    [
+      -0.7326765832870104,
+      -0.07785867741308859,
+      0.047660296259062374,
+      0.044540116101991926
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "pixal_partial_micro_refinement": {
+    "enabled": true,
+    "applied": true,
+    "reason": "fixed_two_camera_joint_objective",
+    "parameters": {
+      "style": "same local camera-frame coordinate descent as Pixal--MoGe",
+      "score": "Camera-1 partial 2D+3D primary, Camera-2 Pixal--MoGe weighted auxiliary",
+      "search_points": 32000,
+      "proposal_gate": false
+    },
+    "partial_before": {
+      "objective": null,
+      "geometric_objective": null,
+      "pair_count": 0,
+      "projection": {
+        "iou": 0.28508929641615727,
+        "coverage": 0.3860887914941969,
+        "leakage": 0.4785134838851129,
+        "visible_depth_mean": 0.005616217712483981,
+        "visible_depth_normalized": 0.005315384288733771
+      }
+    },
+    "partial_after": {
+      "objective": null,
+      "geometric_objective": null,
+      "pair_count": 0,
+      "projection": {
+        "iou": 0.28508929641615727,
+        "coverage": 0.3860887914941969,
+        "leakage": 0.4785134838851129,
+        "visible_depth_mean": 0.005616217712483981,
+        "visible_depth_normalized": 0.005315384288733771
+      }
+    },
+    "native_before": {
+      "objective": 0.4236185397036877,
+      "iou": 0.8634775136064164,
+      "coverage": 0.9546289454238361,
+      "leakage": 0.0995698582125219,
+      "log_depth_median": 0.4048098850687943,
+      "depth_boundary": 0.0009660201612859964,
+      "rgb_median": null
+    },
+    "native_after": {
+      "objective": 0.4236185397036877,
+      "iou": 0.8634775136064164,
+      "coverage": 0.9546289454238361,
+      "leakage": 0.0995698582125219,
+      "log_depth_median": 0.4048098850687943,
+      "depth_boundary": 0.0009660201612859964,
+      "rgb_median": null
+    },
+    "local_search": {
+      "method": "pixal_moge_style_local_camera_residual_for_two_camera_partial_bridge",
+      "native_before": {
+        "objective": 0.4236185397036877,
+        "iou": 0.8634775136064164,
+        "coverage": 0.9546289454238361,
+        "leakage": 0.0995698582125219,
+        "log_depth_median": 0.4048098850687943,
+        "depth_boundary": 0.0009660201612859964,
+        "rgb_median": null
+      },
+      "native_after": {
+        "objective": 0.4236185397036877,
+        "iou": 0.8634775136064164,
+        "coverage": 0.9546289454238361,
+        "leakage": 0.0995698582125219,
+        "log_depth_median": 0.4048098850687943,
+        "depth_boundary": 0.0009660201612859964,
+        "rgb_median": null
+      },
+      "partial_before": {
+        "objective": null,
+        "geometric_objective": null,
+        "pair_count": 0,
+        "projection": {
+          "iou": 0.28508929641615727,
+          "coverage": 0.3860887914941969,
+          "leakage": 0.4785134838851129,
+          "visible_depth_mean": 0.005616217712483981,
+          "visible_depth_normalized": 0.005315384288733771
+        }
+      },
+      "partial_after": {
+        "objective": null,
+        "geometric_objective": null,
+        "pair_count": 0,
+        "projection": {
+          "iou": 0.28508929641615727,
+          "coverage": 0.3860887914941969,
+          "leakage": 0.4785134838851129,
+          "visible_depth_mean": 0.005616217712483981,
+          "visible_depth_normalized": 0.005315384288733771
+        }
+      },
+      "levels": [
+        {
+          "scale_delta": 0.01,
+          "rotation_deg": 0.75,
+          "translation_depth_ratio": 0.01
+        },
+        {
+          "scale_delta": 0.004,
+          "rotation_deg": 0.3,
+          "translation_depth_ratio": 0.004
+        },
+        {
+          "scale_delta": 0.002,
+          "rotation_deg": 0.12,
+          "translation_depth_ratio": 0.002
+        }
+      ],
+      "trace": [
+        {
+          "level": {
+            "scale_delta": 0.01,
+            "rotation_deg": 0.75,
+            "translation_depth_ratio": 0.01
+          },
+          "action": "identity",
+          "joint_objective": null,
+          "native": {
+            "objective": 0.4236185397036877,
+            "iou": 0.8634775136064164,
+            "coverage": 0.9546289454238361,
+            "leakage": 0.0995698582125219,
+            "log_depth_median": 0.4048098850687943,
+            "depth_boundary": 0.0009660201612859964,
+            "rgb_median": null
+          },
+          "partial": {
+            "objective": null,
+            "geometric_objective": null,
+            "pair_count": 0,
+            "projection": {
+              "iou": 0.28508929641615727,
+              "coverage": 0.3860887914941969,
+              "leakage": 0.4785134838851129,
+              "visible_depth_mean": 0.005616217712483981,
+              "visible_depth_normalized": 0.005315384288733771
+            }
+          }
+        },
+        {
+          "level": {
+            "scale_delta": 0.004,
+            "rotation_deg": 0.3,
+            "translation_depth_ratio": 0.004
+          },
+          "action": "identity",
+          "joint_objective": null,
+          "native": {
+            "objective": 0.4236185397036877,
+            "iou": 0.8634775136064164,
+            "coverage": 0.9546289454238361,
+            "leakage": 0.0995698582125219,
+            "log_depth_median": 0.4048098850687943,
+            "depth_boundary": 0.0009660201612859964,
+            "rgb_median": null
+          },
+          "partial": {
+            "objective": null,
+            "geometric_objective": null,
+            "pair_count": 0,
+            "projection": {
+              "iou": 0.28508929641615727,
+              "coverage": 0.3860887914941969,
+              "leakage": 0.4785134838851129,
+              "visible_depth_mean": 0.005616217712483981,
+              "visible_depth_normalized": 0.005315384288733771
+            }
+          }
+        },
+        {
+          "level": {
+            "scale_delta": 0.002,
+            "rotation_deg": 0.12,
+            "translation_depth_ratio": 0.002
+          },
+          "action": "identity",
+          "joint_objective": null,
+          "native": {
+            "objective": 0.4236185397036877,
+            "iou": 0.8634775136064164,
+            "coverage": 0.9546289454238361,
+            "leakage": 0.0995698582125219,
+            "log_depth_median": 0.4048098850687943,
+            "depth_boundary": 0.0009660201612859964,
+            "rgb_median": null
+          },
+          "partial": {
+            "objective": null,
+            "geometric_objective": null,
+            "pair_count": 0,
+            "projection": {
+              "iou": 0.28508929641615727,
+              "coverage": 0.3860887914941969,
+              "leakage": 0.4785134838851129,
+              "visible_depth_mean": 0.005616217712483981,
+              "visible_depth_normalized": 0.005315384288733771
+            }
+          }
+        }
+      ]
+    },
+    "partial_residual": [
+      [
+        1.0000000000000004,
+        1.8968645832052495e-17,
+        1.1553720457193618e-16,
+        3.3306690738754696e-16
+      ],
+      [
+        3.121589700393679e-17,
+        1.0000000000000009,
+        1.4943859092746118e-16,
+        -1.6653345369377348e-16
+      ],
+      [
+        1.076764726158251e-16,
+        1.5843570853834744e-16,
+        1.0000000000000016,
+        2.862293735361732e-17
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "native_residual": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ]
+  },
+  "transform_contract": {
+    "proper_sim3": true,
+    "isotropic_singular_values": [
+      0.7383416913497061,
+      0.7383416913497056,
+      0.7383416913497053
+    ],
+    "all_pixal_points_preserved": true,
+    "nonrigid_deformation_used": false
+  },
+  "next_step": "This output is registration-only; preserve the completed Pixal body for any later fusion/edit stage."
+}

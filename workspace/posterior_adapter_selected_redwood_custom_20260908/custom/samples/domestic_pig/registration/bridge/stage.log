@@ -1,0 +1,20 @@
+{
+  "output_dir": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/registration/domestic_pig/bridge",
+  "mask_iou": 0.965847806918613,
+  "matches": 16374,
+  "fit": {
+    "unique_pixel_pairs": 16029,
+    "inlier_threshold": 0.05153790894631594,
+    "inliers": 13397,
+    "inlier_ratio": 0.8357976168195146,
+    "mean_residual": 0.04152907907055118,
+    "p90_residual": 0.08820100253959566,
+    "scale": 0.34335033510617785
+  },
+  "all_match_residual": {
+    "mean": 0.04152907907055118,
+    "median": 0.021674569476480415,
+    "p90": 0.08820100253959566,
+    "count": 16029
+  }
+}

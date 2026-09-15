@@ -1,0 +1,30 @@
+{
+  "sample": "wolf",
+  "selection": "gpt_clarity",
+  "selection_rule": "lexicographic(iou, depth_coverage, -semantic_leakage)",
+  "ground_truth_used": false,
+  "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/inputs/camera/wolf/depth.png",
+  "candidates": {
+    "qwen": {
+      "path": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/inputs/camera/wolf/img.png",
+      "sha256": "8ceff9649ae9cb9fe435f05190fbb23f2ea004dc0dc2e08f87620d2ee432f024",
+      "foreground_vs_depth": {
+        "iou": 0.43300843759092233,
+        "depth_coverage": 0.9811559169322053,
+        "semantic_leakage": 0.5633603090388988
+      }
+    },
+    "gpt_clarity": {
+      "path": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/inputs/pixal/wolf/gpt_clarity_candidate.png",
+      "sha256": "fdeec30471c48adcac994fa7c1293c3999eac1f6e945bc80e3894692cb09c464",
+      "foreground_vs_depth": {
+        "iou": 0.5437877480586712,
+        "depth_coverage": 0.9695088451818481,
+        "semantic_leakage": 0.44675047810138885
+      }
+    }
+  },
+  "installed_path": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/inputs/pixal/wolf/gpt_image.png",
+  "installed_sha256": "fdeec30471c48adcac994fa7c1293c3999eac1f6e945bc80e3894692cb09c464",
+  "prompt_path": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/inputs/pixal/wolf/gpt_clarity_prompt.txt"
+}

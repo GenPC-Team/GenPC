@@ -1,0 +1,60 @@
+{
+  "sample_id": "tyrannosaurus_rex_skeleton",
+  "input": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/inputs/pixal/tyrannosaurus_rex_skeleton/gpt_image.png",
+  "preprocessed_input": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/inputs/pixal/tyrannosaurus_rex_skeleton/pixal3d_input.png",
+  "model": "/opt/data/private/cr/lab/GenPC/models/Pixal3D-weights",
+  "dino": "/opt/data/private/cr/lab/GenPC/models/dinov3-vitl16-pretrain-lvd1689m",
+  "moge": "/opt/data/private/cr/lab/GenPC/models/moge-2-vitl/model.pt",
+  "rmbg": "/opt/data/private/cr/lab/GenPC/models/RMBG-2.0",
+  "attention_backend": "xformers",
+  "seed": 42,
+  "requested_resolution": 1024,
+  "actual_resolution": 1024,
+  "decimation_target": 300000,
+  "texture_size": 2048,
+  "sampler_params": {
+    "sparse_structure": {
+      "steps": 12,
+      "guidance_strength": 7.5,
+      "guidance_rescale": 0.7,
+      "rescale_t": 5.0
+    },
+    "shape": {
+      "steps": 12,
+      "guidance_strength": 7.5,
+      "guidance_rescale": 0.5,
+      "rescale_t": 3.0
+    },
+    "texture": {
+      "steps": 12,
+      "guidance_strength": 1.0,
+      "guidance_rescale": 0.0,
+      "rescale_t": 3.0
+    }
+  },
+  "camera": {
+    "camera_angle_x": 1.1001420226803127,
+    "distance": 0.8153907656669617,
+    "mesh_scale": 1.0
+  },
+  "native_moge_observation_cache": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/inputs/pixal/tyrannosaurus_rex_skeleton/pixal_moge_fp16_observation.npz",
+  "native_moge_observation_contract": "FP16 MoGe on pixal3d_input.png; consumed by native registration",
+  "glb": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/inputs/pixal/tyrannosaurus_rex_skeleton/pixal3d.glb",
+  "sampled_ply": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/inputs/pixal/tyrannosaurus_rex_skeleton/pixal3d_sampled_100k.ply",
+  "elapsed_seconds": 33.71103549003601,
+  "point_count": 100000,
+  "mesh_vertices": 236103,
+  "mesh_faces": 285186,
+  "bounds": [
+    [
+      -0.38734060525894165,
+      -0.1509513556957245,
+      -0.14597409963607788
+    ],
+    [
+      0.5005363821983337,
+      0.1569858193397522,
+      0.17037595808506012
+    ]
+  ]
+}

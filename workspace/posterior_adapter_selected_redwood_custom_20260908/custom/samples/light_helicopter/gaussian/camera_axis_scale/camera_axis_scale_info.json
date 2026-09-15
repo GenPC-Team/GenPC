@@ -1,0 +1,121 @@
+{
+  "method": "camera1_supported_global_relative_axis_scale",
+  "strict_zero_shot": true,
+  "ground_truth_cd_emd_used": false,
+  "inputs": {
+    "prior": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/registration/light_helicopter/final/camera1_amplified_registered_100k.ply",
+    "partial": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/inputs/partial/light_helicopter.ply",
+    "camera": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/inputs/camera/light_helicopter/camera.pth"
+  },
+  "fit_mode": "matched_relative_axis",
+  "pairing": {
+    "partial_visible_pixels": 11390,
+    "prior_visible_pixels": 21462,
+    "nearby_pixel_pairs": 9134,
+    "mutual_pixel_pairs": 6236,
+    "max_pixel_distance": 1.0,
+    "pair_subsample_limit": 16384
+  },
+  "estimate": {
+    "pixel_pairs": 6236,
+    "within_metric_limit": 5768,
+    "collision_free_pairs": 5768,
+    "max_residual": 0.09552373719874074,
+    "residual_median": 0.011012371541579384,
+    "residual_p90": 0.04666028075692066,
+    "active": false,
+    "reason": "no_supported_anisotropic_residual",
+    "controls": 5768,
+    "relative_scale": [
+      0.9964030307313037,
+      0.9996567344623817,
+      1.003954577170558
+    ],
+    "anisotropy_log": 0.003946778384099549,
+    "isotropic_error": 0.008399757282338813,
+    "anisotropic_error": 0.00840886634451468,
+    "axis_supported": [
+      true,
+      true,
+      true
+    ],
+    "source_axis_spread": [
+      0.14933195540521252,
+      0.05036484117940358,
+      0.14948847153092193
+    ],
+    "target_axis_spread": [
+      0.14883465667171591,
+      0.05036103454528768,
+      0.15011982299355495
+    ],
+    "residual_reduction": -0.0010844434987449247,
+    "minimum_residual_reduction": 0.03,
+    "trace": [
+      {
+        "kept": 4326,
+        "raw_scale": [
+          0.994571642735682,
+          0.998025092906086,
+          1.0312713371142108
+        ],
+        "clipped_scale": [
+          0.994571642735682,
+          0.998025092906086,
+          1.0312713371142108
+        ],
+        "residual_median": 0.011294297204627119,
+        "residual_trim_limit": 0.022338840956210887
+      },
+      {
+        "kept": 4326,
+        "raw_scale": [
+          0.9971686261142712,
+          1.0006757262093633,
+          1.0118423051824013
+        ],
+        "clipped_scale": [
+          0.9971686261142712,
+          1.0006757262093633,
+          1.0118423051824013
+        ],
+        "residual_median": 0.010229676668461217,
+        "residual_trim_limit": 0.022512156460546287
+      },
+      {
+        "kept": 4326,
+        "raw_scale": [
+          0.9969134450156943,
+          1.0002567803514866,
+          1.0064441454013129
+        ],
+        "clipped_scale": [
+          0.9969134450156943,
+          1.0002567803514866,
+          1.0064441454013129
+        ],
+        "residual_median": 0.010140300348402997,
+        "residual_trim_limit": 0.02265933079160634
+      }
+    ]
+  },
+  "parameters": {
+    "max_pixel_distance": 1.0,
+    "max_anchor_residual_ratio": 0.075,
+    "max_log_stretch": 0.16,
+    "minimum_pairs": 512,
+    "minimum_anisotropy": 0.025,
+    "minimum_residual_reduction": 0.03,
+    "trim_quantile": 0.75,
+    "iterations": 3,
+    "retain_isotropic_component": false,
+    "extent_quantile": 0.01,
+    "extent_minimum_visible_points": 512,
+    "extent_minimum_log_expansion": 0.025,
+    "extent_max_log_expansion": 0.25,
+    "principal_minimum_axis_anisotropy": 1.15,
+    "principal_anchor_tolerance": 0.03
+  },
+  "output": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/gaussian/light_helicopter/camera_axis_scale/camera_axis_scaled_prior_100k.ply",
+  "carrier_slots_preserved": true
+}

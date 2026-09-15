@@ -1,0 +1,20 @@
+{
+  "output_dir": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/registration/cartoon_fox/bridge",
+  "mask_iou": 0.9584323040380047,
+  "matches": 16384,
+  "fit": {
+    "unique_pixel_pairs": 13738,
+    "inlier_threshold": 0.09201256007102801,
+    "inliers": 9608,
+    "inlier_ratio": 0.6993739991265104,
+    "mean_residual": 0.07756496689777881,
+    "p90_residual": 0.15452726922373153,
+    "scale": 0.6272801368827478
+  },
+  "all_match_residual": {
+    "mean": 0.07756496689777881,
+    "median": 0.06164671562851849,
+    "p90": 0.15452726922373153,
+    "count": 13738
+  }
+}

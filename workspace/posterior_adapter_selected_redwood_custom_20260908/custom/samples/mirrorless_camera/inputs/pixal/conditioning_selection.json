@@ -1,0 +1,30 @@
+{
+  "sample": "mirrorless_camera",
+  "selection": "gpt_clarity",
+  "selection_rule": "lexicographic(iou, depth_coverage, -semantic_leakage)",
+  "ground_truth_used": false,
+  "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/inputs/camera/mirrorless_camera/depth.png",
+  "candidates": {
+    "qwen": {
+      "path": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/inputs/camera/mirrorless_camera/img.png",
+      "sha256": "04a47bc2a72b32288e8ce662d72773a64439b15ddf613518431fcc1206ef7de9",
+      "foreground_vs_depth": {
+        "iou": 0.6596186417527181,
+        "depth_coverage": 0.9770697887722896,
+        "semantic_leakage": 0.3300098041029246
+      }
+    },
+    "gpt_clarity": {
+      "path": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/inputs/pixal/mirrorless_camera/gpt_clarity_candidate.png",
+      "sha256": "fb2462b0d636e9b345cc52abc5377004b6681e9fb2602371bcd1d68b7b63244a",
+      "foreground_vs_depth": {
+        "iou": 0.709987330027834,
+        "depth_coverage": 0.9599260837896895,
+        "semantic_leakage": 0.26832603376308267
+      }
+    }
+  },
+  "installed_path": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/inputs/pixal/mirrorless_camera/gpt_image.png",
+  "installed_sha256": "fb2462b0d636e9b345cc52abc5377004b6681e9fb2602371bcd1d68b7b63244a",
+  "prompt_path": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/inputs/pixal/mirrorless_camera/gpt_clarity_prompt.txt"
+}

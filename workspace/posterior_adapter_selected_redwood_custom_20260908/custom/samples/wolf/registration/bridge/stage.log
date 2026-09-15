@@ -1,0 +1,20 @@
+{
+  "output_dir": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/registration/wolf/bridge",
+  "mask_iou": 0.9430631662168425,
+  "matches": 16371,
+  "fit": {
+    "unique_pixel_pairs": 15304,
+    "inlier_threshold": 0.024671432544590408,
+    "inliers": 11966,
+    "inlier_ratio": 0.7818870883429169,
+    "mean_residual": 0.020660783482817247,
+    "p90_residual": 0.03767989266474282,
+    "scale": 0.20218066137360124
+  },
+  "all_match_residual": {
+    "mean": 0.020660783482817247,
+    "median": 0.013423554048357943,
+    "p90": 0.03767989266474282,
+    "count": 15304
+  }
+}

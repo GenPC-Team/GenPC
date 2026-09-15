@@ -1,0 +1,84 @@
+{
+  "pairing": {
+    "saved_camera": {
+      "partial_visible_pixels": 8358,
+      "prior_visible_pixels": 10261,
+      "nearby_pixel_pairs": 6052,
+      "mutual_pixel_pairs": 3751,
+      "max_pixel_distance": 1.0,
+      "pair_subsample_limit": 16384
+    },
+    "virtual_positive_overlap": {
+      "virtual_views": 6,
+      "virtual_resolution": 384,
+      "virtual_max_pixel_distance": 1.0,
+      "virtual_mutual_pairs": 48724,
+      "per_view": [
+        {
+          "view": 0,
+          "pca_depth_axis": 0,
+          "depth_sign": -1,
+          "partial_visible_points": 11513,
+          "prior_visible_points": 33978,
+          "mutual_pairs": 8851
+        },
+        {
+          "view": 1,
+          "pca_depth_axis": 0,
+          "depth_sign": 1,
+          "partial_visible_points": 11513,
+          "prior_visible_points": 33978,
+          "mutual_pairs": 8851
+        },
+        {
+          "view": 2,
+          "pca_depth_axis": 1,
+          "depth_sign": -1,
+          "partial_visible_points": 11149,
+          "prior_visible_points": 25477,
+          "mutual_pairs": 7700
+        },
+        {
+          "view": 3,
+          "pca_depth_axis": 1,
+          "depth_sign": 1,
+          "partial_visible_points": 11149,
+          "prior_visible_points": 25477,
+          "mutual_pairs": 7700
+        },
+        {
+          "view": 4,
+          "pca_depth_axis": 2,
+          "depth_sign": -1,
+          "partial_visible_points": 11875,
+          "prior_visible_points": 26784,
+          "mutual_pairs": 7811
+        },
+        {
+          "view": 5,
+          "pca_depth_axis": 2,
+          "depth_sign": 1,
+          "partial_visible_points": 11875,
+          "prior_visible_points": 26784,
+          "mutual_pairs": 7811
+        }
+      ],
+      "evidence_policy": "positive_overlap_only; missing_partial_pixels_are_unconstrained"
+    },
+    "combined_pairs": 52475
+  },
+  "decoder": {
+    "pixel_pairs": 52475,
+    "within_metric_limit": 43266,
+    "collision_free_pairs": 10834,
+    "max_residual": 0.0792447555163769,
+    "residual_median": 0.0012602783792335095,
+    "residual_p90": 0.03224972765907264,
+    "prior_points": 100000,
+    "decoded_points": 100000,
+    "all_prior_slots_preserved": true,
+    "partial_anchor_fraction": 0.10834,
+    "decoder": "collision_free_saved_view_hard_anchor_replacement"
+  },
+  "output_dir": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/gaussian/tyrannosaurus_rex_skeleton/decoded"
+}

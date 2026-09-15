@@ -1,0 +1,20 @@
+{
+  "output_dir": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/registration/hydra_creature/bridge",
+  "mask_iou": 0.8689670558488882,
+  "matches": 16330,
+  "fit": {
+    "unique_pixel_pairs": 15061,
+    "inlier_threshold": 0.06696829537032692,
+    "inliers": 8338,
+    "inlier_ratio": 0.5536152977889914,
+    "mean_residual": 0.07554490059761364,
+    "p90_residual": 0.158326987860026,
+    "scale": 0.3033979966824529
+  },
+  "all_match_residual": {
+    "mean": 0.07554490059761364,
+    "median": 0.057577511920091966,
+    "p90": 0.158326987860026,
+    "count": 15061
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "output_dir": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/registration/single_engine_airplane/bridge",
+  "mask_iou": 0.8338735600190351,
+  "matches": 15880,
+  "fit": {
+    "unique_pixel_pairs": 15665,
+    "inlier_threshold": 0.022651177764839495,
+    "inliers": 11490,
+    "inlier_ratio": 0.7334822853495052,
+    "mean_residual": 0.020505993040080047,
+    "p90_residual": 0.05703760399405073,
+    "scale": 0.11648745196798166
+  },
+  "all_match_residual": {
+    "mean": 0.020505993040080047,
+    "median": 0.009274797943700806,
+    "p90": 0.05703760399405073,
+    "count": 15665
+  }
+}

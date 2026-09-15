@@ -1,0 +1,121 @@
+{
+  "method": "camera1_supported_global_relative_axis_scale",
+  "strict_zero_shot": true,
+  "ground_truth_cd_emd_used": false,
+  "inputs": {
+    "prior": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/registration/handheld_power_drill/final/camera1_amplified_registered_100k.ply",
+    "partial": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/inputs/partial/handheld_power_drill.ply",
+    "camera": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/inputs/camera/handheld_power_drill/camera.pth"
+  },
+  "fit_mode": "matched_relative_axis",
+  "pairing": {
+    "partial_visible_pixels": 14089,
+    "prior_visible_pixels": 50699,
+    "nearby_pixel_pairs": 14011,
+    "mutual_pixel_pairs": 10638,
+    "max_pixel_distance": 1.0,
+    "pair_subsample_limit": 16384
+  },
+  "estimate": {
+    "pixel_pairs": 10638,
+    "within_metric_limit": 9106,
+    "collision_free_pairs": 9106,
+    "max_residual": 0.09492806724604394,
+    "residual_median": 0.011597847560468132,
+    "residual_p90": 0.040668855758317066,
+    "active": false,
+    "reason": "no_supported_anisotropic_residual",
+    "controls": 9106,
+    "relative_scale": [
+      1.0015912512417282,
+      0.9972820047396875,
+      1.0011323497977067
+    ],
+    "anisotropy_log": 0.002721695716165254,
+    "isotropic_error": 0.009455661265629389,
+    "anisotropic_error": 0.009431650350871916,
+    "axis_supported": [
+      true,
+      true,
+      true
+    ],
+    "source_axis_spread": [
+      0.13307393586842298,
+      0.261819992553252,
+      0.15904267514768938
+    ],
+    "target_axis_spread": [
+      0.13360135550529018,
+      0.261726759935665,
+      0.15959986042666124
+    ],
+    "residual_reduction": 0.002539316297713645,
+    "minimum_residual_reduction": 0.03,
+    "trace": [
+      {
+        "kept": 6829,
+        "raw_scale": [
+          0.9997500830346312,
+          0.998000761844351,
+          0.9898469467106039
+        ],
+        "clipped_scale": [
+          0.9997500830346312,
+          0.998000761844351,
+          0.9898469467106039
+        ],
+        "residual_median": 0.011633298149544767,
+        "residual_trim_limit": 0.023548007003452703
+      },
+      {
+        "kept": 6829,
+        "raw_scale": [
+          1.0041826061236836,
+          1.0000218833131795,
+          0.9987979036109919
+        ],
+        "clipped_scale": [
+          1.0041826061236836,
+          1.0000218833131795,
+          0.9987979036109919
+        ],
+        "residual_median": 0.011504570612701707,
+        "residual_trim_limit": 0.02357353752708191
+      },
+      {
+        "kept": 6829,
+        "raw_scale": [
+          1.004159584727471,
+          0.9998645938376642,
+          1.0018415267519152
+        ],
+        "clipped_scale": [
+          1.004159584727471,
+          0.9998645938376642,
+          1.0018415267519152
+        ],
+        "residual_median": 0.01154843128151371,
+        "residual_trim_limit": 0.023594080860492396
+      }
+    ]
+  },
+  "parameters": {
+    "max_pixel_distance": 1.0,
+    "max_anchor_residual_ratio": 0.075,
+    "max_log_stretch": 0.16,
+    "minimum_pairs": 512,
+    "minimum_anisotropy": 0.025,
+    "minimum_residual_reduction": 0.03,
+    "trim_quantile": 0.75,
+    "iterations": 3,
+    "retain_isotropic_component": false,
+    "extent_quantile": 0.01,
+    "extent_minimum_visible_points": 512,
+    "extent_minimum_log_expansion": 0.025,
+    "extent_max_log_expansion": 0.25,
+    "principal_minimum_axis_anisotropy": 1.15,
+    "principal_anchor_tolerance": 0.03
+  },
+  "output": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/gaussian/handheld_power_drill/camera_axis_scale/camera_axis_scaled_prior_100k.ply",
+  "carrier_slots_preserved": true
+}

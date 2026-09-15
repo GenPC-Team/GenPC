@@ -1,0 +1,84 @@
+{
+  "pairing": {
+    "saved_camera": {
+      "partial_visible_pixels": 11390,
+      "prior_visible_pixels": 22226,
+      "nearby_pixel_pairs": 11103,
+      "mutual_pixel_pairs": 7194,
+      "max_pixel_distance": 1.0,
+      "pair_subsample_limit": 16384
+    },
+    "virtual_positive_overlap": {
+      "virtual_views": 6,
+      "virtual_resolution": 384,
+      "virtual_max_pixel_distance": 1.0,
+      "virtual_mutual_pairs": 41598,
+      "per_view": [
+        {
+          "view": 0,
+          "pca_depth_axis": 0,
+          "depth_sign": -1,
+          "partial_visible_points": 5430,
+          "prior_visible_points": 18773,
+          "mutual_pairs": 5143
+        },
+        {
+          "view": 1,
+          "pca_depth_axis": 0,
+          "depth_sign": 1,
+          "partial_visible_points": 5430,
+          "prior_visible_points": 18773,
+          "mutual_pairs": 5143
+        },
+        {
+          "view": 2,
+          "pca_depth_axis": 1,
+          "depth_sign": -1,
+          "partial_visible_points": 12752,
+          "prior_visible_points": 43114,
+          "mutual_pairs": 10817
+        },
+        {
+          "view": 3,
+          "pca_depth_axis": 1,
+          "depth_sign": 1,
+          "partial_visible_points": 12752,
+          "prior_visible_points": 43114,
+          "mutual_pairs": 10817
+        },
+        {
+          "view": 4,
+          "pca_depth_axis": 2,
+          "depth_sign": -1,
+          "partial_visible_points": 5316,
+          "prior_visible_points": 15315,
+          "mutual_pairs": 4839
+        },
+        {
+          "view": 5,
+          "pca_depth_axis": 2,
+          "depth_sign": 1,
+          "partial_visible_points": 5316,
+          "prior_visible_points": 15315,
+          "mutual_pairs": 4839
+        }
+      ],
+      "evidence_policy": "positive_overlap_only; missing_partial_pixels_are_unconstrained"
+    },
+    "combined_pairs": 48792
+  },
+  "decoder": {
+    "pixel_pairs": 48792,
+    "within_metric_limit": 43733,
+    "collision_free_pairs": 13626,
+    "max_residual": 0.09552373719874074,
+    "residual_median": 0.0012470567696223156,
+    "residual_p90": 0.025746458887839458,
+    "prior_points": 100000,
+    "decoded_points": 100000,
+    "all_prior_slots_preserved": true,
+    "partial_anchor_fraction": 0.13626,
+    "decoder": "collision_free_saved_view_hard_anchor_replacement"
+  },
+  "output_dir": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/gaussian/light_helicopter/decoded"
+}

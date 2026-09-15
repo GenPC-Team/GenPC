@@ -1,0 +1,60 @@
+{
+  "sample_id": "single_engine_airplane",
+  "input": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/inputs/pixal/single_engine_airplane/gpt_image.png",
+  "preprocessed_input": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/inputs/pixal/single_engine_airplane/pixal3d_input.png",
+  "model": "/opt/data/private/cr/lab/GenPC/models/Pixal3D-weights",
+  "dino": "/opt/data/private/cr/lab/GenPC/models/dinov3-vitl16-pretrain-lvd1689m",
+  "moge": "/opt/data/private/cr/lab/GenPC/models/moge-2-vitl/model.pt",
+  "rmbg": "/opt/data/private/cr/lab/GenPC/models/RMBG-2.0",
+  "attention_backend": "xformers",
+  "seed": 42,
+  "requested_resolution": 1024,
+  "actual_resolution": 1024,
+  "decimation_target": 300000,
+  "texture_size": 2048,
+  "sampler_params": {
+    "sparse_structure": {
+      "steps": 12,
+      "guidance_strength": 7.5,
+      "guidance_rescale": 0.7,
+      "rescale_t": 5.0
+    },
+    "shape": {
+      "steps": 12,
+      "guidance_strength": 7.5,
+      "guidance_rescale": 0.5,
+      "rescale_t": 3.0
+    },
+    "texture": {
+      "steps": 12,
+      "guidance_strength": 1.0,
+      "guidance_rescale": 0.0,
+      "rescale_t": 3.0
+    }
+  },
+  "camera": {
+    "camera_angle_x": 1.0391129773612697,
+    "distance": 0.8741670250892639,
+    "mesh_scale": 1.0
+  },
+  "native_moge_observation_cache": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/inputs/pixal/single_engine_airplane/pixal_moge_fp16_observation.npz",
+  "native_moge_observation_contract": "FP16 MoGe on pixal3d_input.png; consumed by native registration",
+  "glb": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/inputs/pixal/single_engine_airplane/pixal3d.glb",
+  "sampled_ply": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/inputs/pixal/single_engine_airplane/pixal3d_sampled_100k.ply",
+  "elapsed_seconds": 32.81828856468201,
+  "point_count": 100000,
+  "mesh_vertices": 233388,
+  "mesh_faces": 282756,
+  "bounds": [
+    [
+      -0.3026365637779236,
+      -0.17245829105377197,
+      -0.3758159875869751
+    ],
+    [
+      0.4949994385242462,
+      0.242634579539299,
+      0.28949546813964844
+    ]
+  ]
+}

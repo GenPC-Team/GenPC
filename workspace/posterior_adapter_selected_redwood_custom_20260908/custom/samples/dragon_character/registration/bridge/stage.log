@@ -1,0 +1,20 @@
+{
+  "output_dir": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/registration/dragon_character/bridge",
+  "mask_iou": 0.9158735091876773,
+  "matches": 16372,
+  "fit": {
+    "unique_pixel_pairs": 13814,
+    "inlier_threshold": 0.07417241334332358,
+    "inliers": 9517,
+    "inlier_ratio": 0.6889387577819603,
+    "mean_residual": 0.06469517434350243,
+    "p90_residual": 0.17603461085023991,
+    "scale": 0.4123401261572636
+  },
+  "all_match_residual": {
+    "mean": 0.06469517434350243,
+    "median": 0.0422639330381446,
+    "p90": 0.17603461085023991,
+    "count": 13814
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "method": "partial_anchored_dual_3dgs_collision_free_decode",
+  "strict_zero_shot": true,
+  "ground_truth_cd_emd_used": false,
+  "fusion": "all editable Pixal Gaussian slots retained; one-to-one hard partial-anchor replacement",
+  "inputs": {
+    "edited_prior": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/gaussian/single_engine_airplane/edit/partial_anchored_gaussian_edit_editable_prior_100k.ply",
+    "partial": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/inputs/partial/single_engine_airplane.ply",
+    "camera": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/inputs/camera/single_engine_airplane/camera.pth",
+    "semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/inputs/camera/single_engine_airplane/img.png"
+  },
+  "pairing": {
+    "saved_camera": {
+      "partial_visible_pixels": 9998,
+      "prior_visible_pixels": 13828,
+      "nearby_pixel_pairs": 8885,
+      "mutual_pixel_pairs": 6464,
+      "max_pixel_distance": 1.0,
+      "pair_subsample_limit": 16384
+    },
+    "virtual_positive_overlap": {
+      "virtual_views": 6,
+      "virtual_resolution": 384,
+      "virtual_max_pixel_distance": 1.0,
+      "virtual_mutual_pairs": 42966,
+      "per_view": [
+        {
+          "view": 0,
+          "pca_depth_axis": 0,
+          "depth_sign": -1,
+          "partial_visible_points": 8233,
+          "prior_visible_points": 26821,
+          "mutual_pairs": 6354
+        },
+        {
+          "view": 1,
+          "pca_depth_axis": 0,
+          "depth_sign": 1,
+          "partial_visible_points": 8233,
+          "prior_visible_points": 26821,
+          "mutual_pairs": 6354
+        },
+        {
+          "view": 2,
+          "pca_depth_axis": 1,
+          "depth_sign": -1,
+          "partial_visible_points": 8684,
+          "prior_visible_points": 16697,
+          "mutual_pairs": 7125
+        },
+        {
+          "view": 3,
+          "pca_depth_axis": 1,
+          "depth_sign": 1,
+          "partial_visible_points": 8684,
+          "prior_visible_points": 16697,
+          "mutual_pairs": 7125
+        },
+        {
+          "view": 4,
+          "pca_depth_axis": 2,
+          "depth_sign": -1,
+          "partial_visible_points": 10000,
+          "prior_visible_points": 23271,
+          "mutual_pairs": 8004
+        },
+        {
+          "view": 5,
+          "pca_depth_axis": 2,
+          "depth_sign": 1,
+          "partial_visible_points": 10000,
+          "prior_visible_points": 23271,
+          "mutual_pairs": 8004
+        }
+      ],
+      "evidence_policy": "positive_overlap_only; missing_partial_pixels_are_unconstrained"
+    },
+    "combined_pairs": 49430
+  },
+  "decoder": {
+    "pixel_pairs": 49430,
+    "within_metric_limit": 43972,
+    "collision_free_pairs": 12946,
+    "max_residual": 0.09639627539487289,
+    "residual_median": 0.0017457301441348462,
+    "residual_p90": 0.03751151507742705,
+    "prior_points": 100000,
+    "decoded_points": 100000,
+    "all_prior_slots_preserved": true,
+    "partial_anchor_fraction": 0.12946,
+    "decoder": "collision_free_saved_view_hard_anchor_replacement"
+  },
+  "parameters": {
+    "max_pixel_distance": 1.0,
+    "max_anchor_residual_ratio": 0.075,
+    "virtual_positive_views": 6,
+    "virtual_render_size": 384,
+    "virtual_max_pixel_distance": 1.0,
+    "view_reference": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/gaussian/single_engine_airplane/camera_axis_scale/camera_axis_scaled_prior_100k.ply"
+  },
+  "outputs": {
+    "prediction": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/gaussian/single_engine_airplane/decoded/partial_anchored_gaussian_decoded_100k.ply",
+    "comparison": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/gaussian/single_engine_airplane/decoded/partial_anchored_gaussian_partial_gray_decoded_red.ply",
+    "saved_view": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/gaussian/single_engine_airplane/decoded/partial_anchored_gaussian_saved_view_projection.png",
+    "virtual_view_board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/gaussian/single_engine_airplane/decoded/partial_anchored_gaussian_virtual_view_board.png",
+    "anchor_pairs": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/gaussian/single_engine_airplane/decoded/partial_anchored_gaussian_anchor_pairs.npy",
+    "positive_pairs": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/gaussian/single_engine_airplane/decoded/partial_anchored_gaussian_positive_pixel_pairs.npy"
+  }
+}

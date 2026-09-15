@@ -1,0 +1,20 @@
+{
+  "output_dir": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/registration/light_helicopter/bridge",
+  "mask_iou": 0.9096780188635414,
+  "matches": 16381,
+  "fit": {
+    "unique_pixel_pairs": 11091,
+    "inlier_threshold": 0.025241993637708366,
+    "inliers": 8093,
+    "inlier_ratio": 0.729690740239834,
+    "mean_residual": 0.026463027755130385,
+    "p90_residual": 0.07340954575330123,
+    "scale": 0.13225330909783425
+  },
+  "all_match_residual": {
+    "mean": 0.026463027755130385,
+    "median": 0.009344493447784843,
+    "p90": 0.07340954575330123,
+    "count": 11091
+  }
+}

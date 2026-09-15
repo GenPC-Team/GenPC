@@ -1,0 +1,20 @@
+{
+  "output_dir": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/registration/tyrannosaurus_rex_skeleton/bridge",
+  "mask_iou": 0.7893985168909641,
+  "matches": 16115,
+  "fit": {
+    "unique_pixel_pairs": 14277,
+    "inlier_threshold": 0.03470231024437281,
+    "inliers": 10322,
+    "inlier_ratio": 0.722981018421237,
+    "mean_residual": 0.026438541578387986,
+    "p90_residual": 0.05433207904439188,
+    "scale": 0.18458542283742635
+  },
+  "all_match_residual": {
+    "mean": 0.026438541578387986,
+    "median": 0.018490212023096947,
+    "p90": 0.05433207904439188,
+    "count": 14277
+  }
+}

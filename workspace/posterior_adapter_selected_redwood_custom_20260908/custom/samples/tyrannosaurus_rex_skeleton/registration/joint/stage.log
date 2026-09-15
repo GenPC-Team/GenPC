@@ -1,0 +1,7 @@
+{
+  "joint_applied": true,
+  "pixel_applied": true,
+  "partial_before": Infinity,
+  "partial_after": 0.3593612692728269,
+  "output_dir": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/registration/tyrannosaurus_rex_skeleton/joint"
+}

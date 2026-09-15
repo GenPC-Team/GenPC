@@ -1,0 +1,20 @@
+{
+  "output_dir": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/custom/registration/handheld_power_drill/bridge",
+  "mask_iou": 0.9794903666873834,
+  "matches": 16382,
+  "fit": {
+    "unique_pixel_pairs": 14080,
+    "inlier_threshold": 0.03939335623939173,
+    "inliers": 9946,
+    "inlier_ratio": 0.7063920454545455,
+    "mean_residual": 0.04164006151268313,
+    "p90_residual": 0.07428895563972153,
+    "scale": 0.6719997990578261
+  },
+  "all_match_residual": {
+    "mean": 0.04164006151268313,
+    "median": 0.026931048291007766,
+    "p90": 0.07428895563972153,
+    "count": 14080
+  }
+}
