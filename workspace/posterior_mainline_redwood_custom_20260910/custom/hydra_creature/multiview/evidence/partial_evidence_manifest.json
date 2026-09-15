@@ -1,0 +1,190 @@
+{
+  "method": "visibility_aware_positive_partial_evidence",
+  "ground_truth_used": false,
+  "view_order": [
+    "front",
+    "side",
+    "back",
+    "right"
+  ],
+  "registered_prior": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/custom10_fixed_mainline_20260907/registration/hydra_creature/final/camera1_amplified_registered_100k.ply",
+  "partial": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/custom10_fixed_mainline_20260907/inputs/partial/hydra_creature.ply",
+  "manifest": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/hydra_creature/multiview/render/render_manifest.json",
+  "partial_diagonal": 1.0421474465709284,
+  "occlusion_tolerance_ratio": 0.02,
+  "occlusion_tolerance": 0.020842948931418567,
+  "prior_board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/hydra_creature/multiview/evidence/prior_rgb_front_side_back_right.png",
+  "evidence_board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/hydra_creature/multiview/evidence/partial_evidence_front_side_back_right.png",
+  "positive_overlay_board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/hydra_creature/multiview/evidence/partial_positive_overlay_front_side_back_right.png",
+  "correspondence_overlay_board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/hydra_creature/multiview/evidence/partial_correspondence_overlay_front_side_back_right.png",
+  "paper_residual_board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/hydra_creature/multiview/evidence/prior_to_partial_residual_front_side_back_right.png",
+  "residual_arrow_direction": "registered_prior_to_physical_partial",
+  "pair_distance_quantiles": [
+    0.0259223218234124,
+    0.06143304368128565,
+    0.12631174263225856,
+    0.15312368446453742
+  ],
+  "views": [
+    {
+      "name": "front",
+      "prior_rgb": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/hydra_creature/multiview/render/pixal_registered_front.png",
+      "partial_evidence": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/hydra_creature/multiview/evidence/partial_evidence_front.png",
+      "positive_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/hydra_creature/multiview/evidence/partial_positive_overlay_front.png",
+      "correspondence_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/hydra_creature/multiview/evidence/partial_correspondence_overlay_front.png",
+      "paper_residual": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/hydra_creature/multiview/evidence/prior_to_partial_residual_front.png",
+      "residual_arrow_direction": "registered_prior_to_physical_partial",
+      "displayed_residual_vectors": 57,
+      "visible_correspondences": 12067,
+      "projected_pixels": 9757,
+      "visible_positive_pixels": 7003,
+      "occluded_unknown_pixels": 2754,
+      "camera_pose": [
+        [
+          -0.9428519667279034,
+          -0.12025946117403717,
+          0.31075364975403713,
+          0.6206421262327819
+        ],
+        [
+          0.0026271864233578103,
+          0.9298887637036208,
+          0.36783146280497636,
+          0.6768586315159713
+        ],
+        [
+          -0.3332015407059539,
+          0.3476270258997163,
+          -0.8764315056724608,
+          -1.776523240521972
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "side",
+      "prior_rgb": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/hydra_creature/multiview/render/pixal_registered_side.png",
+      "partial_evidence": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/hydra_creature/multiview/evidence/partial_evidence_side.png",
+      "positive_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/hydra_creature/multiview/evidence/partial_positive_overlay_side.png",
+      "correspondence_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/hydra_creature/multiview/evidence/partial_correspondence_overlay_side.png",
+      "paper_residual": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/hydra_creature/multiview/evidence/prior_to_partial_residual_side.png",
+      "residual_arrow_direction": "registered_prior_to_physical_partial",
+      "displayed_residual_vectors": 49,
+      "visible_correspondences": 6312,
+      "projected_pixels": 12375,
+      "visible_positive_pixels": 5259,
+      "occluded_unknown_pixels": 7116,
+      "camera_pose": [
+        [
+          0.9428519667279035,
+          -0.12025946117403712,
+          -0.31075364975403724,
+          -0.6461813615727852
+        ],
+        [
+          -0.0026271864233578524,
+          0.9298887637036207,
+          -0.36783146280497625,
+          -0.822649216594733
+        ],
+        [
+          0.33320154070595404,
+          0.34762702589971617,
+          0.8764315056724608,
+          1.7963519862612556
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "back",
+      "prior_rgb": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/hydra_creature/multiview/render/pixal_registered_back.png",
+      "partial_evidence": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/hydra_creature/multiview/evidence/partial_evidence_back.png",
+      "positive_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/hydra_creature/multiview/evidence/partial_positive_overlay_back.png",
+      "correspondence_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/hydra_creature/multiview/evidence/partial_correspondence_overlay_back.png",
+      "paper_residual": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/hydra_creature/multiview/evidence/prior_to_partial_residual_back.png",
+      "residual_arrow_direction": "registered_prior_to_physical_partial",
+      "displayed_residual_vectors": 55,
+      "visible_correspondences": 9958,
+      "projected_pixels": 10996,
+      "visible_positive_pixels": 6924,
+      "occluded_unknown_pixels": 4072,
+      "camera_pose": [
+        [
+          0.5441930216125616,
+          -0.12025946117403724,
+          0.8302961021384603,
+          1.6796298197218784
+        ],
+        [
+          0.3546179437636137,
+          0.9298887637036208,
+          -0.09773945517864459,
+          -0.27211843537878033
+        ],
+        [
+          -0.7603289217102401,
+          0.3476270258997163,
+          0.5486851389230999,
+          1.1283038462480042
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "right",
+      "prior_rgb": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/hydra_creature/multiview/render/pixal_registered_right.png",
+      "partial_evidence": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/hydra_creature/multiview/evidence/partial_evidence_right.png",
+      "positive_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/hydra_creature/multiview/evidence/partial_positive_overlay_right.png",
+      "correspondence_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/hydra_creature/multiview/evidence/partial_correspondence_overlay_right.png",
+      "paper_residual": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/hydra_creature/multiview/evidence/prior_to_partial_residual_right.png",
+      "residual_arrow_direction": "registered_prior_to_physical_partial",
+      "displayed_residual_vectors": 59,
+      "visible_correspondences": 12200,
+      "projected_pixels": 11334,
+      "visible_positive_pixels": 8924,
+      "occluded_unknown_pixels": 2410,
+      "camera_pose": [
+        [
+          -0.4469610063088245,
+          -0.12025946117403717,
+          0.8864330323479225,
+          1.794054190568266
+        ],
+        [
+          0.26195382301856374,
+          0.9298887637036207,
+          0.2582384203477685,
+          0.4534742233284051
+        ],
+        [
+          -0.8553397298415186,
+          0.34762702589971634,
+          -0.3841215919715474,
+          -0.7730438566925529
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

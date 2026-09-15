@@ -1,0 +1,517 @@
+{
+  "method": "structure_aware_partial_ot_complete_gaussian_posterior",
+  "strict_zero_shot": true,
+  "ground_truth_cd_emd_used": false,
+  "category_or_part_rules_used": false,
+  "inputs": {
+    "prior": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/custom10_fixed_mainline_20260907/gaussian/tyrannosaurus_rex_skeleton/decoded/partial_anchored_gaussian_decoded_100k.ply",
+    "partial": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/custom10_fixed_mainline_20260907/inputs/partial/tyrannosaurus_rex_skeleton.ply",
+    "camera": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/custom10_fixed_mainline_20260907/inputs/camera/tyrannosaurus_rex_skeleton/camera.pth",
+    "semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/custom10_fixed_mainline_20260907/inputs/camera/tyrannosaurus_rex_skeleton/img.png"
+  },
+  "estimate": {
+    "active": true,
+    "method": "structure_aware_partial_ot_complete_gaussian_posterior",
+    "strict_zero_shot": true,
+    "ground_truth_cd_emd_used": false,
+    "category_or_part_rules_used": false,
+    "carrier_slots_before": 100000,
+    "carrier_slots_after": 100000,
+    "carrier_slots_preserved": true,
+    "config": {
+      "partial_samples": 3072,
+      "prior_samples": 6144,
+      "normal_neighbours": 24,
+      "transport_iterations": 60,
+      "transport_relaxation": 0.72,
+      "transport_temperature_floor": 0.012,
+      "maximum_3d_ratio": 0.34,
+      "maximum_screen_ratio": 0.28,
+      "maximum_depth_ratio": 0.34,
+      "structural_rescue_candidates": 48,
+      "structural_rescue_screen_fraction": 0.55,
+      "structural_rescue_depth_fraction": 0.7,
+      "intrinsic_landmarks": 8,
+      "intrinsic_graph_neighbours": 12,
+      "minimum_transport_pairs": 96,
+      "stable_spacing_multiplier": 3.0,
+      "stable_residual_quantile": 0.22,
+      "residual_quantile": 0.42,
+      "coarse_node_fraction": 0.02,
+      "fine_node_fraction": 0.055,
+      "minimum_graph_nodes": 192,
+      "maximum_graph_nodes": 6144,
+      "skinning_neighbours": 4,
+      "low_frequency_modes": 24,
+      "low_frequency_regularization": 0.035,
+      "low_frequency_stable_weight": 6.0,
+      "coarse_neighbours": 18,
+      "coarse_edge_ratio": 2.45,
+      "coarse_data_weight": 2.5,
+      "coarse_screening": 0.0008,
+      "coarse_iterations": 5,
+      "coarse_displacement_ratio": 0.28,
+      "fine_neighbours": 10,
+      "fine_edge_ratio": 1.85,
+      "fine_data_weight": 4.0,
+      "fine_screening": 0.003,
+      "fine_iterations": 5,
+      "fine_displacement_ratio": 0.12,
+      "attachment_edge_ratio": 3.2,
+      "minimum_observed_improvement": 0.025,
+      "minimum_edge_compression": 0.55,
+      "maximum_edge_stretch": 2.8,
+      "minimum_hidden_coverage": 0.95,
+      "coverage_resolution": 160
+    },
+    "stages": [
+      {
+        "stage": "coarse",
+        "transport": {
+          "active": true,
+          "method": "camera_structure_unbalanced_partial_transport",
+          "device": "cuda",
+          "partial_diagonal": 1.0565967402183587,
+          "partial_spacing": 0.0014948906742285445,
+          "visible_prior": 7875,
+          "partial_samples": 3072,
+          "prior_samples": 6144,
+          "valid_transport_rows": 3072,
+          "retained_capacity_pairs": 266,
+          "stable_pairs": 676,
+          "coherent_residual_rows": 272,
+          "raw_coherent_residual_rows": 272,
+          "coherent_residual_fraction": 0.08854166666666667,
+          "coherent_prior_support_fraction": 0.021484375,
+          "localization_bound": 0.19999999999999998,
+          "localized_residual_evidence": true,
+          "residual_pairs": 266,
+          "stable_prior": 2762,
+          "residual_prior": 266,
+          "unsupported_prior": 96972,
+          "unmatched_partial_fraction": 0.693359375,
+          "temperature": 0.012,
+          "stable_limit": 0.012675791824586972,
+          "residual_limit": 0.021861862956481463,
+          "residual_median": 0.054457381306871264,
+          "residual_p90": 0.09394791009655745
+        },
+        "solver": {
+          "active": true,
+          "field": "hierarchical_embedded_arap_posterior",
+          "graph_nodes": 2242,
+          "node_graph_edges": 20117,
+          "attachment_edges": 0,
+          "carrier_graph_edges": 898726,
+          "carrier_attachment_edges": 0,
+          "target_gaussians": 266,
+          "stable_gaussians": 2762,
+          "moved_gaussians": 97231,
+          "moved_fraction": 0.97231,
+          "maximum_displacement": 0.027128338858509817,
+          "mean_displacement": 0.003489440513860161,
+          "coherent_targets": {
+            "component_radius": 0.021490935089643122,
+            "minimum_component_points": 8,
+            "components": 5,
+            "regularized_targets": 266,
+            "component_records": [
+              {
+                "points": 45,
+                "median_residual": [
+                  0.017799735069274902,
+                  0.010681629180908203,
+                  -0.031928612387402744
+                ],
+                "median_residual_norm": 0.03808364556446523,
+                "directional_coherence": 0.5275050196449502
+              },
+              {
+                "points": 54,
+                "median_residual": [
+                  0.049246235074742864,
+                  0.04029486385520426,
+                  0.014900386333465576
+                ],
+                "median_residual_norm": 0.0653520407870543,
+                "directional_coherence": 0.7143531047265912
+              },
+              {
+                "points": 26,
+                "median_residual": [
+                  0.014771322138741758,
+                  -0.006307551471581239,
+                  0.03837169781013609
+                ],
+                "median_residual_norm": 0.041597648444660094,
+                "directional_coherence": 0.40583418340347854
+              },
+              {
+                "points": 16,
+                "median_residual": [
+                  -0.011588037014007568,
+                  -0.03006577491760254,
+                  -0.006522253155708313
+                ],
+                "median_residual_norm": 0.03287511535281807,
+                "directional_coherence": 0.7154318384604319
+              },
+              {
+                "points": 125,
+                "median_residual": [
+                  -0.012201880616975552,
+                  -0.008954164702063876,
+                  0.020165171897621913
+                ],
+                "median_residual_norm": 0.025213034600445283,
+                "directional_coherence": 0.4661558249501802
+              }
+            ]
+          },
+          "node_solver": {
+            "active": true,
+            "field": "soft_full_surface_arap_posterior",
+            "surface_graph_edges": 20117,
+            "attachment_edges": 0,
+            "coherent_targets": {
+              "components": 0,
+              "regularized_targets": 0
+            },
+            "line_search": [
+              {
+                "alpha": 1.0,
+                "observed_residual_before": 0.025213034600445283,
+                "observed_residual_after": 5.674834230812929e-05,
+                "observed_improvement": 0.9977492458481326,
+                "hidden_coverage_ratio": 0.977878985035784,
+                "hidden_coverage_per_view": [
+                  1.015299026425591,
+                  1.000733137829912,
+                  0.977878985035784
+                ],
+                "original_graph_components": 1,
+                "candidate_graph_components": 1,
+                "edge_stretch_p01": 0.6209109025692292,
+                "edge_stretch_p50": 1.0001619921929072,
+                "edge_stretch_p99": 3.1563588200284483,
+                "edge_stretch_p999": 9.075108546320106,
+                "significant_component_size": 32,
+                "original_significant_components": 1,
+                "candidate_significant_components": 1,
+                "candidate_small_component_mass": 0
+              },
+              {
+                "alpha": 0.85,
+                "observed_residual_before": 0.025213034600445283,
+                "observed_residual_after": 0.0038021516076873255,
+                "observed_improvement": 0.8491989691863518,
+                "hidden_coverage_ratio": 0.9752925877763329,
+                "hidden_coverage_per_view": [
+                  1.0272156315422192,
+                  1.0051319648093842,
+                  0.9752925877763329
+                ],
+                "original_graph_components": 1,
+                "candidate_graph_components": 1,
+                "edge_stretch_p01": 0.6372654075302783,
+                "edge_stretch_p50": 1.0000691638447845,
+                "edge_stretch_p99": 2.738576993063329,
+                "edge_stretch_p999": 7.727265229188911,
+                "significant_component_size": 32,
+                "original_significant_components": 1,
+                "candidate_significant_components": 1,
+                "candidate_small_component_mass": 0
+              },
+              {
+                "alpha": 0.7,
+                "observed_residual_before": 0.025213034600445283,
+                "observed_residual_after": 0.007580451646396913,
+                "observed_improvement": 0.6993439398896063,
+                "hidden_coverage_ratio": 0.9825581395348837,
+                "hidden_coverage_per_view": [
+                  1.0112123335669236,
+                  1.0058651026392962,
+                  0.9825581395348837
+                ],
+                "original_graph_components": 1,
+                "candidate_graph_components": 1,
+                "edge_stretch_p01": 0.6550825221796424,
+                "edge_stretch_p50": 1.0000243438314211,
+                "edge_stretch_p99": 2.3428127128488248,
+                "edge_stretch_p999": 6.445098679688633,
+                "significant_component_size": 32,
+                "original_significant_components": 1,
+                "candidate_significant_components": 1,
+                "candidate_small_component_mass": 0
+              },
+              {
+                "alpha": 0.55,
+                "observed_residual_before": 0.025213034600445283,
+                "observed_residual_after": 0.01135883832611307,
+                "observed_improvement": 0.5494854742351218,
+                "hidden_coverage_ratio": 0.9851228978007762,
+                "hidden_coverage_per_view": [
+                  1.0167832167832167,
+                  1.0,
+                  0.9851228978007762
+                ],
+                "original_graph_components": 1,
+                "candidate_graph_components": 1,
+                "edge_stretch_p01": 0.6773091257436685,
+                "edge_stretch_p50": 1.000004457070325,
+                "edge_stretch_p99": 1.9543678176281305,
+                "edge_stretch_p999": 5.135457702400944,
+                "significant_component_size": 32,
+                "original_significant_components": 1,
+                "candidate_significant_components": 1,
+                "candidate_small_component_mass": 0
+              },
+              {
+                "alpha": 0.4,
+                "observed_residual_before": 0.025213034600445283,
+                "observed_residual_after": 0.015137246767958832,
+                "observed_improvement": 0.39962614545051645,
+                "hidden_coverage_ratio": 0.9876543209876543,
+                "hidden_coverage_per_view": [
+                  0.9978947368421053,
+                  0.9876543209876543,
+                  1.0071243523316062
+                ],
+                "original_graph_components": 1,
+                "candidate_graph_components": 1,
+                "edge_stretch_p01": 0.7181634798745565,
+                "edge_stretch_p50": 1.0,
+                "edge_stretch_p99": 1.6019819804348705,
+                "edge_stretch_p999": 3.845300371458131,
+                "significant_component_size": 32,
+                "original_significant_components": 1,
+                "candidate_significant_components": 1,
+                "candidate_small_component_mass": 0
+              }
+            ],
+            "target_gaussians": 266,
+            "stable_gaussians": 359,
+            "moved_gaussians": 1883,
+            "moved_fraction": 0.8398751115075825,
+            "maximum_displacement": 0.026326650035303392,
+            "mean_displacement": 0.0048987164172344735,
+            "cg_status": [
+              0,
+              0,
+              0
+            ],
+            "alpha": 0.4,
+            "observed_residual_before": 0.025213034600445283,
+            "observed_residual_after": 0.015137246767958832,
+            "observed_improvement": 0.39962614545051645,
+            "hidden_coverage_ratio": 0.9876543209876543,
+            "hidden_coverage_per_view": [
+              0.9978947368421053,
+              0.9876543209876543,
+              1.0071243523316062
+            ],
+            "original_graph_components": 1,
+            "candidate_graph_components": 1,
+            "edge_stretch_p01": 0.7181634798745565,
+            "edge_stretch_p50": 1.0,
+            "edge_stretch_p99": 1.6019819804348705,
+            "edge_stretch_p999": 3.845300371458131,
+            "significant_component_size": 32,
+            "original_significant_components": 1,
+            "candidate_significant_components": 1,
+            "candidate_small_component_mass": 0
+          },
+          "line_search": [
+            {
+              "alpha": 1.0,
+              "observed_residual_before": 0.025213034600445283,
+              "observed_residual_after": 0.015276993987414464,
+              "observed_improvement": 0.39408348778672364,
+              "hidden_coverage_ratio": 0.985936867664913,
+              "hidden_coverage_per_view": [
+                1.0090712049450108,
+                0.9973947025618758,
+                0.985936867664913
+              ],
+              "original_graph_components": 1,
+              "candidate_graph_components": 1,
+              "significant_component_size": 100,
+              "original_significant_components": 1,
+              "candidate_significant_components": 1,
+              "candidate_small_component_mass": 0,
+              "robust_edge_quantile": 0.99,
+              "edge_stretch_p01": 0.7509260393746493,
+              "edge_stretch_p50": 1.0000004984898045,
+              "edge_stretch_p99": 1.4351942135129634,
+              "edge_stretch_p999": 2.2641489713281584
+            }
+          ],
+          "alpha": 1.0,
+          "observed_residual_before": 0.025213034600445283,
+          "observed_residual_after": 0.015276993987414464,
+          "observed_improvement": 0.39408348778672364,
+          "hidden_coverage_ratio": 0.985936867664913,
+          "hidden_coverage_per_view": [
+            1.0090712049450108,
+            0.9973947025618758,
+            0.985936867664913
+          ],
+          "original_graph_components": 1,
+          "candidate_graph_components": 1,
+          "significant_component_size": 100,
+          "original_significant_components": 1,
+          "candidate_significant_components": 1,
+          "candidate_small_component_mass": 0,
+          "robust_edge_quantile": 0.99,
+          "edge_stretch_p01": 0.7509260393746493,
+          "edge_stretch_p50": 1.0000004984898045,
+          "edge_stretch_p99": 1.4351942135129634,
+          "edge_stretch_p999": 2.2641489713281584
+        }
+      },
+      {
+        "stage": "fine",
+        "active": false,
+        "reason": "insufficient_residual_transport_pairs",
+        "transport": {
+          "active": false,
+          "method": "camera_structure_unbalanced_partial_transport",
+          "device": "cuda",
+          "partial_diagonal": 1.0565967402183587,
+          "partial_spacing": 0.0014948906742285445,
+          "visible_prior": 7692,
+          "partial_samples": 3072,
+          "prior_samples": 6144,
+          "valid_transport_rows": 3072,
+          "retained_capacity_pairs": 0,
+          "stable_pairs": 676,
+          "coherent_residual_rows": 0,
+          "raw_coherent_residual_rows": 1731,
+          "coherent_residual_fraction": 0.5634765625,
+          "coherent_prior_support_fraction": 0.173828125,
+          "localization_bound": 0.19999999999999998,
+          "localized_residual_evidence": false,
+          "residual_pairs": 0,
+          "stable_prior": 2933,
+          "residual_prior": 0,
+          "unsupported_prior": 97067,
+          "unmatched_partial_fraction": 0.7799479166666666,
+          "temperature": 0.012,
+          "stable_limit": 0.012934593238700633,
+          "residual_limit": 0.022038916199208867,
+          "residual_median": null,
+          "residual_p90": null
+        }
+      }
+    ],
+    "supported_stable": 2762,
+    "supported_stable_final": 2762,
+    "supported_residual": 0,
+    "unsupported": 97067,
+    "moved": 97231,
+    "hidden_coverage_ratio": 0.985936867664913,
+    "hidden_coverage_per_view": [
+      1.0090712049450108,
+      0.9973947025618758,
+      0.985936867664913
+    ],
+    "integrity": {
+      "input_connected_components": 14,
+      "output_connected_components": 12,
+      "new_connected_components": 0,
+      "component_significance_size": 100,
+      "input_significant_components": 1,
+      "output_significant_components": 1,
+      "input_component_sizes": [
+        99904,
+        45,
+        37,
+        3,
+        2,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "output_component_sizes": [
+        99907,
+        45,
+        37,
+        3,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "tracked_original_edges": 497583,
+      "tracked_edge_replacement_fraction": 0.0005245356051151265,
+      "stable_motion_p50": 0.0,
+      "stable_motion_p95": 0.0,
+      "stable_motion_max": 0.0,
+      "passed": true
+    },
+    "topology_projection": {
+      "active": true,
+      "corrected_points": 3,
+      "passes": [
+        {
+          "pass": 0,
+          "components_before": 15,
+          "new_small_fragment_points": 3
+        },
+        {
+          "pass": 1,
+          "components_before": 12,
+          "new_small_fragment_points": 0
+        }
+      ]
+    },
+    "posterior_verifier": {
+      "criterion": "local_transport_improves_and_global_visible_score_does_not_worsen",
+      "accepted": true,
+      "initial": {
+        "objective": 0.08919038979816983,
+        "visible_3d": 0.010629516017437508,
+        "visible_pair_count": 6166,
+        "silhouette_iou": 0.7739461045891142,
+        "coverage": 0.9417255092930769,
+        "leakage": 0.18712344122180188,
+        "depth_error_normalized": 9.400334608626669e-05
+      },
+      "candidate": {
+        "objective": 0.08874328791659215,
+        "visible_3d": 0.010557358592329442,
+        "visible_pair_count": 6169,
+        "silhouette_iou": 0.7746716066015493,
+        "coverage": 0.9333657982306631,
+        "leakage": 0.17997718197375928,
+        "depth_error_normalized": 0.00010303776700822647
+      },
+      "objective_delta": -0.0004471018815776773,
+      "ground_truth_cd_emd_used": false
+    },
+    "edge_stretch_p01": 0.7384018562712356,
+    "edge_stretch_p50": 1.0000000220632912,
+    "edge_stretch_p99": 1.4787098599252524,
+    "edge_stretch_p999": 2.4356110536957507
+  },
+  "outputs": {
+    "posterior": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/tyrannosaurus_rex_skeleton/posterior_prior_100k.ply",
+    "coarse": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/tyrannosaurus_rex_skeleton/coarse_prior_100k.ply",
+    "comparison": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/tyrannosaurus_rex_skeleton/partial_gray_posterior_red.ply",
+    "saved_view": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/tyrannosaurus_rex_skeleton/posterior_saved_view_projection.png",
+    "virtual_views": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/tyrannosaurus_rex_skeleton/posterior_virtual_views.png",
+    "support_status": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/tyrannosaurus_rex_skeleton/posterior_support_status.png",
+    "transport_pairs": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/tyrannosaurus_rex_skeleton/partial_ot_pairs.npy",
+    "field": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/tyrannosaurus_rex_skeleton/posterior_field.npz"
+  }
+}

@@ -1,0 +1,245 @@
+{
+  "method": "registered_pixal_visible_partial_ranked_multiview",
+  "ground_truth_used": false,
+  "glb": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/custom10_fixed_mainline_20260907/inputs/pixal/domestic_pig/pixal3d.glb",
+  "source_carrier": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/custom10_fixed_mainline_20260907/inputs/pixal/domestic_pig/pixal3d_sampled_100k.ply",
+  "registered_carrier": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/custom10_fixed_mainline_20260907/registration/domestic_pig/final/camera1_amplified_registered_100k.ply",
+  "saved_partial_camera": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/custom10_fixed_mainline_20260907/inputs/camera/domestic_pig/camera.pth",
+  "ordered_similarity": [
+    [
+      0.2645616657161637,
+      -0.3748230217631009,
+      0.807881297952598,
+      -0.15189945667349447
+    ],
+    [
+      -0.023912897726849607,
+      0.8394800690347383,
+      0.39731442360861063,
+      0.03774163673797348
+    ],
+    [
+      -0.8902767336887448,
+      -0.13393386517798656,
+      0.22940449298714752,
+      0.021596703077683493
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "ordered_similarity_fit_rmse": 1.8734244272826337e-16,
+  "resolution": 512,
+  "field_of_view_degrees": 38.0,
+  "centre": [
+    -0.14786103733188904,
+    0.025138168398319616,
+    0.029941561566611426
+  ],
+  "radius": 0.5086277478459632,
+  "front_direction": [
+    -0.8416989249837641,
+    -0.4324790370540095,
+    -0.32327202506559805
+  ],
+  "up_direction": [
+    -0.41299935305262697,
+    0.9013332311168293,
+    -0.13049881556017318
+  ],
+  "views": [
+    {
+      "name": "front",
+      "image": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/domestic_pig/multiview/render/pixal_registered_front.png",
+      "camera_pose": [
+        [
+          -0.3478138209722086,
+          -0.41299935305262686,
+          -0.8416989249837642,
+          -1.6206242466445544
+        ],
+        [
+          -0.023670424443452326,
+          0.9013332311168293,
+          -0.4324790370540094,
+          -0.731592291468194
+        ],
+        [
+          0.9372647741953068,
+          -0.13049881556017312,
+          -0.32327202506559805,
+          -0.5357038622122039
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "orbit_yaw_degrees": 0.0
+    },
+    {
+      "name": "side",
+      "image": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/domestic_pig/multiview/render/pixal_registered_side.png",
+      "camera_pose": [
+        [
+          0.34781382097220875,
+          -0.41299935305262697,
+          0.841698924983764,
+          1.324902171980776
+        ],
+        [
+          0.023670424443452423,
+          0.9013332311168293,
+          0.4324790370540095,
+          0.7818686282648333
+        ],
+        [
+          -0.9372647741953067,
+          -0.13049881556017318,
+          0.3232720250655982,
+          0.595586985345427
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "orbit_yaw_degrees": 180.0
+    },
+    {
+      "name": "back",
+      "image": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/domestic_pig/multiview/render/pixal_registered_back.png",
+      "camera_pose": [
+        [
+          -0.8411125289732992,
+          -0.41299935305262697,
+          -0.349229506173594,
+          -0.7589255795716463
+        ],
+        [
+          -0.3225463774594473,
+          0.9013332311168293,
+          -0.28907134218438924,
+          -0.4806645895700512
+        ],
+        [
+          0.43415843650898744,
+          -0.1304988155601732,
+          -0.8913341186925716,
+          -1.5296708583267247
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "orbit_yaw_degrees": 315.0
+    },
+    {
+      "name": "right",
+      "image": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/domestic_pig/multiview/render/pixal_registered_right.png",
+      "camera_pose": [
+        [
+          0.8411125289732992,
+          -0.412999353052627,
+          0.34922950617359416,
+          0.46320350490786844
+        ],
+        [
+          0.3225463774594473,
+          0.9013332311168294,
+          0.2890713421843893,
+          0.5309409263666904
+        ],
+        [
+          -0.43415843650898767,
+          -0.13049881556017312,
+          0.8913341186925716,
+          1.5895539814599473
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "orbit_yaw_degrees": 135.0
+    }
+  ],
+  "view_selection": {
+    "method": "camera1_plus_ranked_visible_partial_support",
+    "ground_truth_used": false,
+    "num_partial_points": 16384,
+    "candidate_yaw_step_degrees": 15.0,
+    "min_yaw_separation_degrees": 45.0,
+    "selection_resolution": 256,
+    "selected": [
+      {
+        "rank": 1,
+        "yaw_degrees": 0.0,
+        "visible_points": 8082,
+        "new_visible_points": 8082,
+        "camera1_fixed": true
+      },
+      {
+        "rank": 2,
+        "yaw_degrees": 180.0,
+        "visible_points": 6780,
+        "new_visible_points": 3378,
+        "camera1_fixed": false
+      },
+      {
+        "rank": 3,
+        "yaw_degrees": 315.0,
+        "visible_points": 6041,
+        "new_visible_points": 1340,
+        "camera1_fixed": false
+      },
+      {
+        "rank": 4,
+        "yaw_degrees": 135.0,
+        "visible_points": 5256,
+        "new_visible_points": 650,
+        "camera1_fixed": false
+      }
+    ],
+    "covered_partial_points": 13450,
+    "candidate_visible_points": {
+      "0": 8082,
+      "15": 7084,
+      "30": 6292,
+      "45": 4926,
+      "60": 4046,
+      "75": 3430,
+      "90": 3450,
+      "105": 3806,
+      "120": 4371,
+      "135": 5256,
+      "150": 6053,
+      "165": 6494,
+      "180": 6780,
+      "195": 6754,
+      "210": 5846,
+      "225": 4990,
+      "240": 4132,
+      "255": 3451,
+      "270": 3394,
+      "285": 3945,
+      "300": 4762,
+      "315": 6041,
+      "330": 6910,
+      "345": 7657
+    }
+  },
+  "board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/domestic_pig/multiview/render/pixal_registered_front_side_back_right_board.png"
+}

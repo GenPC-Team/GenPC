@@ -1,0 +1,22 @@
+{
+  "stable_residual_quantile": 0.12,
+  "residual_quantile": 0.72,
+  "coarse_data_weight": 3.5,
+  "coarse_screening": 0.00005,
+  "coarse_displacement_ratio": 0.36,
+  "fine_screening": 0.0002,
+  "fine_displacement_ratio": 0.18,
+  "bending_regularization": 8.0,
+  "minimum_hidden_coverage": 0.85,
+  "minimum_edge_compression": 0.30,
+  "maximum_edge_stretch": 5.0,
+  "assimilation_anchor_residual_ratio": 0.075,
+  "assimilation_screening": 0.0003,
+  "assimilation_displacement_ratio": 0.12,
+  "slender_rigidity_projection": true,
+  "slender_neighbours": 128,
+  "slender_linearity_quantile": 0.95,
+  "slender_minimum_fraction": 0.002,
+  "slender_minimum_aspect_ratio": 4.0,
+  "slender_dilation_steps": 2
+}

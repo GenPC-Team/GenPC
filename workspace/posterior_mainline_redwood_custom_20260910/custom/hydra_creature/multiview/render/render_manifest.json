@@ -1,0 +1,245 @@
+{
+  "method": "registered_pixal_visible_partial_ranked_multiview",
+  "ground_truth_used": false,
+  "glb": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/custom10_fixed_mainline_20260907/inputs/pixal/hydra_creature/pixal3d.glb",
+  "source_carrier": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/custom10_fixed_mainline_20260907/inputs/pixal/hydra_creature/pixal3d_sampled_100k.ply",
+  "registered_carrier": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/custom10_fixed_mainline_20260907/registration/hydra_creature/final/camera1_amplified_registered_100k.ply",
+  "saved_partial_camera": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/custom10_fixed_mainline_20260907/inputs/camera/hydra_creature/camera.pth",
+  "ordered_similarity": [
+    [
+      0.897431867140814,
+      -0.46265010048322563,
+      -0.36748312530145133,
+      -0.012758822654474478
+    ],
+    [
+      -0.2901252767330033,
+      0.23709973640829998,
+      -1.007017357255584,
+      -0.03348774160279683
+    ],
+    [
+      0.5147001910423811,
+      0.9403252195577246,
+      0.07311028534320198,
+      0.06524796931418098
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "ordered_similarity_fit_rmse": 1.7405453990966124e-16,
+  "resolution": 512,
+  "field_of_view_degrees": 38.0,
+  "centre": [
+    -0.012769617670001492,
+    -0.07289529253938103,
+    0.009914372869641806
+  ],
+  "radius": 0.5925073855503655,
+  "front_direction": [
+    0.3107536497540371,
+    0.3678314628049763,
+    -0.8764315056724605
+  ],
+  "up_direction": [
+    -0.12025946117403717,
+    0.9298887637036208,
+    0.34762702589971634
+  ],
+  "views": [
+    {
+      "name": "front",
+      "image": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/hydra_creature/multiview/render/pixal_registered_front.png",
+      "camera_pose": [
+        [
+          -0.9428519667279034,
+          -0.12025946117403717,
+          0.31075364975403713,
+          0.6206421262327819
+        ],
+        [
+          0.0026271864233578103,
+          0.9298887637036208,
+          0.36783146280497636,
+          0.6768586315159713
+        ],
+        [
+          -0.3332015407059539,
+          0.3476270258997163,
+          -0.8764315056724608,
+          -1.776523240521972
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "orbit_yaw_degrees": 0.0
+    },
+    {
+      "name": "side",
+      "image": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/hydra_creature/multiview/render/pixal_registered_side.png",
+      "camera_pose": [
+        [
+          0.9428519667279035,
+          -0.12025946117403712,
+          -0.31075364975403724,
+          -0.6461813615727852
+        ],
+        [
+          -0.0026271864233578524,
+          0.9298887637036207,
+          -0.36783146280497625,
+          -0.822649216594733
+        ],
+        [
+          0.33320154070595404,
+          0.34762702589971617,
+          0.8764315056724608,
+          1.7963519862612556
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "orbit_yaw_degrees": 180.0
+    },
+    {
+      "name": "back",
+      "image": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/hydra_creature/multiview/render/pixal_registered_back.png",
+      "camera_pose": [
+        [
+          0.5441930216125616,
+          -0.12025946117403724,
+          0.8302961021384603,
+          1.6796298197218784
+        ],
+        [
+          0.3546179437636137,
+          0.9298887637036208,
+          -0.09773945517864459,
+          -0.27211843537878033
+        ],
+        [
+          -0.7603289217102401,
+          0.3476270258997163,
+          0.5486851389230999,
+          1.1283038462480042
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "orbit_yaw_degrees": 255.0
+    },
+    {
+      "name": "right",
+      "image": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/hydra_creature/multiview/render/pixal_registered_right.png",
+      "camera_pose": [
+        [
+          -0.4469610063088245,
+          -0.12025946117403717,
+          0.8864330323479225,
+          1.794054190568266
+        ],
+        [
+          0.26195382301856374,
+          0.9298887637036207,
+          0.2582384203477685,
+          0.4534742233284051
+        ],
+        [
+          -0.8553397298415186,
+          0.34762702589971634,
+          -0.3841215919715474,
+          -0.7730438566925529
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "orbit_yaw_degrees": 315.0
+    }
+  ],
+  "view_selection": {
+    "method": "camera1_plus_ranked_visible_partial_support",
+    "ground_truth_used": false,
+    "num_partial_points": 16384,
+    "candidate_yaw_step_degrees": 15.0,
+    "min_yaw_separation_degrees": 45.0,
+    "selection_resolution": 256,
+    "selected": [
+      {
+        "rank": 1,
+        "yaw_degrees": 0.0,
+        "visible_points": 1779,
+        "new_visible_points": 1779,
+        "camera1_fixed": true
+      },
+      {
+        "rank": 2,
+        "yaw_degrees": 180.0,
+        "visible_points": 1961,
+        "new_visible_points": 1739,
+        "camera1_fixed": false
+      },
+      {
+        "rank": 3,
+        "yaw_degrees": 255.0,
+        "visible_points": 1842,
+        "new_visible_points": 1068,
+        "camera1_fixed": false
+      },
+      {
+        "rank": 4,
+        "yaw_degrees": 315.0,
+        "visible_points": 1812,
+        "new_visible_points": 995,
+        "camera1_fixed": false
+      }
+    ],
+    "covered_partial_points": 5581,
+    "candidate_visible_points": {
+      "0": 1779,
+      "15": 1643,
+      "30": 1460,
+      "45": 1449,
+      "60": 1444,
+      "75": 1484,
+      "90": 1499,
+      "105": 1305,
+      "120": 1435,
+      "135": 1805,
+      "150": 1900,
+      "165": 1868,
+      "180": 1961,
+      "195": 1899,
+      "210": 1735,
+      "225": 1676,
+      "240": 1768,
+      "255": 1842,
+      "270": 1602,
+      "285": 1451,
+      "300": 1771,
+      "315": 1812,
+      "330": 1786,
+      "345": 1792
+    }
+  },
+  "board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/hydra_creature/multiview/render/pixal_registered_front_side_back_right_board.png"
+}

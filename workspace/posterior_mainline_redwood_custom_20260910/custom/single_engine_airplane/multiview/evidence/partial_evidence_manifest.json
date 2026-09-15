@@ -1,0 +1,190 @@
+{
+  "method": "visibility_aware_positive_partial_evidence",
+  "ground_truth_used": false,
+  "view_order": [
+    "front",
+    "side",
+    "back",
+    "right"
+  ],
+  "registered_prior": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/custom10_fixed_mainline_20260907/registration/single_engine_airplane/final/camera1_amplified_registered_100k.ply",
+  "partial": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/custom10_fixed_mainline_20260907/inputs/partial/single_engine_airplane.ply",
+  "manifest": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/single_engine_airplane/multiview/render/render_manifest.json",
+  "partial_diagonal": 1.16078761529618,
+  "occlusion_tolerance_ratio": 0.02,
+  "occlusion_tolerance": 0.0232157523059236,
+  "prior_board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/single_engine_airplane/multiview/evidence/prior_rgb_front_side_back_right.png",
+  "evidence_board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/single_engine_airplane/multiview/evidence/partial_evidence_front_side_back_right.png",
+  "positive_overlay_board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/single_engine_airplane/multiview/evidence/partial_positive_overlay_front_side_back_right.png",
+  "correspondence_overlay_board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/single_engine_airplane/multiview/evidence/partial_correspondence_overlay_front_side_back_right.png",
+  "paper_residual_board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/single_engine_airplane/multiview/evidence/prior_to_partial_residual_front_side_back_right.png",
+  "residual_arrow_direction": "registered_prior_to_physical_partial",
+  "pair_distance_quantiles": [
+    0.007692001892341031,
+    0.015349033055550083,
+    0.028049226759968487,
+    0.04348822707694685
+  ],
+  "views": [
+    {
+      "name": "front",
+      "prior_rgb": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/single_engine_airplane/multiview/render/pixal_registered_front.png",
+      "partial_evidence": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/single_engine_airplane/multiview/evidence/partial_evidence_front.png",
+      "positive_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/single_engine_airplane/multiview/evidence/partial_positive_overlay_front.png",
+      "correspondence_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/single_engine_airplane/multiview/evidence/partial_correspondence_overlay_front.png",
+      "paper_residual": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/single_engine_airplane/multiview/evidence/prior_to_partial_residual_front.png",
+      "residual_arrow_direction": "registered_prior_to_physical_partial",
+      "displayed_residual_vectors": 64,
+      "visible_correspondences": 15323,
+      "projected_pixels": 22784,
+      "visible_positive_pixels": 21009,
+      "occluded_unknown_pixels": 1775,
+      "camera_pose": [
+        [
+          -0.8510653657565661,
+          0.2043913698471158,
+          -0.48364440567596967,
+          -0.7968359399348612
+        ],
+        [
+          -0.00497177311932101,
+          0.9179442731751759,
+          0.39667819806103294,
+          0.6559976426915042
+        ],
+        [
+          0.525036212733648,
+          0.3400036459759183,
+          -0.7802143910755491,
+          -1.3168534399748246
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "side",
+      "prior_rgb": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/single_engine_airplane/multiview/render/pixal_registered_side.png",
+      "partial_evidence": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/single_engine_airplane/multiview/evidence/partial_evidence_side.png",
+      "positive_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/single_engine_airplane/multiview/evidence/partial_positive_overlay_side.png",
+      "correspondence_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/single_engine_airplane/multiview/evidence/partial_correspondence_overlay_side.png",
+      "paper_residual": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/single_engine_airplane/multiview/evidence/prior_to_partial_residual_side.png",
+      "residual_arrow_direction": "registered_prior_to_physical_partial",
+      "displayed_residual_vectors": 64,
+      "visible_correspondences": 4219,
+      "projected_pixels": 22025,
+      "visible_positive_pixels": 9874,
+      "occluded_unknown_pixels": 12151,
+      "camera_pose": [
+        [
+          0.6968896333981885,
+          0.2043913698471158,
+          0.6874365474675885,
+          1.150356693003603
+        ],
+        [
+          0.10747023649354717,
+          0.917944273175176,
+          -0.3818749266617529,
+          -0.63852679197035
+        ],
+        [
+          -0.7090803812898504,
+          0.34000364597591837,
+          0.6177398591583053,
+          1.0075684626557497
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "back",
+      "prior_rgb": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/single_engine_airplane/multiview/render/pixal_registered_back.png",
+      "partial_evidence": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/single_engine_airplane/multiview/evidence/partial_evidence_back.png",
+      "positive_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/single_engine_airplane/multiview/evidence/partial_positive_overlay_back.png",
+      "correspondence_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/single_engine_airplane/multiview/evidence/partial_correspondence_overlay_back.png",
+      "paper_residual": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/single_engine_airplane/multiview/evidence/prior_to_partial_residual_back.png",
+      "residual_arrow_direction": "registered_prior_to_physical_partial",
+      "displayed_residual_vectors": 64,
+      "visible_correspondences": 15794,
+      "projected_pixels": 19793,
+      "visible_positive_pixels": 18748,
+      "occluded_unknown_pixels": 1045,
+      "camera_pose": [
+        [
+          -0.25980585242306153,
+          0.20439136984711578,
+          -0.9437823302958929,
+          -1.5619215427280908
+        ],
+        [
+          -0.2840094182850097,
+          0.9179442731751759,
+          0.2769782693106239,
+          0.45696885753331595
+        ],
+        [
+          0.9229515531013189,
+          0.3400036459759184,
+          -0.18043822031638862,
+          -0.31958699312559985
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "right",
+      "prior_rgb": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/single_engine_airplane/multiview/render/pixal_registered_right.png",
+      "partial_evidence": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/single_engine_airplane/multiview/evidence/partial_evidence_right.png",
+      "positive_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/single_engine_airplane/multiview/evidence/partial_positive_overlay_right.png",
+      "correspondence_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/single_engine_airplane/multiview/evidence/partial_correspondence_overlay_right.png",
+      "paper_residual": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/single_engine_airplane/multiview/evidence/prior_to_partial_residual_right.png",
+      "residual_arrow_direction": "registered_prior_to_physical_partial",
+      "displayed_residual_vectors": 61,
+      "visible_correspondences": 6287,
+      "projected_pixels": 19275,
+      "visible_positive_pixels": 8280,
+      "occluded_unknown_pixels": 10995,
+      "camera_pose": [
+        [
+          0.006684341164666986,
+          0.20439136984711584,
+          0.9788664298642659,
+          1.6349261999174172
+        ],
+        [
+          0.34601928320795006,
+          0.9179442731751759,
+          -0.19403341720733205,
+          -0.3261968865202939
+        ],
+        [
+          -0.9382035894364564,
+          0.34000364597591837,
+          -0.06458750259633489,
+          -0.1269584105672523
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

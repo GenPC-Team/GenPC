@@ -1,0 +1,570 @@
+{
+  "output_dir": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/redwood/06127",
+  "estimate": {
+    "active": false,
+    "method": "structure_aware_partial_ot_complete_gaussian_posterior",
+    "strict_zero_shot": true,
+    "ground_truth_cd_emd_used": false,
+    "category_or_part_rules_used": false,
+    "carrier_slots_before": 100000,
+    "carrier_slots_after": 100000,
+    "carrier_slots_preserved": true,
+    "config": {
+      "partial_samples": 3072,
+      "prior_samples": 6144,
+      "normal_neighbours": 24,
+      "transport_iterations": 60,
+      "transport_relaxation": 0.72,
+      "transport_temperature_floor": 0.012,
+      "maximum_3d_ratio": 0.34,
+      "maximum_screen_ratio": 0.28,
+      "maximum_depth_ratio": 0.34,
+      "structural_rescue_candidates": 48,
+      "structural_rescue_screen_fraction": 0.55,
+      "structural_rescue_depth_fraction": 0.7,
+      "intrinsic_landmarks": 8,
+      "intrinsic_graph_neighbours": 12,
+      "minimum_transport_pairs": 96,
+      "stable_spacing_multiplier": 3.0,
+      "stable_residual_quantile": 0.22,
+      "residual_quantile": 0.42,
+      "coarse_node_fraction": 0.02,
+      "fine_node_fraction": 0.055,
+      "minimum_graph_nodes": 192,
+      "maximum_graph_nodes": 6144,
+      "skinning_neighbours": 4,
+      "low_frequency_modes": 24,
+      "low_frequency_regularization": 0.035,
+      "low_frequency_stable_weight": 6.0,
+      "coarse_neighbours": 18,
+      "coarse_edge_ratio": 2.45,
+      "coarse_data_weight": 2.5,
+      "coarse_screening": 0.0008,
+      "coarse_iterations": 5,
+      "coarse_displacement_ratio": 0.28,
+      "fine_neighbours": 10,
+      "fine_edge_ratio": 1.85,
+      "fine_data_weight": 4.0,
+      "fine_screening": 0.003,
+      "fine_iterations": 5,
+      "fine_displacement_ratio": 0.12,
+      "attachment_edge_ratio": 3.2,
+      "minimum_observed_improvement": 0.025,
+      "minimum_edge_compression": 0.55,
+      "maximum_edge_stretch": 2.8,
+      "minimum_hidden_coverage": 0.95,
+      "coverage_resolution": 160
+    },
+    "stages": [
+      {
+        "stage": "coarse",
+        "transport": {
+          "active": true,
+          "method": "camera_structure_unbalanced_partial_transport",
+          "device": "cuda",
+          "partial_diagonal": 1.0944159467448056,
+          "partial_spacing": 0.0023562030784657073,
+          "visible_prior": 28555,
+          "partial_samples": 3072,
+          "prior_samples": 6144,
+          "valid_transport_rows": 3072,
+          "retained_capacity_pairs": 131,
+          "stable_pairs": 676,
+          "coherent_residual_rows": 131,
+          "raw_coherent_residual_rows": 131,
+          "coherent_residual_fraction": 0.042643229166666664,
+          "coherent_prior_support_fraction": 0.017252604166666668,
+          "localization_bound": 0.19999999999999998,
+          "localized_residual_evidence": true,
+          "residual_pairs": 131,
+          "stable_prior": 4108,
+          "residual_prior": 131,
+          "unsupported_prior": 95761,
+          "unmatched_partial_fraction": 0.7373046875,
+          "temperature": 0.012,
+          "stable_limit": 0.009695269695888452,
+          "residual_limit": 0.018865114922506157,
+          "residual_median": 0.03211487439978686,
+          "residual_p90": 0.06318117738753914
+        },
+        "solver": {
+          "active": true,
+          "field": "hierarchical_embedded_arap_posterior",
+          "graph_nodes": 2130,
+          "node_graph_edges": 19112,
+          "attachment_edges": 0,
+          "carrier_graph_edges": 899818,
+          "carrier_attachment_edges": 1,
+          "target_gaussians": 131,
+          "stable_gaussians": 4108,
+          "moved_gaussians": 95072,
+          "moved_fraction": 0.95072,
+          "maximum_displacement": 0.05210603322108904,
+          "mean_displacement": 0.004281140163950727,
+          "coherent_targets": {
+            "component_radius": 0.04525163913564613,
+            "minimum_component_points": 8,
+            "components": 3,
+            "regularized_targets": 68,
+            "component_records": [
+              {
+                "points": 21,
+                "median_residual": [
+                  -0.017883222039896243,
+                  0.016681914340879844,
+                  -0.013080017171605618
+                ],
+                "median_residual_norm": 0.02773414404329402,
+                "directional_coherence": 0.4455410343802055
+              },
+              {
+                "points": 25,
+                "median_residual": [
+                  0.007910540858649007,
+                  0.0026259010810881223,
+                  -0.004919739302283399
+                ],
+                "median_residual_norm": 0.009678628413491607,
+                "directional_coherence": 0.3259794178024184
+              },
+              {
+                "points": 22,
+                "median_residual": [
+                  -0.008173833293322705,
+                  0.022895094667061244,
+                  0.004568055599972316
+                ],
+                "median_residual_norm": 0.024735885722673556,
+                "directional_coherence": 0.23517902602209578
+              }
+            ]
+          },
+          "node_solver": {
+            "active": true,
+            "field": "soft_full_surface_arap_posterior",
+            "surface_graph_edges": 19112,
+            "attachment_edges": 0,
+            "coherent_targets": {
+              "components": 0,
+              "regularized_targets": 0
+            },
+            "line_search": [
+              {
+                "alpha": 1.0,
+                "observed_residual_before": 0.024735885722673556,
+                "observed_residual_after": 0.0015353731197729047,
+                "observed_improvement": 0.9379293251518566,
+                "hidden_coverage_ratio": 0.97796817625459,
+                "hidden_coverage_per_view": [
+                  1.0024630541871922,
+                  0.993993993993994,
+                  0.97796817625459
+                ],
+                "original_graph_components": 1,
+                "candidate_graph_components": 1,
+                "edge_stretch_p01": 0.6953189053350126,
+                "edge_stretch_p50": 1.0000471925297423,
+                "edge_stretch_p99": 1.7191845069557383,
+                "edge_stretch_p999": 3.5279372961718853,
+                "significant_component_size": 32,
+                "original_significant_components": 1,
+                "candidate_significant_components": 1,
+                "candidate_small_component_mass": 0
+              }
+            ],
+            "target_gaussians": 131,
+            "stable_gaussians": 456,
+            "moved_gaussians": 1674,
+            "moved_fraction": 0.7859154929577464,
+            "maximum_displacement": 0.0669546197038205,
+            "mean_displacement": 0.005223707660576457,
+            "cg_status": [
+              0,
+              0,
+              0
+            ],
+            "alpha": 1.0,
+            "observed_residual_before": 0.024735885722673556,
+            "observed_residual_after": 0.0015353731197729047,
+            "observed_improvement": 0.9379293251518566,
+            "hidden_coverage_ratio": 0.97796817625459,
+            "hidden_coverage_per_view": [
+              1.0024630541871922,
+              0.993993993993994,
+              0.97796817625459
+            ],
+            "original_graph_components": 1,
+            "candidate_graph_components": 1,
+            "edge_stretch_p01": 0.6953189053350126,
+            "edge_stretch_p50": 1.0000471925297423,
+            "edge_stretch_p99": 1.7191845069557383,
+            "edge_stretch_p999": 3.5279372961718853,
+            "significant_component_size": 32,
+            "original_significant_components": 1,
+            "candidate_significant_components": 1,
+            "candidate_small_component_mass": 0
+          },
+          "line_search": [
+            {
+              "alpha": 1.0,
+              "observed_residual_before": 0.024735885722673556,
+              "observed_residual_after": 0.010067469200323824,
+              "observed_improvement": 0.5930014670509365,
+              "hidden_coverage_ratio": 1.0013588634959851,
+              "hidden_coverage_per_view": [
+                1.0013588634959851,
+                1.0045065865495724,
+                1.0033889950089345
+              ],
+              "original_graph_components": 1,
+              "candidate_graph_components": 1,
+              "significant_component_size": 100,
+              "original_significant_components": 1,
+              "candidate_significant_components": 1,
+              "candidate_small_component_mass": 0,
+              "robust_edge_quantile": 0.99,
+              "edge_stretch_p01": 0.8053606458295737,
+              "edge_stretch_p50": 1.0000318176544838,
+              "edge_stretch_p99": 1.4143804472965777,
+              "edge_stretch_p999": 2.5249559570861586
+            }
+          ],
+          "alpha": 1.0,
+          "observed_residual_before": 0.024735885722673556,
+          "observed_residual_after": 0.010067469200323824,
+          "observed_improvement": 0.5930014670509365,
+          "hidden_coverage_ratio": 1.0013588634959851,
+          "hidden_coverage_per_view": [
+            1.0013588634959851,
+            1.0045065865495724,
+            1.0033889950089345
+          ],
+          "original_graph_components": 1,
+          "candidate_graph_components": 1,
+          "significant_component_size": 100,
+          "original_significant_components": 1,
+          "candidate_significant_components": 1,
+          "candidate_small_component_mass": 0,
+          "robust_edge_quantile": 0.99,
+          "edge_stretch_p01": 0.8053606458295737,
+          "edge_stretch_p50": 1.0000318176544838,
+          "edge_stretch_p99": 1.4143804472965777,
+          "edge_stretch_p999": 2.5249559570861586
+        }
+      },
+      {
+        "stage": "fine",
+        "transport": {
+          "active": true,
+          "method": "camera_structure_unbalanced_partial_transport",
+          "device": "cuda",
+          "partial_diagonal": 1.0944159467448056,
+          "partial_spacing": 0.0023562030784657073,
+          "visible_prior": 28479,
+          "partial_samples": 3072,
+          "prior_samples": 6144,
+          "valid_transport_rows": 3072,
+          "retained_capacity_pairs": 106,
+          "stable_pairs": 676,
+          "coherent_residual_rows": 107,
+          "raw_coherent_residual_rows": 107,
+          "coherent_residual_fraction": 0.034830729166666664,
+          "coherent_prior_support_fraction": 0.012532552083333334,
+          "localization_bound": 0.19999999999999998,
+          "localized_residual_evidence": true,
+          "residual_pairs": 106,
+          "stable_prior": 4313,
+          "residual_prior": 106,
+          "unsupported_prior": 95581,
+          "unmatched_partial_fraction": 0.7454427083333333,
+          "temperature": 0.012,
+          "stable_limit": 0.010184787288611094,
+          "residual_limit": 0.01882699910693089,
+          "residual_median": 0.037826564356671366,
+          "residual_p90": 0.06880347193012133
+        },
+        "solver": {
+          "active": true,
+          "field": "hierarchical_embedded_arap_posterior",
+          "graph_nodes": 5588,
+          "node_graph_edges": 27870,
+          "attachment_edges": 0,
+          "carrier_graph_edges": 497879,
+          "carrier_attachment_edges": 6,
+          "target_gaussians": 98,
+          "stable_gaussians": 7079,
+          "moved_gaussians": 90183,
+          "moved_fraction": 0.90183,
+          "maximum_displacement": 0.04936908962919583,
+          "mean_displacement": 0.0032259168077319014,
+          "coherent_targets": {
+            "component_radius": 0.043283386394027394,
+            "minimum_component_points": 8,
+            "components": 1,
+            "regularized_targets": 24,
+            "component_records": [
+              {
+                "points": 24,
+                "median_residual": [
+                  -0.004664283945359772,
+                  0.020182264417006657,
+                  0.007811307303496995
+                ],
+                "median_residual_norm": 0.02213810885126775,
+                "directional_coherence": 0.24667068719876006
+              }
+            ]
+          },
+          "node_solver": {
+            "active": true,
+            "field": "soft_full_surface_arap_posterior",
+            "surface_graph_edges": 27870,
+            "attachment_edges": 0,
+            "coherent_targets": {
+              "components": 0,
+              "regularized_targets": 0
+            },
+            "line_search": [
+              {
+                "alpha": 1.0,
+                "observed_residual_before": 0.024446001694632225,
+                "observed_residual_after": 0.0033174773125229525,
+                "observed_improvement": 0.8642936642988374,
+                "hidden_coverage_ratio": 0.9967835316822129,
+                "hidden_coverage_per_view": [
+                  1.0125536835150313,
+                  0.9967835316822129,
+                  1.0029663810151614
+                ],
+                "original_graph_components": 1,
+                "candidate_graph_components": 1,
+                "edge_stretch_p01": 0.8304475703034071,
+                "edge_stretch_p50": 1.000000691249208,
+                "edge_stretch_p99": 1.9120455351217038,
+                "edge_stretch_p999": 5.069147290037946,
+                "significant_component_size": 32,
+                "original_significant_components": 1,
+                "candidate_significant_components": 1,
+                "candidate_small_component_mass": 0
+              },
+              {
+                "alpha": 0.85,
+                "observed_residual_before": 0.024446001694632225,
+                "observed_residual_after": 0.006140033305810203,
+                "observed_improvement": 0.7488328200861406,
+                "hidden_coverage_ratio": 0.9942028985507246,
+                "hidden_coverage_per_view": [
+                  1.0082508250825082,
+                  0.9942028985507246,
+                  0.996039603960396
+                ],
+                "original_graph_components": 1,
+                "candidate_graph_components": 1,
+                "edge_stretch_p01": 0.8306482628400615,
+                "edge_stretch_p50": 1.0,
+                "edge_stretch_p99": 1.7058661577101624,
+                "edge_stretch_p999": 4.392202415742228,
+                "significant_component_size": 32,
+                "original_significant_components": 1,
+                "candidate_significant_components": 1,
+                "candidate_small_component_mass": 0
+              },
+              {
+                "alpha": 0.7,
+                "observed_residual_before": 0.024446001694632225,
+                "observed_residual_after": 0.009195512178974966,
+                "observed_improvement": 0.6238439195971222,
+                "hidden_coverage_ratio": 0.9849165596919127,
+                "hidden_coverage_per_view": [
+                  1.0049554013875124,
+                  0.9849165596919127,
+                  0.9944078947368421
+                ],
+                "original_graph_components": 1,
+                "candidate_graph_components": 1,
+                "edge_stretch_p01": 0.8266779549683848,
+                "edge_stretch_p50": 1.0,
+                "edge_stretch_p99": 1.530006214058377,
+                "edge_stretch_p999": 3.6450708755709615,
+                "significant_component_size": 32,
+                "original_significant_components": 1,
+                "candidate_significant_components": 1,
+                "candidate_small_component_mass": 0
+              }
+            ],
+            "target_gaussians": 98,
+            "stable_gaussians": 1036,
+            "moved_gaussians": 4552,
+            "moved_fraction": 0.8146027201145312,
+            "maximum_displacement": 0.06328408463997554,
+            "mean_displacement": 0.0039942246583266165,
+            "cg_status": [
+              0,
+              0,
+              0
+            ],
+            "alpha": 0.7,
+            "observed_residual_before": 0.024446001694632225,
+            "observed_residual_after": 0.009195512178974966,
+            "observed_improvement": 0.6238439195971222,
+            "hidden_coverage_ratio": 0.9849165596919127,
+            "hidden_coverage_per_view": [
+              1.0049554013875124,
+              0.9849165596919127,
+              0.9944078947368421
+            ],
+            "original_graph_components": 1,
+            "candidate_graph_components": 1,
+            "edge_stretch_p01": 0.8266779549683848,
+            "edge_stretch_p50": 1.0,
+            "edge_stretch_p99": 1.530006214058377,
+            "edge_stretch_p999": 3.6450708755709615,
+            "significant_component_size": 32,
+            "original_significant_components": 1,
+            "candidate_significant_components": 1,
+            "candidate_small_component_mass": 0
+          },
+          "line_search": [
+            {
+              "alpha": 1.0,
+              "observed_residual_before": 0.024446001694632225,
+              "observed_residual_after": 0.01913171992687018,
+              "observed_improvement": 0.2173885870640735,
+              "hidden_coverage_ratio": 0.9995679012345678,
+              "hidden_coverage_per_view": [
+                0.9995679012345678,
+                1.0076923076923077,
+                1.001907809711367
+              ],
+              "original_graph_components": 1,
+              "candidate_graph_components": 1,
+              "significant_component_size": 100,
+              "original_significant_components": 1,
+              "candidate_significant_components": 1,
+              "candidate_small_component_mass": 0,
+              "robust_edge_quantile": 0.99,
+              "edge_stretch_p01": 0.8446046668475681,
+              "edge_stretch_p50": 1.0000005162692147,
+              "edge_stretch_p99": 1.2994430758415534,
+              "edge_stretch_p999": 2.387020189293011
+            }
+          ],
+          "alpha": 1.0,
+          "observed_residual_before": 0.024446001694632225,
+          "observed_residual_after": 0.01913171992687018,
+          "observed_improvement": 0.2173885870640735,
+          "hidden_coverage_ratio": 0.9995679012345678,
+          "hidden_coverage_per_view": [
+            0.9995679012345678,
+            1.0076923076923077,
+            1.001907809711367
+          ],
+          "original_graph_components": 1,
+          "candidate_graph_components": 1,
+          "significant_component_size": 100,
+          "original_significant_components": 1,
+          "candidate_significant_components": 1,
+          "candidate_small_component_mass": 0,
+          "robust_edge_quantile": 0.99,
+          "edge_stretch_p01": 0.8446046668475681,
+          "edge_stretch_p50": 1.0000005162692147,
+          "edge_stretch_p99": 1.2994430758415534,
+          "edge_stretch_p999": 2.387020189293011
+        }
+      }
+    ],
+    "supported_stable": 4108,
+    "supported_stable_final": 7079,
+    "supported_residual": 106,
+    "unsupported": 95581,
+    "moved": 0,
+    "hidden_coverage_ratio": 1.0,
+    "hidden_coverage_per_view": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "integrity": {
+      "input_connected_components": 7,
+      "output_connected_components": 7,
+      "new_connected_components": 0,
+      "component_significance_size": 100,
+      "input_significant_components": 1,
+      "output_significant_components": 1,
+      "input_component_sizes": [
+        99941,
+        54,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "output_component_sizes": [
+        99941,
+        54,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "tracked_original_edges": 497867,
+      "tracked_edge_replacement_fraction": 0.0,
+      "stable_motion_p50": 0.0,
+      "stable_motion_p95": 0.0,
+      "stable_motion_max": 0.0,
+      "passed": true
+    },
+    "topology_projection": {
+      "active": true,
+      "corrected_points": 1,
+      "passes": [
+        {
+          "pass": 0,
+          "components_before": 7,
+          "new_small_fragment_points": 1
+        },
+        {
+          "pass": 1,
+          "components_before": 7,
+          "new_small_fragment_points": 1
+        },
+        {
+          "pass": 2,
+          "components_before": 7,
+          "new_small_fragment_points": 1
+        }
+      ],
+      "candidate_reverted_by_visible_pareto": true
+    },
+    "posterior_verifier": {
+      "criterion": "local_transport_improves_and_global_visible_score_does_not_worsen",
+      "accepted": false,
+      "initial": {
+        "objective": 0.035794507457153915,
+        "visible_3d": 0.006999496014897239,
+        "visible_pair_count": 37761,
+        "silhouette_iou": 0.9151276024177301,
+        "coverage": 0.9861053317171132,
+        "leakage": 0.07291808409307389,
+        "depth_error_normalized": 0.0003888134924243657
+      },
+      "candidate": {
+        "objective": 0.03884182162664001,
+        "visible_3d": 0.007004015198107578,
+        "visible_pair_count": 37348,
+        "silhouette_iou": 0.9068132451209604,
+        "coverage": 0.9894342626598882,
+        "leakage": 0.0843197990791126,
+        "depth_error_normalized": 0.0004006104766222438
+      },
+      "objective_delta": 0.003047314169486094,
+      "ground_truth_cd_emd_used": false
+    },
+    "edge_stretch_p01": 1.0,
+    "edge_stretch_p50": 1.0,
+    "edge_stretch_p99": 1.0,
+    "edge_stretch_p999": 1.0
+  }
+}

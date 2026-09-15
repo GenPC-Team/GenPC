@@ -1,0 +1,19 @@
+{
+  "stable_residual_quantile": 0.12,
+  "residual_quantile": 0.72,
+  "coarse_node_fraction": 0.012,
+  "fine_node_fraction": 0.040,
+  "skinning_neighbours": 8,
+  "coarse_neighbours": 24,
+  "coarse_edge_ratio": 2.80,
+  "coarse_data_weight": 3.5,
+  "coarse_displacement_ratio": 0.36,
+  "fine_neighbours": 14,
+  "fine_edge_ratio": 2.10,
+  "fine_displacement_ratio": 0.18,
+  "minimum_hidden_coverage": 0.85,
+  "minimum_edge_compression": 0.35,
+  "maximum_edge_stretch": 4.5,
+  "assimilation_anchor_residual_ratio": 0.075,
+  "assimilation_displacement_ratio": 0.12
+}

@@ -1,0 +1,213 @@
+{
+  "method": "structure_aware_partial_ot_complete_gaussian_posterior",
+  "strict_zero_shot": true,
+  "ground_truth_cd_emd_used": false,
+  "category_or_part_rules_used": false,
+  "input_root": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples",
+  "case_manifest": null,
+  "output_root": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/redwood",
+  "prior_template": "gaussian_axis_global_candidate_20260907/{sample}/decoded/partial_anchored_gaussian_decoded_100k.ply",
+  "sample_workers": 2,
+  "samples": [
+    {
+      "sample_id": "01184",
+      "status": "completed",
+      "elapsed_seconds": 17.865127086639404,
+      "output": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/redwood/01184",
+      "inputs": {
+        "prior": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/01184/gaussian_axis_global_candidate_20260907/01184/decoded/partial_anchored_gaussian_decoded_100k.ply",
+        "partial": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/01184/inputs/partial/01184.ply",
+        "camera": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/01184/inputs/camera/01184/camera.pth",
+        "semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/01184/inputs/camera/01184/img.png"
+      },
+      "estimate": {
+        "active": false,
+        "accepted": true,
+        "visible_objective_delta": 0.0,
+        "carrier_slots_preserved": true,
+        "new_connected_components": 0,
+        "hidden_coverage_ratio": 1.0
+      }
+    },
+    {
+      "sample_id": "05117",
+      "status": "completed",
+      "elapsed_seconds": 17.388635396957397,
+      "output": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/redwood/05117",
+      "inputs": {
+        "prior": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/05117/gaussian_axis_global_candidate_20260907/05117/decoded/partial_anchored_gaussian_decoded_100k.ply",
+        "partial": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/05117/inputs/partial/05117.ply",
+        "camera": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/05117/inputs/camera/05117/camera.pth",
+        "semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/05117/inputs/camera/05117/img.png"
+      },
+      "estimate": {
+        "active": false,
+        "accepted": true,
+        "visible_objective_delta": 0.0,
+        "carrier_slots_preserved": true,
+        "new_connected_components": 0,
+        "hidden_coverage_ratio": 1.0
+      }
+    },
+    {
+      "sample_id": "05452",
+      "status": "completed",
+      "elapsed_seconds": 17.855543613433838,
+      "output": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/redwood/05452",
+      "inputs": {
+        "prior": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/05452/gaussian_axis_global_candidate_20260907/05452/decoded/partial_anchored_gaussian_decoded_100k.ply",
+        "partial": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/05452/inputs/partial/05452.ply",
+        "camera": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/05452/inputs/camera/05452/camera.pth",
+        "semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/05452/inputs/camera/05452/img.png"
+      },
+      "estimate": {
+        "active": false,
+        "accepted": true,
+        "visible_objective_delta": 0.0,
+        "carrier_slots_preserved": true,
+        "new_connected_components": 0,
+        "hidden_coverage_ratio": 1.0
+      }
+    },
+    {
+      "sample_id": "06127",
+      "status": "completed",
+      "elapsed_seconds": 31.020248651504517,
+      "output": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/redwood/06127",
+      "inputs": {
+        "prior": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/06127/gaussian_axis_global_candidate_20260907/06127/decoded/partial_anchored_gaussian_decoded_100k.ply",
+        "partial": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/06127/inputs/partial/06127.ply",
+        "camera": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/06127/inputs/camera/06127/camera.pth",
+        "semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/06127/inputs/camera/06127/img.png"
+      },
+      "estimate": {
+        "active": false,
+        "accepted": false,
+        "visible_objective_delta": 0.003047314169486094,
+        "carrier_slots_preserved": true,
+        "new_connected_components": 0,
+        "hidden_coverage_ratio": 1.0
+      }
+    },
+    {
+      "sample_id": "06145",
+      "status": "completed",
+      "elapsed_seconds": 18.363242626190186,
+      "output": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/redwood/06145",
+      "inputs": {
+        "prior": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/06145/gaussian_axis_global_candidate_20260907/06145/decoded/partial_anchored_gaussian_decoded_100k.ply",
+        "partial": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/06145/inputs/partial/06145.ply",
+        "camera": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/06145/inputs/camera/06145/camera.pth",
+        "semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/06145/inputs/camera/06145/img.png"
+      },
+      "estimate": {
+        "active": false,
+        "accepted": true,
+        "visible_objective_delta": 0.0,
+        "carrier_slots_preserved": true,
+        "new_connected_components": 0,
+        "hidden_coverage_ratio": 1.0
+      }
+    },
+    {
+      "sample_id": "06188",
+      "status": "completed",
+      "elapsed_seconds": 18.443485260009766,
+      "output": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/redwood/06188",
+      "inputs": {
+        "prior": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/06188/gaussian_axis_global_candidate_20260907/06188/decoded/partial_anchored_gaussian_decoded_100k.ply",
+        "partial": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/06188/inputs/partial/06188.ply",
+        "camera": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/06188/inputs/camera/06188/camera.pth",
+        "semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/06188/inputs/camera/06188/img.png"
+      },
+      "estimate": {
+        "active": false,
+        "accepted": true,
+        "visible_objective_delta": 0.0,
+        "carrier_slots_preserved": true,
+        "new_connected_components": 0,
+        "hidden_coverage_ratio": 1.0
+      }
+    },
+    {
+      "sample_id": "06830",
+      "status": "completed",
+      "elapsed_seconds": 15.778077125549316,
+      "output": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/redwood/06830",
+      "inputs": {
+        "prior": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/06830/gaussian_axis_global_candidate_20260907/06830/decoded/partial_anchored_gaussian_decoded_100k.ply",
+        "partial": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/06830/inputs/partial/06830.ply",
+        "camera": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/06830/inputs/camera/06830/camera.pth",
+        "semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/06830/inputs/camera/06830/img.png"
+      },
+      "estimate": {
+        "active": false,
+        "accepted": true,
+        "visible_objective_delta": 0.0,
+        "carrier_slots_preserved": true,
+        "new_connected_components": 0,
+        "hidden_coverage_ratio": 1.0
+      }
+    },
+    {
+      "sample_id": "07136",
+      "status": "completed",
+      "elapsed_seconds": 19.041630744934082,
+      "output": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/redwood/07136",
+      "inputs": {
+        "prior": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/07136/gaussian_axis_global_candidate_20260907/07136/decoded/partial_anchored_gaussian_decoded_100k.ply",
+        "partial": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/07136/inputs/partial/07136.ply",
+        "camera": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/07136/inputs/camera/07136/camera.pth",
+        "semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/07136/inputs/camera/07136/img.png"
+      },
+      "estimate": {
+        "active": false,
+        "accepted": true,
+        "visible_objective_delta": 0.0,
+        "carrier_slots_preserved": true,
+        "new_connected_components": 0,
+        "hidden_coverage_ratio": 1.0
+      }
+    },
+    {
+      "sample_id": "07306",
+      "status": "completed",
+      "elapsed_seconds": 17.99674916267395,
+      "output": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/redwood/07306",
+      "inputs": {
+        "prior": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/07306/gaussian_axis_global_candidate_20260907/07306/decoded/partial_anchored_gaussian_decoded_100k.ply",
+        "partial": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/07306/inputs/partial/07306.ply",
+        "camera": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/07306/inputs/camera/07306/camera.pth",
+        "semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/07306/inputs/camera/07306/img.png"
+      },
+      "estimate": {
+        "active": false,
+        "accepted": true,
+        "visible_objective_delta": 0.0,
+        "carrier_slots_preserved": true,
+        "new_connected_components": 0,
+        "hidden_coverage_ratio": 1.0
+      }
+    },
+    {
+      "sample_id": "09639",
+      "status": "completed",
+      "elapsed_seconds": 25.545219659805298,
+      "output": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/redwood/09639",
+      "inputs": {
+        "prior": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/09639/gaussian_axis_global_candidate_20260907/09639/decoded/partial_anchored_gaussian_decoded_100k.ply",
+        "partial": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/09639/inputs/partial/09639.ply",
+        "camera": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/09639/inputs/camera/09639/camera.pth",
+        "semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/agentic_redwood10_final_20260907/samples/09639/inputs/camera/09639/img.png"
+      },
+      "estimate": {
+        "active": false,
+        "accepted": false,
+        "visible_objective_delta": 0.0010995407123810044,
+        "carrier_slots_preserved": true,
+        "new_connected_components": 0,
+        "hidden_coverage_ratio": 1.0
+      }
+    }
+  ]
+}

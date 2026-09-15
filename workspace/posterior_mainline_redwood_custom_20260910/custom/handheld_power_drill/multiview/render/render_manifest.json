@@ -1,0 +1,245 @@
+{
+  "method": "registered_pixal_visible_partial_ranked_multiview",
+  "ground_truth_used": false,
+  "glb": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/custom10_fixed_mainline_20260907/inputs/pixal/handheld_power_drill/pixal3d.glb",
+  "source_carrier": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/custom10_fixed_mainline_20260907/inputs/pixal/handheld_power_drill/pixal3d_sampled_100k.ply",
+  "registered_carrier": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/custom10_fixed_mainline_20260907/registration/handheld_power_drill/final/camera1_amplified_registered_100k.ply",
+  "saved_partial_camera": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/custom10_fixed_mainline_20260907/inputs/camera/handheld_power_drill/camera.pth",
+  "ordered_similarity": [
+    [
+      -1.0608750169883392,
+      0.17467238883336506,
+      -0.3989354934487668,
+      0.03656649105803943
+    ],
+    [
+      0.01631320874868401,
+      1.0657032826360187,
+      0.4232329921250334,
+      -0.015052468619795145
+    ],
+    [
+      0.4351940378432214,
+      0.3858520998802949,
+      -0.9883522041598607,
+      -0.03933171847072864
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "ordered_similarity_fit_rmse": 2.705041061414755e-16,
+  "resolution": 512,
+  "field_of_view_degrees": 38.0,
+  "centre": [
+    -0.017161458724073535,
+    -0.014863202578864925,
+    -0.09387805258980898
+  ],
+  "radius": 0.6081595134917783,
+  "front_direction": [
+    0.3350154838407614,
+    -0.37363643627014465,
+    0.8649626807430982
+  ],
+  "up_direction": [
+    0.1404278489980096,
+    0.927559200623417,
+    0.3462859346907402
+  ],
+  "views": [
+    {
+      "name": "front",
+      "image": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/handheld_power_drill/multiview/render/pixal_registered_front.png",
+      "camera_pose": [
+        [
+          0.9316891352874803,
+          0.14042784899800967,
+          0.33501548384076135,
+          0.6837424625610671
+        ],
+        [
+          -0.005453698762636767,
+          0.9275592006234172,
+          -0.3736364362701446,
+          -0.7965680966763196
+        ],
+        [
+          -0.36321565544050227,
+          0.34628593469074026,
+          0.8649626807430981,
+          1.7157569163607855
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "orbit_yaw_degrees": 0.0
+    },
+    {
+      "name": "side",
+      "image": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/handheld_power_drill/multiview/render/pixal_registered_side.png",
+      "camera_pose": [
+        [
+          0.8956954259459025,
+          0.14042784899800967,
+          -0.42191198509331374,
+          -0.8998662262734505
+        ],
+        [
+          -0.26805720516260384,
+          0.9275592006234172,
+          -0.2603445104073854,
+          -0.5595439622190095
+        ],
+        [
+          0.3547887240316441,
+          0.3462859346907403,
+          0.868453230021835,
+          1.7230596823370248
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "orbit_yaw_degrees": 315.0
+    },
+    {
+      "name": "back",
+      "image": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/handheld_power_drill/multiview/render/pixal_registered_back.png",
+      "camera_pose": [
+        [
+          -0.9866509854693318,
+          0.1404278489980096,
+          -0.08246121572102023,
+          -0.18968300546032843
+        ],
+        [
+          0.10197209413457936,
+          0.9275592006234172,
+          0.3594935623299197,
+          0.7372526239050555
+        ],
+        [
+          0.12697056702324722,
+          0.3462859346907402,
+          -0.9294969212133817,
+          -2.0385285786848595
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "orbit_yaw_degrees": 165.0
+    },
+    {
+      "name": "right",
+      "image": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/handheld_power_drill/multiview/render/pixal_registered_right.png",
+      "camera_pose": [
+        [
+          -0.7559764873109744,
+          0.1404278489980097,
+          0.6393587176685342,
+          1.3204753190874203
+        ],
+        [
+          0.3263054949707491,
+          0.9275592006234172,
+          0.18209517646204096,
+          0.3661079148337841
+        ],
+        [
+          -0.5674718271287612,
+          0.34628593469074026,
+          -0.7470353250352395,
+          -1.6567908548667178
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "orbit_yaw_degrees": 120.0
+    }
+  ],
+  "view_selection": {
+    "method": "camera1_plus_ranked_visible_partial_support",
+    "ground_truth_used": false,
+    "num_partial_points": 16384,
+    "candidate_yaw_step_degrees": 15.0,
+    "min_yaw_separation_degrees": 45.0,
+    "selection_resolution": 256,
+    "selected": [
+      {
+        "rank": 1,
+        "yaw_degrees": 0.0,
+        "visible_points": 8314,
+        "new_visible_points": 8314,
+        "camera1_fixed": true
+      },
+      {
+        "rank": 2,
+        "yaw_degrees": 315.0,
+        "visible_points": 6623,
+        "new_visible_points": 2781,
+        "camera1_fixed": false
+      },
+      {
+        "rank": 3,
+        "yaw_degrees": 165.0,
+        "visible_points": 5967,
+        "new_visible_points": 1720,
+        "camera1_fixed": false
+      },
+      {
+        "rank": 4,
+        "yaw_degrees": 120.0,
+        "visible_points": 5275,
+        "new_visible_points": 759,
+        "camera1_fixed": false
+      }
+    ],
+    "covered_partial_points": 13574,
+    "candidate_visible_points": {
+      "0": 8314,
+      "15": 7804,
+      "30": 6341,
+      "45": 4306,
+      "60": 2373,
+      "75": 2508,
+      "90": 3677,
+      "105": 4682,
+      "120": 5275,
+      "135": 5528,
+      "150": 5809,
+      "165": 5967,
+      "180": 5699,
+      "195": 5455,
+      "210": 4832,
+      "225": 3764,
+      "240": 2417,
+      "255": 1915,
+      "270": 3221,
+      "285": 4640,
+      "300": 5665,
+      "315": 6623,
+      "330": 7606,
+      "345": 8162
+    }
+  },
+  "board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/handheld_power_drill/multiview/render/pixal_registered_front_side_back_right_board.png"
+}

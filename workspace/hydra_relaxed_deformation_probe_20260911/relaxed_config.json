@@ -1,0 +1,8 @@
+{
+  "stable_residual_quantile": 0.15,
+  "minimum_hidden_coverage": 0.85,
+  "minimum_edge_compression": 0.35,
+  "maximum_edge_stretch": 4.8,
+  "assimilation_anchor_residual_ratio": 0.075,
+  "assimilation_displacement_ratio": 0.12
+}

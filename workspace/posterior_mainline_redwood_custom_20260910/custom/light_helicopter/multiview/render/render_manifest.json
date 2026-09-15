@@ -1,0 +1,245 @@
+{
+  "method": "registered_pixal_visible_partial_ranked_multiview",
+  "ground_truth_used": false,
+  "glb": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/custom10_fixed_mainline_20260907/inputs/pixal/light_helicopter/pixal3d.glb",
+  "source_carrier": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/custom10_fixed_mainline_20260907/inputs/pixal/light_helicopter/pixal3d_sampled_100k.ply",
+  "registered_carrier": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/custom10_fixed_mainline_20260907/registration/light_helicopter/final/camera1_amplified_registered_100k.ply",
+  "saved_partial_camera": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/custom10_fixed_mainline_20260907/inputs/camera/light_helicopter/camera.pth",
+  "ordered_similarity": [
+    [
+      0.523595604858387,
+      -0.013593426117915253,
+      -0.45920693545066227,
+      0.012774648234924968
+    ],
+    [
+      -0.07048538724283016,
+      0.6856431366738935,
+      -0.10066502641854327,
+      -0.045388273956791125
+    ],
+    [
+      0.4539687224741812,
+      0.12213458201915867,
+      0.5140074815766769,
+      -0.006169757363354844
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "ordered_similarity_fit_rmse": 9.972931583972382e-17,
+  "resolution": 512,
+  "field_of_view_degrees": 38.0,
+  "centre": [
+    0.025981404832004267,
+    -0.015672686429001728,
+    0.0734779625531859
+  ],
+  "radius": 0.3976656256820628,
+  "front_direction": [
+    0.5786462357372337,
+    0.2950969037577814,
+    -0.7603199006074354
+  ],
+  "up_direction": [
+    -0.19380577015252495,
+    0.9552947771726564,
+    0.22327385015319487
+  ],
+  "views": [
+    {
+      "name": "front",
+      "image": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/light_helicopter/multiview/render/pixal_registered_front.png",
+      "camera_pose": [
+        [
+          -0.792217051901003,
+          -0.19380577015252498,
+          0.5786462357372336,
+          0.8175841458884686
+        ],
+        [
+          -0.01815781096980987,
+          0.9552947771726565,
+          0.29509690375778136,
+          0.3880273697794589
+        ],
+        [
+          -0.6099692095327995,
+          0.22327385015319484,
+          -0.7603199006074354,
+          -0.9666589643444727
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "orbit_yaw_degrees": 0.0
+    },
+    {
+      "name": "side",
+      "image": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/light_helicopter/multiview/render/pixal_registered_side.png",
+      "camera_pose": [
+        [
+          -0.15101737237294643,
+          -0.193805770152525,
+          0.9693467267686818,
+          1.35207233665421
+        ],
+        [
+          0.19582551048602526,
+          0.9552947771726565,
+          0.2215045330225372,
+          0.28735113826359854
+        ],
+        [
+          -0.96894072196624,
+          0.22327385015319492,
+          -0.10631399321495849,
+          -0.07196227924566731
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "orbit_yaw_degrees": 315.0
+    },
+    {
+      "name": "back",
+      "image": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/light_helicopter/multiview/render/pixal_registered_back.png",
+      "camera_pose": [
+        [
+          0.3967569743888669,
+          -0.193805770152525,
+          -0.8972308659031847,
+          -1.201453198461526
+        ],
+        [
+          -0.1318233263019196,
+          0.9552947771726565,
+          -0.2646403207172753,
+          -0.3777073638117255
+        ],
+        [
+          0.9084087812854352,
+          0.2232738501531949,
+          0.3534717441624988,
+          0.5570362824453872
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "orbit_yaw_degrees": 150.0
+    },
+    {
+      "name": "right",
+      "image": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/light_helicopter/multiview/render/pixal_registered_right.png",
+      "camera_pose": [
+        [
+          -0.7639702042704982,
+          -0.19380577015252504,
+          -0.615458244272087,
+          -0.8159810984768783
+        ],
+        [
+          -0.2897413078939389,
+          0.9552947771726565,
+          0.05883760027868516,
+          0.06481864451079233
+        ],
+        [
+          0.5765409798850406,
+          0.2232738501531949,
+          -0.7859702833765191,
+          -1.0017493391799444
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "orbit_yaw_degrees": 75.0
+    }
+  ],
+  "view_selection": {
+    "method": "camera1_plus_ranked_visible_partial_support",
+    "ground_truth_used": false,
+    "num_partial_points": 16384,
+    "candidate_yaw_step_degrees": 15.0,
+    "min_yaw_separation_degrees": 45.0,
+    "selection_resolution": 256,
+    "selected": [
+      {
+        "rank": 1,
+        "yaw_degrees": 0.0,
+        "visible_points": 4725,
+        "new_visible_points": 4725,
+        "camera1_fixed": true
+      },
+      {
+        "rank": 2,
+        "yaw_degrees": 315.0,
+        "visible_points": 3889,
+        "new_visible_points": 2152,
+        "camera1_fixed": false
+      },
+      {
+        "rank": 3,
+        "yaw_degrees": 150.0,
+        "visible_points": 3858,
+        "new_visible_points": 1990,
+        "camera1_fixed": false
+      },
+      {
+        "rank": 4,
+        "yaw_degrees": 75.0,
+        "visible_points": 3815,
+        "new_visible_points": 1357,
+        "camera1_fixed": false
+      }
+    ],
+    "covered_partial_points": 10224,
+    "candidate_visible_points": {
+      "0": 4725,
+      "15": 4428,
+      "30": 2663,
+      "45": 1668,
+      "60": 2892,
+      "75": 3815,
+      "90": 3394,
+      "105": 3449,
+      "120": 3474,
+      "135": 3702,
+      "150": 3858,
+      "165": 3556,
+      "180": 3112,
+      "195": 2487,
+      "210": 1618,
+      "225": 1150,
+      "240": 1676,
+      "255": 2383,
+      "270": 2909,
+      "285": 3530,
+      "300": 3772,
+      "315": 3889,
+      "330": 3943,
+      "345": 4073
+    }
+  },
+  "board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/light_helicopter/multiview/render/pixal_registered_front_side_back_right_board.png"
+}
