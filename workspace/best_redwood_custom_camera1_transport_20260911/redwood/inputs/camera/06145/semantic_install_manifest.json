@@ -1,0 +1,60 @@
+{
+  "method": "depth_mask_conditioned_direct_gpt_semantic_install",
+  "ground_truth_used": false,
+  "sample": "06145",
+  "source_semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/inputs/pixal/06145/gpt_image.png",
+  "source_sha256": "c403ac68f7906804b3c3fd728424ae9127b0d3683d51c6b980d7b7ee9dfbccd2",
+  "prompt_file": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/inputs/pixal/06145/gpt_depth_completion_prompt.txt",
+  "prompt": "Use case: sketch-to-render. Create one complete, realistic RGB product image of a rectangular pedestal table from the supplied incomplete depth map. Image 1 is the sole geometric, camera, and foreground-mask authority. Treat every non-black depth pixel and its silhouette as a hard ControlNet-like spatial constraint: preserve exactly the camera viewpoint, perspective, image-plane center, apparent width and height, crop, orientation, depth ordering, rectangular tabletop outline and its observed long/short dimensions, central support, and oval pedestal base. Complete only missing or occluded surfaces. Keep one coherent modern table with a thin rectangular tabletop, one centered narrow pedestal, and one broad oval base on a pure white background. Do not swap the tabletop length and width, rotate, mirror, recenter, rescale, widen, shorten, tilt, add legs, or move observed parts. Sharp realistic boundaries and materials; no chairs, text, logo, watermark, secondary objects, clutter, or silhouette-changing shadow.",
+  "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/inputs/camera/06145/depth.png",
+  "installed_semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/inputs/camera/06145/img.png",
+  "object_mask": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/inputs/camera/06145/06145_moge_to_raw_partial_object_mask.png",
+  "audit_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/inputs/camera/06145/semantic_depth_audit.png",
+  "audit_colours": {
+    "cyan": "observed depth not covered by semantic foreground",
+    "magenta": "semantic foreground outside observed depth"
+  },
+  "resolution": 512,
+  "initial_framing": {
+    "semantic_bbox_xyxy": [
+      66,
+      71,
+      433,
+      431
+    ],
+    "bbox_scale_xy": [
+      1.0110192837465564,
+      0.9917355371900827
+    ],
+    "centre_offset_ratio": 0.017387200990981306,
+    "mask_iou": 0.8706801765989478,
+    "depth_coverage": 0.9726379440665155
+  },
+  "framing_transform": null,
+  "depth_bbox_xyxy": [
+    75,
+    75,
+    438,
+    438
+  ],
+  "semantic_bbox_xyxy": [
+    66,
+    71,
+    433,
+    431
+  ],
+  "centre_offset_ratio": 0.017387200990981306,
+  "bbox_scale_xy": [
+    1.0110192837465564,
+    0.9917355371900827
+  ],
+  "mask_iou": 0.8706801765989478,
+  "depth_coverage": 0.9726379440665155,
+  "semantic_leakage": 0.10745807973087794,
+  "thresholds": {
+    "maximum_center_offset_ratio": 0.04,
+    "maximum_bbox_scale_error": 0.125,
+    "minimum_depth_coverage": 0.84
+  },
+  "passed": true
+}

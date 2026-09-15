@@ -1,0 +1,8 @@
+{
+  "method": "camera_consistent_four_view_posterior_diagnostic",
+  "ground_truth_used": false,
+  "render_manifest": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/residuals/07306/render/render_manifest.json",
+  "evidence_manifest": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/residuals/07306/evidence/partial_evidence_manifest.json",
+  "covered_partial_points": 39768,
+  "paper_residual_board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/residuals/07306/evidence/prior_to_partial_residual_front_side_back_right.png"
+}

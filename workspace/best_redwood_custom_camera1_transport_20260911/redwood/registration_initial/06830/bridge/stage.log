@@ -1,0 +1,20 @@
+{
+  "output_dir": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/registration_initial/06830/bridge",
+  "mask_iou": 0.9486989307126522,
+  "matches": 19145,
+  "fit": {
+    "unique_pixel_pairs": 13915,
+    "inlier_threshold": 0.05504837557592343,
+    "inliers": 9688,
+    "inlier_ratio": 0.6962270930650377,
+    "mean_residual": 0.04871354211652304,
+    "p90_residual": 0.11417544324482914,
+    "scale": 0.5986376528698577
+  },
+  "all_match_residual": {
+    "mean": 0.04871354211652304,
+    "median": 0.033320043828726234,
+    "p90": 0.11417544324482914,
+    "count": 13915
+  }
+}

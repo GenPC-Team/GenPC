@@ -1,0 +1,228 @@
+{
+  "method": "registered_pointcloud_visible_partial_ranked_multiview",
+  "ground_truth_used": false,
+  "registered_carrier": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/registration_selected/06830/camera1_amplified_registered_100k.ply",
+  "saved_partial_camera": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/inputs/camera/06830/camera.pth",
+  "resolution": 768,
+  "field_of_view_degrees": 38.0,
+  "centre": [
+    0.027471514674656777,
+    -0.00012998224329555108,
+    -0.04048495338368188
+  ],
+  "radius": 0.5830605390282635,
+  "front_direction": [
+    0.04917652888853612,
+    -0.11097102583921455,
+    0.9926062161958625
+  ],
+  "up_direction": [
+    0.0075947952474935375,
+    0.9938214374555151,
+    0.11073061699007378
+  ],
+  "views": [
+    {
+      "name": "front",
+      "image": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/residuals/06830/render/registered_prior_front.png",
+      "mask": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/residuals/06830/render/registered_prior_front_mask.png",
+      "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/residuals/06830/render/registered_prior_front_depth.npy",
+      "depth_preview": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/residuals/06830/render/registered_prior_front_depth.png",
+      "camera_pose": [
+        [
+          0.9987612267662496,
+          0.007594795247493536,
+          0.04917652888853612,
+          0.12611027959866752
+        ],
+        [
+          -0.002093293588139088,
+          0.993821437455515,
+          -0.11097102583921455,
+          -0.2227167564326856
+        ],
+        [
+          -0.049715490848730774,
+          0.11073061699007376,
+          0.9926062161958625,
+          1.9504943498399707
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "orbit_yaw_degrees": 0.0
+    },
+    {
+      "name": "side",
+      "image": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/residuals/06830/render/registered_prior_side.png",
+      "mask": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/residuals/06830/render/registered_prior_side_mask.png",
+      "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/residuals/06830/render/registered_prior_side_depth.npy",
+      "depth_preview": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/residuals/06830/render/registered_prior_side_depth.png",
+      "camera_pose": [
+        [
+          0.74100389328491,
+          0.007594795247493546,
+          -0.6714577791803104,
+          -1.319345097516219
+        ],
+        [
+          -0.07994854697732369,
+          0.993821437455515,
+          -0.0769881827949487,
+          -0.15455363589014756
+        ],
+        [
+          0.6667244258108596,
+          0.11073061699007376,
+          0.7370327472291698,
+          1.4378625741536573
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "orbit_yaw_degrees": 315.0
+    },
+    {
+      "name": "back",
+      "image": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/residuals/06830/render/registered_prior_back.png",
+      "mask": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/residuals/06830/render/registered_prior_back_mask.png",
+      "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/residuals/06830/render/registered_prior_back_depth.npy",
+      "depth_preview": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/residuals/06830/render/registered_prior_back_depth.png",
+      "camera_pose": [
+        [
+          -0.9987612267662496,
+          0.007594795247493536,
+          -0.04917652888853599,
+          -0.07116725024935372
+        ],
+        [
+          0.002093293588139102,
+          0.993821437455515,
+          0.11097102583921455,
+          0.2224567919460945
+        ],
+        [
+          0.04971549084873065,
+          0.11073061699007376,
+          -0.9926062161958625,
+          -2.0314642566073347
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "orbit_yaw_degrees": 180.0
+    },
+    {
+      "name": "right",
+      "image": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/residuals/06830/render/registered_prior_right.png",
+      "mask": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/residuals/06830/render/registered_prior_right_mask.png",
+      "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/residuals/06830/render/registered_prior_right_depth.npy",
+      "depth_preview": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/residuals/06830/render/registered_prior_right_depth.png",
+      "camera_pose": [
+        [
+          0.049176528888535936,
+          0.007594795247493537,
+          -0.9987612267662496,
+          -1.975853569239075
+        ],
+        [
+          -0.11097102583921456,
+          0.993821437455515,
+          0.0020932935881391086,
+          0.004068766607510925
+        ],
+        [
+          0.9926062161958626,
+          0.11073061699007378,
+          0.049715490848730594,
+          0.05923486673670325
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "orbit_yaw_degrees": 270.0
+    }
+  ],
+  "view_selection": {
+    "method": "camera1_plus_ranked_visible_partial_support",
+    "ground_truth_used": false,
+    "num_partial_points": 20941,
+    "candidate_yaw_step_degrees": 15.0,
+    "min_yaw_separation_degrees": 45.0,
+    "selection_resolution": 256,
+    "selected": [
+      {
+        "rank": 1,
+        "yaw_degrees": 0.0,
+        "visible_points": 7612,
+        "new_visible_points": 7612,
+        "camera1_fixed": true
+      },
+      {
+        "rank": 2,
+        "yaw_degrees": 315.0,
+        "visible_points": 6292,
+        "new_visible_points": 3408,
+        "camera1_fixed": false
+      },
+      {
+        "rank": 3,
+        "yaw_degrees": 180.0,
+        "visible_points": 5614,
+        "new_visible_points": 2864,
+        "camera1_fixed": false
+      },
+      {
+        "rank": 4,
+        "yaw_degrees": 270.0,
+        "visible_points": 4915,
+        "new_visible_points": 1318,
+        "camera1_fixed": false
+      }
+    ],
+    "covered_partial_points": 15202,
+    "candidate_visible_points": {
+      "0": 7612,
+      "15": 6883,
+      "30": 5762,
+      "45": 4708,
+      "60": 4738,
+      "75": 4638,
+      "90": 4316,
+      "105": 4176,
+      "120": 4358,
+      "135": 4805,
+      "150": 5134,
+      "165": 5551,
+      "180": 5614,
+      "195": 5144,
+      "210": 4708,
+      "225": 4306,
+      "240": 4329,
+      "255": 4677,
+      "270": 4915,
+      "285": 5118,
+      "300": 5458,
+      "315": 6292,
+      "330": 6885,
+      "345": 7578
+    }
+  },
+  "board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/residuals/06830/render/registered_prior_front_side_back_right_board.png"
+}

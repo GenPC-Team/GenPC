@@ -1,0 +1,60 @@
+{
+  "method": "depth_mask_conditioned_direct_gpt_semantic_install",
+  "ground_truth_used": false,
+  "sample": "07136",
+  "source_semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/inputs/pixal/07136/gpt_image.png",
+  "source_sha256": "c6e4c1bdd5886737ee207307e671ce91f6cc98d1e32929bbf369778a7e43239a",
+  "prompt_file": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/inputs/pixal/07136/gpt_depth_completion_prompt.txt",
+  "prompt": "Use case: sketch-to-render. Create one complete, realistic RGB product image of a long black leather sofa from the supplied incomplete depth map. Image 1 is the sole geometric, camera, and foreground-mask authority. Treat every non-black depth pixel and its silhouette as a hard ControlNet-like spatial constraint: preserve exactly the oblique end-on camera viewpoint, perspective, image-plane center, apparent width and height, crop, orientation, depth ordering, visible sofa end, seat plane, backrest line, and the strong foreshortening of the long sofa body. Complete only genuinely missing or occluded surfaces along the depth direction. Keep one coherent full-length sofa with a continuous seat, continuous backrest, two end armrests, and short attached feet, in dark leather on a pure white background. Do not turn it into a single chair or sectional sofa, do not shorten or widen the body, and do not rotate, mirror, recenter, rescale, tilt, redesign, or move observed surfaces. Sharp realistic boundaries and upholstery; no cushions detached from the sofa, text, logo, watermark, secondary object, clutter, or silhouette-changing shadow.",
+  "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/inputs/camera/07136/depth.png",
+  "installed_semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/inputs/camera/07136/img.png",
+  "object_mask": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/inputs/camera/07136/07136_moge_to_raw_partial_object_mask.png",
+  "audit_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/inputs/camera/07136/semantic_depth_audit.png",
+  "audit_colours": {
+    "cyan": "observed depth not covered by semantic foreground",
+    "magenta": "semantic foreground outside observed depth"
+  },
+  "resolution": 512,
+  "initial_framing": {
+    "semantic_bbox_xyxy": [
+      124,
+      63,
+      374,
+      440
+    ],
+    "bbox_scale_xy": [
+      0.9191176470588235,
+      1.0385674931129476
+    ],
+    "centre_offset_ratio": 0.01680141653719263,
+    "mask_iou": 0.846775076653526,
+    "depth_coverage": 0.9625031117749564
+  },
+  "framing_transform": null,
+  "depth_bbox_xyxy": [
+    120,
+    75,
+    392,
+    438
+  ],
+  "semantic_bbox_xyxy": [
+    124,
+    63,
+    374,
+    440
+  ],
+  "centre_offset_ratio": 0.01680141653719263,
+  "bbox_scale_xy": [
+    0.9191176470588235,
+    1.0385674931129476
+  ],
+  "mask_iou": 0.846775076653526,
+  "depth_coverage": 0.9625031117749564,
+  "semantic_leakage": 0.1243382498655267,
+  "thresholds": {
+    "maximum_center_offset_ratio": 0.04,
+    "maximum_bbox_scale_error": 0.125,
+    "minimum_depth_coverage": 0.835
+  },
+  "passed": true
+}

@@ -1,0 +1,39 @@
+{
+  "method": "depth_mask_conditioned_direct_gpt_semantic_install",
+  "ground_truth_used": false,
+  "sample": "01184",
+  "source_semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/inputs/pixal/01184/gpt_image.png",
+  "source_sha256": "8bc8822cff48ff60b34261ff7c1a2228151639f468e8bf041277259c790052a3",
+  "prompt_file": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/inputs/pixal/01184/gpt_depth_completion_prompt.txt",
+  "prompt": "Use case: sketch-to-render\nAsset type: camera-consistent semantic conditioning image for single-image 3D generation\nPrimary request: Generate a complete, realistic RGB image by completing the object represented by Image 1, which is an incomplete depth map. The object category is a blue wheeled rubbish bin / outdoor garbage bin.\nInput images: Image 1 is the sole geometric and camera authority: an occluded depth rendering from a partial 3D scan.\nScene/backdrop: pure white studio background, no floor clutter.\nSubject: one complete blue wheeled rubbish bin with a rectangular tapered bin body, closed hinged lid, rear handle/hinge structure, and exactly two black wheels mounted on the same axle. The two wheels must be front/back parallel wheels as implied by the depth image, not side-by-side decorations.\nStyle/medium: clean realistic product photograph, coherent plastic and rubber materials, sharp boundaries, sufficient local detail for image-to-3D reconstruction.\nComposition/framing: preserve exactly Image 1's camera viewpoint, perspective, object orientation, apparent scale, image-plane center, crop, silhouette, body proportions, lid pose, and visible wheel locations. Complete only genuinely missing or occluded surfaces.\nConstraints: follow the depth silhouette and depth ordering closely; keep both wheels parallel and structurally attached; retain the slight three-quarter view; output one complete connected object. Do not rotate, mirror, recrop, rescale, recenter, tilt, shorten, widen, or redesign the bin. Do not add extra wheels, pedals, handles, text, logos, shadows that alter the silhouette, or any secondary object.\nAvoid: stylization, malformed geometry, detached parts, duplicated wheels, changed pose, changed camera, black background, text, watermark.",
+  "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/inputs/camera/01184/depth.png",
+  "installed_semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/inputs/camera/01184/img.png",
+  "object_mask": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/inputs/camera/01184/01184_moge_to_raw_partial_object_mask.png",
+  "resolution": 512,
+  "depth_bbox_xyxy": [
+    146,
+    75,
+    366,
+    438
+  ],
+  "semantic_bbox_xyxy": [
+    144,
+    69,
+    366,
+    439
+  ],
+  "centre_offset_ratio": 0.005258950006967289,
+  "bbox_scale_xy": [
+    1.009090909090909,
+    1.019283746556474
+  ],
+  "mask_iou": 0.8303413536252077,
+  "depth_coverage": 0.972123468150069,
+  "semantic_leakage": 0.14940530649588288,
+  "thresholds": {
+    "maximum_center_offset_ratio": 0.04,
+    "maximum_bbox_scale_error": 0.12,
+    "minimum_depth_coverage": 0.9
+  },
+  "passed": true
+}

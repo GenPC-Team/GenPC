@@ -1,0 +1,71 @@
+{
+  "method": "depth_mask_conditioned_direct_gpt_semantic_install",
+  "ground_truth_used": false,
+  "sample": "06830",
+  "source_semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/inputs/pixal/06830/gpt_image.png",
+  "source_sha256": "4d6a74b8e26f19b16b44165fa4bdff46369431bce200c933a9b6619b68b245cb",
+  "prompt_file": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/inputs/pixal/06830/gpt_depth_completion_structure_reference_prompt.txt",
+  "prompt": "Use case: sketch-to-render. Image 1 is the authoritative current depth map, camera, and hard foreground layout. Image 2 is only a category/structure reference showing the correct kind of compact blue three-wheeled push tricycle; do not copy any camera difference from Image 2. Generate a new complete realistic RGB image from Image 1. Keep the compact sculpted saddle and curved blue frame style of Image 2 rather than a generic baby seat. Match every observed part in Image 1: the exact steep high three-quarter camera, center, apparent width and height, crop, tall narrow loop handle and its three openings, small stacked saddle elements, closely grouped rear wheels, curved forward neck, low handlebars, pedals, front wheel position, and its slight steering angle. Every non-black observed depth region must be covered by the corresponding connected component. Missing depth regions are unknown and should be completed plausibly. Preserve one connected object with exactly three wheels. Pure white background, sharp realistic blue/black material. No generic catalog camera, wide child seat, safety belt, white frame, flattened curves, camera rotation, mirror, recenter, extra parts, text, watermark, clutter, or silhouette-changing shadow.",
+  "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/inputs/camera/06830/depth.png",
+  "installed_semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/inputs/camera/06830/img.png",
+  "object_mask": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/inputs/camera/06830/06830_moge_to_raw_partial_object_mask.png",
+  "audit_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/inputs/camera/06830/semantic_depth_audit.png",
+  "audit_colours": {
+    "cyan": "observed depth not covered by semantic foreground",
+    "magenta": "semantic foreground outside observed depth"
+  },
+  "resolution": 512,
+  "initial_framing": {
+    "semantic_bbox_xyxy": [
+      142,
+      46,
+      373,
+      465
+    ],
+    "bbox_scale_xy": [
+      1.1,
+      1.1542699724517906
+    ],
+    "centre_offset_ratio": 0.003521046167445302,
+    "mask_iou": 0.6089356326889279,
+    "depth_coverage": 0.8213571375657456
+  },
+  "framing_transform": {
+    "type": "global_image_plane_similarity",
+    "isotropic_scale": 0.9746420047732697,
+    "source_centre_xy": [
+      257.5,
+      255.5
+    ],
+    "target_centre_xy": [
+      256.0,
+      256.5
+    ]
+  },
+  "depth_bbox_xyxy": [
+    151,
+    75,
+    361,
+    438
+  ],
+  "semantic_bbox_xyxy": [
+    144,
+    53,
+    368,
+    461
+  ],
+  "centre_offset_ratio": 0.0009765625,
+  "bbox_scale_xy": [
+    1.0666666666666667,
+    1.1239669421487604
+  ],
+  "mask_iou": 0.6590465651300271,
+  "depth_coverage": 0.8382472775761167,
+  "semantic_leakage": 0.2449286000266916,
+  "thresholds": {
+    "maximum_center_offset_ratio": 0.04,
+    "maximum_bbox_scale_error": 0.125,
+    "minimum_depth_coverage": 0.835
+  },
+  "passed": true
+}

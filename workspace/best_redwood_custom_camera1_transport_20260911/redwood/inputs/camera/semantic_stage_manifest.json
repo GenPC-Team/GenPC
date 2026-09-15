@@ -1,0 +1,58 @@
+{
+  "method": "saved_view_depth_observation",
+  "strict_zero_shot": true,
+  "ground_truth_cd_emd_used": false,
+  "samples": {
+    "05117": {
+      "state": "depth_complete",
+      "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/inputs/camera/05117/depth.png",
+      "viewpoint_source": "saved_view_selection"
+    },
+    "05452": {
+      "state": "depth_complete",
+      "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/inputs/camera/05452/depth.png",
+      "viewpoint_source": "saved_view_selection"
+    },
+    "06127": {
+      "state": "depth_complete",
+      "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/inputs/camera/06127/depth.png",
+      "viewpoint_source": "saved_view_selection"
+    },
+    "06145": {
+      "state": "depth_complete",
+      "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/inputs/camera/06145/depth.png",
+      "viewpoint_source": "saved_view_selection"
+    },
+    "06188": {
+      "state": "depth_complete",
+      "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/inputs/camera/06188/depth.png",
+      "viewpoint_source": "saved_view_selection"
+    },
+    "06830": {
+      "state": "depth_complete",
+      "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/inputs/camera/06830/depth.png",
+      "viewpoint_source": "saved_view_selection"
+    },
+    "07136": {
+      "state": "depth_complete",
+      "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/inputs/camera/07136/depth.png",
+      "viewpoint_source": "saved_view_selection"
+    },
+    "07306": {
+      "state": "depth_complete",
+      "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/inputs/camera/07306/depth.png",
+      "viewpoint_source": "saved_view_selection"
+    },
+    "09639": {
+      "state": "depth_complete",
+      "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/inputs/camera/09639/depth.png",
+      "viewpoint_source": "saved_view_selection"
+    }
+  },
+  "config": {
+    "depth_projection": "view_select",
+    "camera_resolution": 512,
+    "qwen_steps": null,
+    "qwen_size": null
+  }
+}
