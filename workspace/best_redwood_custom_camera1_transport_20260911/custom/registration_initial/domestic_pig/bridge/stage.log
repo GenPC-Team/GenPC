@@ -1,0 +1,20 @@
+{
+  "output_dir": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/registration_initial/domestic_pig/bridge",
+  "mask_iou": 0.9687434360110109,
+  "matches": 10824,
+  "fit": {
+    "unique_pixel_pairs": 10775,
+    "inlier_threshold": 0.07300061425198348,
+    "inliers": 5920,
+    "inlier_ratio": 0.5494199535962877,
+    "mean_residual": 0.14289855895583728,
+    "p90_residual": 0.42160244322182183,
+    "scale": 0.297288256703911
+  },
+  "all_match_residual": {
+    "mean": 0.14289855895583728,
+    "median": 0.05645816884621587,
+    "p90": 0.42160244322182183,
+    "count": 10775
+  }
+}

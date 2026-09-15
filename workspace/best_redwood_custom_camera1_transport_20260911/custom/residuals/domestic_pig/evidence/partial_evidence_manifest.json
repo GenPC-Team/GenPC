@@ -1,0 +1,190 @@
+{
+  "method": "visibility_aware_positive_partial_evidence",
+  "ground_truth_used": false,
+  "view_order": [
+    "front",
+    "side",
+    "back",
+    "right"
+  ],
+  "registered_prior": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/registration_selected/domestic_pig/camera1_amplified_registered_100k.ply",
+  "partial": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/partial/domestic_pig.ply",
+  "manifest": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/domestic_pig/render/render_manifest.json",
+  "partial_diagonal": 1.1167955009019601,
+  "occlusion_tolerance_ratio": 0.02,
+  "occlusion_tolerance": 0.022335910018039203,
+  "prior_board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/domestic_pig/evidence/prior_rgb_front_side_back_right.png",
+  "evidence_board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/domestic_pig/evidence/partial_evidence_front_side_back_right.png",
+  "positive_overlay_board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/domestic_pig/evidence/partial_positive_overlay_front_side_back_right.png",
+  "correspondence_overlay_board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/domestic_pig/evidence/partial_correspondence_overlay_front_side_back_right.png",
+  "paper_residual_board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/domestic_pig/evidence/prior_to_partial_residual_front_side_back_right.png",
+  "residual_arrow_direction": "registered_prior_to_physical_partial",
+  "pair_distance_quantiles": [
+    0.009662580740922634,
+    0.017129461458520213,
+    0.032074493048006573,
+    0.10202514840551183
+  ],
+  "views": [
+    {
+      "name": "front",
+      "prior_rgb": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/domestic_pig/render/registered_prior_front.png",
+      "partial_evidence": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/domestic_pig/evidence/partial_evidence_front.png",
+      "positive_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/domestic_pig/evidence/partial_positive_overlay_front.png",
+      "correspondence_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/domestic_pig/evidence/partial_correspondence_overlay_front.png",
+      "paper_residual": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/domestic_pig/evidence/prior_to_partial_residual_front.png",
+      "residual_arrow_direction": "registered_prior_to_physical_partial",
+      "displayed_residual_vectors": 64,
+      "visible_correspondences": 11012,
+      "projected_pixels": 51734,
+      "visible_positive_pixels": 34269,
+      "occluded_unknown_pixels": 17465,
+      "camera_pose": [
+        [
+          -0.3013223593054613,
+          -0.3686651485317378,
+          -0.8793695719324511,
+          -1.5899195507013115
+        ],
+        [
+          -0.0037878492766907357,
+          0.9226883272416488,
+          -0.38552808324409393,
+          -0.6794100903882893
+        ],
+        [
+          0.9535148074258982,
+          -0.11283731222463446,
+          -0.2794230716842702,
+          -0.49189215391229235
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "side",
+      "prior_rgb": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/domestic_pig/render/registered_prior_side.png",
+      "partial_evidence": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/domestic_pig/evidence/partial_evidence_side.png",
+      "positive_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/domestic_pig/evidence/partial_positive_overlay_side.png",
+      "correspondence_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/domestic_pig/evidence/partial_correspondence_overlay_side.png",
+      "paper_residual": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/domestic_pig/evidence/prior_to_partial_residual_side.png",
+      "residual_arrow_direction": "registered_prior_to_physical_partial",
+      "displayed_residual_vectors": 64,
+      "visible_correspondences": 2301,
+      "projected_pixels": 48320,
+      "visible_positive_pixels": 12779,
+      "occluded_unknown_pixels": 35541,
+      "camera_pose": [
+        [
+          0.30132235930546136,
+          -0.3686651485317378,
+          0.879369571932451,
+          1.3618534522768644
+        ],
+        [
+          0.0037878492766907634,
+          0.9226883272416488,
+          0.38552808324409393,
+          0.6146890282667447
+        ],
+        [
+          -0.9535148074258981,
+          -0.1128373122246345,
+          0.2794230716842703,
+          0.4460450976511734
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "back",
+      "prior_rgb": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/domestic_pig/render/registered_prior_back.png",
+      "partial_evidence": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/domestic_pig/evidence/partial_evidence_back.png",
+      "positive_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/domestic_pig/evidence/partial_positive_overlay_back.png",
+      "correspondence_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/domestic_pig/evidence/partial_correspondence_overlay_back.png",
+      "paper_residual": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/domestic_pig/evidence/prior_to_partial_residual_back.png",
+      "residual_arrow_direction": "registered_prior_to_physical_partial",
+      "displayed_residual_vectors": 64,
+      "visible_correspondences": 11098,
+      "projected_pixels": 41609,
+      "visible_positive_pixels": 31102,
+      "occluded_unknown_pixels": 10507,
+      "camera_pose": [
+        [
+          -0.8348752710705688,
+          -0.3686651485317379,
+          -0.4087411038945263,
+          -0.8000420914809949
+        ],
+        [
+          -0.27528793590941125,
+          0.9226883272416488,
+          -0.26993110809009,
+          -0.48539835665517217
+        ],
+        [
+          0.47665483748471504,
+          -0.11283731222463457,
+          -0.8718187351005598,
+          -1.4861371119854327
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "right",
+      "prior_rgb": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/domestic_pig/render/registered_prior_right.png",
+      "partial_evidence": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/domestic_pig/evidence/partial_evidence_right.png",
+      "positive_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/domestic_pig/evidence/partial_positive_overlay_right.png",
+      "correspondence_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/domestic_pig/evidence/partial_correspondence_overlay_right.png",
+      "paper_residual": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/domestic_pig/evidence/prior_to_partial_residual_right.png",
+      "residual_arrow_direction": "registered_prior_to_physical_partial",
+      "displayed_residual_vectors": 64,
+      "visible_correspondences": 4018,
+      "projected_pixels": 40139,
+      "visible_positive_pixels": 10389,
+      "occluded_unknown_pixels": 29750,
+      "camera_pose": [
+        [
+          0.8348752710705687,
+          -0.3686651485317378,
+          0.40874110389452656,
+          0.5719759930565484
+        ],
+        [
+          0.27528793590941114,
+          0.922688327241649,
+          0.26993110809009,
+          0.42067729453362757
+        ],
+        [
+          -0.4766548374847153,
+          -0.1128373122246345,
+          0.8718187351005597,
+          1.4402900557243135
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

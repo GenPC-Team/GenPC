@@ -1,0 +1,228 @@
+{
+  "method": "registered_pointcloud_visible_partial_ranked_multiview",
+  "ground_truth_used": false,
+  "registered_carrier": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/registration_selected/hydra_creature/camera1_amplified_registered_100k.ply",
+  "saved_partial_camera": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/camera/hydra_creature/camera.pth",
+  "resolution": 768,
+  "field_of_view_degrees": 38.0,
+  "centre": [
+    -0.0023007523363862414,
+    -0.0248524113125298,
+    0.06617357787065592
+  ],
+  "radius": 0.47252964467352887,
+  "front_direction": [
+    0.29213441789526123,
+    0.3125713023883892,
+    -0.9038565499039232
+  ],
+  "up_direction": [
+    -0.10171473838097188,
+    0.949877926187267,
+    0.29561129433475214
+  ],
+  "views": [
+    {
+      "name": "front",
+      "image": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/hydra_creature/render/registered_prior_front.png",
+      "mask": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/hydra_creature/render/registered_prior_front_mask.png",
+      "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/hydra_creature/render/registered_prior_front_depth.npy",
+      "depth_preview": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/hydra_creature/render/registered_prior_front_depth.png",
+      "camera_pose": [
+        [
+          -0.9509529924644475,
+          -0.10171473838097189,
+          0.29213441789526123,
+          0.47258363451323826
+        ],
+        [
+          -0.005577299113657841,
+          0.9498779261872671,
+          0.3125713023883892,
+          0.48325352276716216
+        ],
+        [
+          -0.3092851432861098,
+          0.29561129433475225,
+          -0.9038565499039232,
+          -1.403106784893831
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "orbit_yaw_degrees": 0.0
+    },
+    {
+      "name": "side",
+      "image": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/hydra_creature/render/registered_prior_side.png",
+      "mask": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/hydra_creature/render/registered_prior_side_mask.png",
+      "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/hydra_creature/render/registered_prior_side_depth.npy",
+      "depth_preview": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/hydra_creature/render/registered_prior_side_depth.png",
+      "camera_pose": [
+        [
+          0.9509529924644474,
+          -0.10171473838097186,
+          -0.2921344178952613,
+          -0.4771851391860109
+        ],
+        [
+          0.005577299113657827,
+          0.949877926187267,
+          -0.3125713023883891,
+          -0.5329583453922215
+        ],
+        [
+          0.30928514328610984,
+          0.2956112943347521,
+          0.9038565499039232,
+          1.5354539406351426
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "orbit_yaw_degrees": 180.0
+    },
+    {
+      "name": "back",
+      "image": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/hydra_creature/render/registered_prior_back.png",
+      "mask": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/hydra_creature/render/registered_prior_back_mask.png",
+      "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/hydra_creature/render/registered_prior_back_depth.npy",
+      "depth_preview": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/hydra_creature/render/registered_prior_back_depth.png",
+      "camera_pose": [
+        [
+          -0.4658550816495265,
+          -0.10171473838097189,
+          0.8789955374729745,
+          1.4265663420094348
+        ],
+        [
+          0.21707754149916775,
+          0.949877926187267,
+          0.22496503354711403,
+          0.3408435679162135
+        ],
+        [
+          -0.8578207177948025,
+          0.2956112943347522,
+          -0.4204254735190797,
+          -0.6172566548506829
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "orbit_yaw_degrees": 315.0
+    },
+    {
+      "name": "right",
+      "image": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/hydra_creature/render/registered_prior_right.png",
+      "mask": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/hydra_creature/render/registered_prior_right_mask.png",
+      "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/hydra_creature/render/registered_prior_right_depth.npy",
+      "depth_preview": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/hydra_creature/render/registered_prior_right_depth.png",
+      "camera_pose": [
+        [
+          0.46585508164952666,
+          -0.10171473838097181,
+          -0.8789955374729745,
+          -1.431167846682207
+        ],
+        [
+          -0.21707754149916772,
+          0.949877926187267,
+          -0.22496503354711397,
+          -0.390548390541273
+        ],
+        [
+          0.8578207177948025,
+          0.2956112943347521,
+          0.42042547351907994,
+          0.7496038105919951
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "orbit_yaw_degrees": 135.0
+    }
+  ],
+  "view_selection": {
+    "method": "camera1_plus_ranked_visible_partial_support",
+    "ground_truth_used": false,
+    "num_partial_points": 16384,
+    "candidate_yaw_step_degrees": 15.0,
+    "min_yaw_separation_degrees": 45.0,
+    "selection_resolution": 256,
+    "selected": [
+      {
+        "rank": 1,
+        "yaw_degrees": 0.0,
+        "visible_points": 2638,
+        "new_visible_points": 2638,
+        "camera1_fixed": true
+      },
+      {
+        "rank": 2,
+        "yaw_degrees": 180.0,
+        "visible_points": 2931,
+        "new_visible_points": 2469,
+        "camera1_fixed": false
+      },
+      {
+        "rank": 3,
+        "yaw_degrees": 315.0,
+        "visible_points": 2701,
+        "new_visible_points": 1583,
+        "camera1_fixed": false
+      },
+      {
+        "rank": 4,
+        "yaw_degrees": 135.0,
+        "visible_points": 2655,
+        "new_visible_points": 1202,
+        "camera1_fixed": false
+      }
+    ],
+    "covered_partial_points": 7892,
+    "candidate_visible_points": {
+      "0": 2638,
+      "15": 2316,
+      "30": 2124,
+      "45": 2154,
+      "60": 2155,
+      "75": 2210,
+      "90": 2183,
+      "105": 1869,
+      "120": 2101,
+      "135": 2655,
+      "150": 2734,
+      "165": 2834,
+      "180": 2931,
+      "195": 2787,
+      "210": 2547,
+      "225": 2390,
+      "240": 2474,
+      "255": 2554,
+      "270": 2192,
+      "285": 2113,
+      "300": 2578,
+      "315": 2701,
+      "330": 2635,
+      "345": 2656
+    }
+  },
+  "board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/hydra_creature/render/registered_prior_front_side_back_right_board.png"
+}

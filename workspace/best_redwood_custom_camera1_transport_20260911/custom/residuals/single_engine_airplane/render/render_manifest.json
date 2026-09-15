@@ -1,0 +1,228 @@
+{
+  "method": "registered_pointcloud_visible_partial_ranked_multiview",
+  "ground_truth_used": false,
+  "registered_carrier": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/registration_selected/single_engine_airplane/camera1_amplified_registered_100k.ply",
+  "saved_partial_camera": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/camera/single_engine_airplane/camera.pth",
+  "resolution": 768,
+  "field_of_view_degrees": 38.0,
+  "centre": [
+    0.020036565805840095,
+    -0.014948924059085524,
+    0.0028465126114476103
+  ],
+  "radius": 0.5149181477832828,
+  "front_direction": [
+    -0.4829522176922073,
+    0.3968405074973969,
+    -0.7805605466812855
+  ],
+  "up_direction": [
+    0.20447050634544803,
+    0.9178756994938859,
+    0.34014116527325217
+  ],
+  "views": [
+    {
+      "name": "front",
+      "image": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/single_engine_airplane/render/registered_prior_front.png",
+      "mask": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/single_engine_airplane/render/registered_prior_front_mask.png",
+      "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/single_engine_airplane/render/registered_prior_front_depth.npy",
+      "depth_preview": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/single_engine_airplane/render/registered_prior_front_depth.png",
+      "camera_pose": [
+        [
+          -0.8514393504302082,
+          0.20447050634544803,
+          -0.4829522176922073,
+          -0.8354603891544171
+        ],
+        [
+          -0.004670319883926577,
+          0.9178756994938859,
+          0.3968405074973969,
+          0.6880105682716278
+        ],
+        [
+          0.5244322841427356,
+          0.34014116527325217,
+          -0.7805605466812855,
+          -1.3798309995426252
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "orbit_yaw_degrees": 0.0
+    },
+    {
+      "name": "side",
+      "image": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/single_engine_airplane/render/registered_prior_side.png",
+      "mask": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/single_engine_airplane/render/registered_prior_side_mask.png",
+      "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/single_engine_airplane/render/registered_prior_side_depth.npy",
+      "depth_preview": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/single_engine_airplane/render/registered_prior_side_depth.png",
+      "camera_pose": [
+        [
+          0.6974300262860846,
+          0.20447050634544806,
+          0.6868647395735403,
+          1.2367422183497674
+        ],
+        [
+          0.10722106380139204,
+          0.9178756994938859,
+          -0.3821097273767151,
+          -0.6918144528965742
+        ],
+        [
+          -0.7085866227299872,
+          0.3401411652732521,
+          0.6182305280190109,
+          1.0979741770231848
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "orbit_yaw_degrees": 195.0
+    },
+    {
+      "name": "back",
+      "image": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/single_engine_airplane/render/registered_prior_back.png",
+      "mask": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/single_engine_airplane/render/registered_prior_back_mask.png",
+      "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/single_engine_airplane/render/registered_prior_back_depth.npy",
+      "depth_preview": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/single_engine_airplane/render/registered_prior_back_depth.png",
+      "camera_pose": [
+        [
+          -0.26055975033902795,
+          0.20447050634544803,
+          -0.9435573265775108,
+          -1.6513718885848774
+        ],
+        [
+          -0.28391102876115515,
+          0.9178756994938858,
+          0.27730619904068543,
+          0.476268633662334
+        ],
+        [
+          0.9227692800754943,
+          0.3401411652732521,
+          -0.1811100312945371,
+          -0.31797007049818493
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "orbit_yaw_degrees": 45.0
+    },
+    {
+      "name": "right",
+      "image": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/single_engine_airplane/render/registered_prior_right.png",
+      "mask": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/single_engine_airplane/render/registered_prior_right_mask.png",
+      "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/single_engine_airplane/render/registered_prior_right_depth.npy",
+      "depth_preview": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/single_engine_airplane/render/registered_prior_right_depth.png",
+      "camera_pose": [
+        [
+          0.007470785879620607,
+          0.204470506345448,
+          0.9788442161003849,
+          1.7539518799457283
+        ],
+        [
+          0.34600912068541795,
+          0.9178756994938859,
+          -0.19437563808541858,
+          -0.3592640765914429
+        ],
+        [
+          -0.9382014046892303,
+          0.34014116527325217,
+          -0.06389140729166481,
+          -0.11033011725751339
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "orbit_yaw_degrees": 240.0
+    }
+  ],
+  "view_selection": {
+    "method": "camera1_plus_ranked_visible_partial_support",
+    "ground_truth_used": false,
+    "num_partial_points": 16384,
+    "candidate_yaw_step_degrees": 15.0,
+    "min_yaw_separation_degrees": 45.0,
+    "selection_resolution": 256,
+    "selected": [
+      {
+        "rank": 1,
+        "yaw_degrees": 0.0,
+        "visible_points": 4333,
+        "new_visible_points": 4333,
+        "camera1_fixed": true
+      },
+      {
+        "rank": 2,
+        "yaw_degrees": 195.0,
+        "visible_points": 3507,
+        "new_visible_points": 2549,
+        "camera1_fixed": false
+      },
+      {
+        "rank": 3,
+        "yaw_degrees": 45.0,
+        "visible_points": 3410,
+        "new_visible_points": 1617,
+        "camera1_fixed": false
+      },
+      {
+        "rank": 4,
+        "yaw_degrees": 240.0,
+        "visible_points": 2925,
+        "new_visible_points": 918,
+        "camera1_fixed": false
+      }
+    ],
+    "covered_partial_points": 9417,
+    "candidate_visible_points": {
+      "0": 4333,
+      "15": 4439,
+      "30": 4069,
+      "45": 3410,
+      "60": 2798,
+      "75": 2377,
+      "90": 2163,
+      "105": 1889,
+      "120": 1920,
+      "135": 2063,
+      "150": 2349,
+      "165": 2962,
+      "180": 3411,
+      "195": 3507,
+      "210": 3419,
+      "225": 3093,
+      "240": 2925,
+      "255": 2550,
+      "270": 2365,
+      "285": 2046,
+      "300": 2027,
+      "315": 2329,
+      "330": 2852,
+      "345": 3683
+    }
+  },
+  "board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/single_engine_airplane/render/registered_prior_front_side_back_right_board.png"
+}

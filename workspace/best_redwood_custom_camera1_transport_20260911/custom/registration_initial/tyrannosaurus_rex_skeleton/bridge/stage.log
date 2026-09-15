@@ -1,0 +1,20 @@
+{
+  "output_dir": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/registration_initial/tyrannosaurus_rex_skeleton/bridge",
+  "mask_iou": 0.8193839539934952,
+  "matches": 5016,
+  "fit": {
+    "unique_pixel_pairs": 4514,
+    "inlier_threshold": 0.052485451850298924,
+    "inliers": 3030,
+    "inlier_ratio": 0.6712450155073106,
+    "mean_residual": 0.041267531646609144,
+    "p90_residual": 0.08231155405201462,
+    "scale": 0.16832625674551244
+  },
+  "all_match_residual": {
+    "mean": 0.041267531646609144,
+    "median": 0.03499642768916481,
+    "p90": 0.08231155405201462,
+    "count": 4514
+  }
+}

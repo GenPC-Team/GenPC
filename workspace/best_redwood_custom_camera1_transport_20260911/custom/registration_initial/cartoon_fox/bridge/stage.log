@@ -1,0 +1,20 @@
+{
+  "output_dir": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/registration_initial/cartoon_fox/bridge",
+  "mask_iou": 0.9669146730680052,
+  "matches": 11480,
+  "fit": {
+    "unique_pixel_pairs": 11423,
+    "inlier_threshold": 0.0956078632430359,
+    "inliers": 7188,
+    "inlier_ratio": 0.6292567626718025,
+    "mean_residual": 0.10864452032009521,
+    "p90_residual": 0.2745726254244082,
+    "scale": 0.4082359457238386
+  },
+  "all_match_residual": {
+    "mean": 0.10864452032009521,
+    "median": 0.061183903266286026,
+    "p90": 0.2745726254244082,
+    "count": 11423
+  }
+}

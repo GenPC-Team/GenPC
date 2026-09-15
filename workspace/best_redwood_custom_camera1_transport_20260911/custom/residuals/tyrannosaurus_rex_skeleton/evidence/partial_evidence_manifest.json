@@ -1,0 +1,190 @@
+{
+  "method": "visibility_aware_positive_partial_evidence",
+  "ground_truth_used": false,
+  "view_order": [
+    "front",
+    "side",
+    "back",
+    "right"
+  ],
+  "registered_prior": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/registration_selected/tyrannosaurus_rex_skeleton/camera1_amplified_registered_100k.ply",
+  "partial": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/partial/tyrannosaurus_rex_skeleton.ply",
+  "manifest": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/tyrannosaurus_rex_skeleton/render/render_manifest.json",
+  "partial_diagonal": 0.9243883189016234,
+  "occlusion_tolerance_ratio": 0.02,
+  "occlusion_tolerance": 0.01848776637803247,
+  "prior_board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/tyrannosaurus_rex_skeleton/evidence/prior_rgb_front_side_back_right.png",
+  "evidence_board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/tyrannosaurus_rex_skeleton/evidence/partial_evidence_front_side_back_right.png",
+  "positive_overlay_board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/tyrannosaurus_rex_skeleton/evidence/partial_positive_overlay_front_side_back_right.png",
+  "correspondence_overlay_board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/tyrannosaurus_rex_skeleton/evidence/partial_correspondence_overlay_front_side_back_right.png",
+  "paper_residual_board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/tyrannosaurus_rex_skeleton/evidence/prior_to_partial_residual_front_side_back_right.png",
+  "residual_arrow_direction": "registered_prior_to_physical_partial",
+  "pair_distance_quantiles": [
+    0.0066065032911744375,
+    0.012560287632335061,
+    0.01799797886577081,
+    0.02204718496224438
+  ],
+  "views": [
+    {
+      "name": "front",
+      "prior_rgb": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/tyrannosaurus_rex_skeleton/render/registered_prior_front.png",
+      "partial_evidence": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/tyrannosaurus_rex_skeleton/evidence/partial_evidence_front.png",
+      "positive_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/tyrannosaurus_rex_skeleton/evidence/partial_positive_overlay_front.png",
+      "correspondence_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/tyrannosaurus_rex_skeleton/evidence/partial_correspondence_overlay_front.png",
+      "paper_residual": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/tyrannosaurus_rex_skeleton/evidence/prior_to_partial_residual_front.png",
+      "residual_arrow_direction": "registered_prior_to_physical_partial",
+      "displayed_residual_vectors": 64,
+      "visible_correspondences": 15075,
+      "projected_pixels": 21324,
+      "visible_positive_pixels": 19359,
+      "occluded_unknown_pixels": 1965,
+      "camera_pose": [
+        [
+          0.23546099725605338,
+          0.4052528332613795,
+          -0.8833619076600538,
+          -1.3286713223278324
+        ],
+        [
+          0.027449420748968695,
+          0.9057816162850657,
+          0.42285481302754524,
+          0.6460850158660019
+        ],
+        [
+          0.971496087522606,
+          -0.12381358864696025,
+          0.20215228713677819,
+          0.39076432292015195
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "side",
+      "prior_rgb": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/tyrannosaurus_rex_skeleton/render/registered_prior_side.png",
+      "partial_evidence": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/tyrannosaurus_rex_skeleton/evidence/partial_evidence_side.png",
+      "positive_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/tyrannosaurus_rex_skeleton/evidence/partial_positive_overlay_side.png",
+      "correspondence_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/tyrannosaurus_rex_skeleton/evidence/partial_correspondence_overlay_side.png",
+      "paper_residual": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/tyrannosaurus_rex_skeleton/evidence/prior_to_partial_residual_side.png",
+      "residual_arrow_direction": "registered_prior_to_physical_partial",
+      "displayed_residual_vectors": 64,
+      "visible_correspondences": 15126,
+      "projected_pixels": 17440,
+      "visible_positive_pixels": 15862,
+      "occluded_unknown_pixels": 1578,
+      "camera_pose": [
+        [
+          -0.45813512728360667,
+          0.4052528332613794,
+          -0.7911272630130112,
+          -1.1886140125794113
+        ],
+        [
+          0.31841317730038543,
+          0.9057816162850657,
+          0.27959383419790823,
+          0.42854476985988454
+        ],
+        [
+          0.8298947244502202,
+          -0.1238135886469603,
+          -0.5440082183166487,
+          -0.7422723297849432
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "back",
+      "prior_rgb": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/tyrannosaurus_rex_skeleton/render/registered_prior_back.png",
+      "partial_evidence": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/tyrannosaurus_rex_skeleton/evidence/partial_evidence_back.png",
+      "positive_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/tyrannosaurus_rex_skeleton/evidence/partial_positive_overlay_back.png",
+      "correspondence_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/tyrannosaurus_rex_skeleton/evidence/partial_correspondence_overlay_back.png",
+      "paper_residual": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/tyrannosaurus_rex_skeleton/evidence/prior_to_partial_residual_back.png",
+      "residual_arrow_direction": "registered_prior_to_physical_partial",
+      "displayed_residual_vectors": 64,
+      "visible_correspondences": 5772,
+      "projected_pixels": 18571,
+      "visible_positive_pixels": 8460,
+      "occluded_unknown_pixels": 10111,
+      "camera_pose": [
+        [
+          -0.2354609972560533,
+          0.40525283326137956,
+          0.8833619076600538,
+          1.3540796720419888
+        ],
+        [
+          -0.027449420748968736,
+          0.9057816162850656,
+          -0.4228548130275453,
+          -0.6381158991685539
+        ],
+        [
+          -0.971496087522606,
+          -0.12381358864696027,
+          -0.20215228713677807,
+          -0.2231677977968181
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "right",
+      "prior_rgb": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/tyrannosaurus_rex_skeleton/render/registered_prior_right.png",
+      "partial_evidence": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/tyrannosaurus_rex_skeleton/evidence/partial_evidence_right.png",
+      "positive_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/tyrannosaurus_rex_skeleton/evidence/partial_positive_overlay_right.png",
+      "correspondence_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/tyrannosaurus_rex_skeleton/evidence/partial_correspondence_overlay_right.png",
+      "paper_residual": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/residuals/tyrannosaurus_rex_skeleton/evidence/prior_to_partial_residual_right.png",
+      "residual_arrow_direction": "registered_prior_to_physical_partial",
+      "displayed_residual_vectors": 64,
+      "visible_correspondences": 6018,
+      "projected_pixels": 17612,
+      "visible_positive_pixels": 7170,
+      "occluded_unknown_pixels": 10442,
+      "camera_pose": [
+        [
+          0.45813512728360656,
+          0.40525283326137956,
+          0.7911272630130112,
+          1.2140223622935677
+        ],
+        [
+          -0.31841317730038543,
+          0.9057816162850657,
+          -0.2795938341979084,
+          -0.4205756531624367
+        ],
+        [
+          -0.8298947244502203,
+          -0.12381358864696024,
+          0.5440082183166486,
+          0.9098688549082767
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

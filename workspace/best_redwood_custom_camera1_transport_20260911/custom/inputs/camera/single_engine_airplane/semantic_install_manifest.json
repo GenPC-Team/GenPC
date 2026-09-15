@@ -1,0 +1,71 @@
+{
+  "method": "depth_mask_conditioned_direct_gpt_semantic_install",
+  "ground_truth_used": false,
+  "sample": "single_engine_airplane",
+  "source_semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/pixal/single_engine_airplane/gpt_image.png",
+  "source_sha256": "fbaceb06a1d0a95fa70560f44b113675e5eaece7d6ff5728e67a0ab77e01c3a1",
+  "prompt_file": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/pixal/single_engine_airplane/gpt_depth_feedback_prompt.txt",
+  "prompt": "Use case: precise-object-edit. Image 1 is the edit target, a complete single-engine light-airplane RGB image. Image 2 is the authoritative incomplete depth raster from the same camera. Correct only the image-plane geometry so Image 1 follows Image 2 more closely: match the non-black depth silhouette, especially vertical height, tail position, wing endpoints, fuselage centerline, propeller, and landing gear. Keep one complete coherent airplane and preserve the current identity and materials. Preserve the exact camera, perspective, center, crop and depth ordering; do not rotate, mirror, recenter, independently stretch parts, redesign, add parts, or add text/shadow. Pure white background, sharp boundaries suitable for image-to-3D reconstruction.",
+  "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/camera/single_engine_airplane/depth.png",
+  "installed_semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/camera/single_engine_airplane/img.png",
+  "object_mask": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/camera/single_engine_airplane/single_engine_airplane_moge_to_raw_partial_object_mask.png",
+  "audit_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/camera/single_engine_airplane/semantic_depth_audit.png",
+  "audit_colours": {
+    "cyan": "observed depth not covered by semantic foreground",
+    "magenta": "semantic foreground outside observed depth"
+  },
+  "resolution": 512,
+  "initial_framing": {
+    "semantic_bbox_xyxy": [
+      38,
+      160,
+      476,
+      362
+    ],
+    "bbox_scale_xy": [
+      1.042857142857143,
+      1.1284916201117319
+    ],
+    "centre_offset_ratio": 0.009212872199274027,
+    "mask_iou": 0.7347553324968632,
+    "depth_coverage": 0.9379604911906033
+  },
+  "framing_transform": {
+    "type": "global_image_plane_similarity",
+    "isotropic_scale": 0.9969059405940593,
+    "source_centre_xy": [
+      257.0,
+      261.0
+    ],
+    "target_centre_xy": [
+      261.0,
+      263.5
+    ]
+  },
+  "depth_bbox_xyxy": [
+    51,
+    174,
+    471,
+    353
+  ],
+  "semantic_bbox_xyxy": [
+    42,
+    163,
+    480,
+    364
+  ],
+  "centre_offset_ratio": 0.0,
+  "bbox_scale_xy": [
+    1.042857142857143,
+    1.1229050279329609
+  ],
+  "mask_iou": 0.7544462837981238,
+  "depth_coverage": 0.9489588894821143,
+  "semantic_leakage": 0.21364420652125823,
+  "thresholds": {
+    "maximum_center_offset_ratio": 0.04,
+    "maximum_bbox_scale_error": 0.125,
+    "minimum_depth_coverage": 0.835
+  },
+  "passed": true
+}

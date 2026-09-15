@@ -1,0 +1,20 @@
+{
+  "output_dir": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/registration_initial/hydra_creature/bridge",
+  "mask_iou": 0.6750138159712628,
+  "matches": 7338,
+  "fit": {
+    "unique_pixel_pairs": 7163,
+    "inlier_threshold": 0.025850605227926468,
+    "inliers": 4786,
+    "inlier_ratio": 0.668155800642189,
+    "mean_residual": 0.023254551709581312,
+    "p90_residual": 0.04615080000264302,
+    "scale": 0.1780154304453233
+  },
+  "all_match_residual": {
+    "mean": 0.023254551709581312,
+    "median": 0.01754401923037191,
+    "p90": 0.04615080000264302,
+    "count": 7163
+  }
+}

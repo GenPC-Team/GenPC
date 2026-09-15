@@ -1,0 +1,78 @@
+/opt/data/private/cr/miniconda3/envs/genpc/lib/python3.10/site-packages/timm/models/layers/__init__.py:49: FutureWarning: Importing from timm.models.layers is deprecated, please import via timm.layers
+  warnings.warn(f"Importing from {__name__} is deprecated, please import via timm.layers", FutureWarning)
+/opt/data/private/cr/miniconda3/envs/genpc/lib/python3.10/site-packages/timm/models/registry.py:4: FutureWarning: Importing from timm.models.registry is deprecated, please import via timm.models
+  warnings.warn(f"Importing from {__name__} is deprecated, please import via timm.models", FutureWarning)
+✓ 背景已移除，保存到: /opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/camera/tyrannosaurus_rex_skeleton/img_rmbg.png
+✓ 背景已移除，保存到: /opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/camera/tyrannosaurus_rex_skeleton/img_rmbg.png
+{
+  "method": "depth_mask_conditioned_direct_gpt_semantic_install",
+  "ground_truth_used": false,
+  "sample": "tyrannosaurus_rex_skeleton",
+  "source_semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/pixal/tyrannosaurus_rex_skeleton/gpt_image.png",
+  "source_sha256": "698e4f1f1337554074497745cd9c8c30e3221283c63ae5a7a8cc88ff8e0c0e23",
+  "prompt_file": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/pixal/tyrannosaurus_rex_skeleton/gpt_depth_completion_prompt.txt",
+  "prompt": "Generate one complete, realistic RGB object image from the supplied incomplete depth map. The object is a complete Tyrannosaurus rex skeleton display. Treat every non-background depth pixel and its foreground mask as a hard ControlNet-like spatial constraint. Preserve the input camera viewpoint, perspective, image-plane center, apparent width and height, crop, orientation, visible silhouette, depth ordering, and all observed part locations. Do not rotate, mirror, recenter, rescale, widen, shorten, tilt, or redesign the observed object. Complete only genuinely missing or occluded regions, connect them naturally to the observed structure, and keep a single coherent object on a pure white background. Produce sharp boundaries and realistic materials suitable for image-to-3D reconstruction. Do not add text, logos, extra parts, secondary objects, or cast shadows that change the foreground mask. Additional structural constraints: Keep one skull, a continuous articulated spine and tail, rib cage, two hind legs, and two small forelimbs anatomically connected.",
+  "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/camera/tyrannosaurus_rex_skeleton/depth.png",
+  "installed_semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/camera/tyrannosaurus_rex_skeleton/img.png",
+  "object_mask": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/camera/tyrannosaurus_rex_skeleton/tyrannosaurus_rex_skeleton_moge_to_raw_partial_object_mask.png",
+  "audit_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/camera/tyrannosaurus_rex_skeleton/semantic_depth_audit.png",
+  "audit_colours": {
+    "cyan": "observed depth not covered by semantic foreground",
+    "magenta": "semantic foreground outside observed depth"
+  },
+  "resolution": 512,
+  "initial_framing": {
+    "semantic_bbox_xyxy": [
+      24,
+      186,
+      492,
+      341
+    ],
+    "bbox_scale_xy": [
+      1.1169451073985681,
+      1.1654135338345866
+    ],
+    "centre_offset_ratio": 0.04311277354422679,
+    "mask_iou": 0.3300580412229788,
+    "depth_coverage": 0.5644833515710489
+  },
+  "framing_transform": {
+    "type": "global_image_plane_similarity",
+    "isotropic_scale": 0.9653225806451612,
+    "source_centre_xy": [
+      258.0,
+      263.5
+    ],
+    "target_centre_xy": [
+      279.5,
+      268.5
+    ]
+  },
+  "depth_bbox_xyxy": [
+    70,
+    202,
+    489,
+    335
+  ],
+  "semantic_bbox_xyxy": [
+    53,
+    193,
+    506,
+    344
+  ],
+  "centre_offset_ratio": 0.0,
+  "bbox_scale_xy": [
+    1.081145584725537,
+    1.1353383458646618
+  ],
+  "mask_iou": 0.4809277261200338,
+  "depth_coverage": 0.7115053931530405,
+  "semantic_leakage": 0.40257268491172804,
+  "thresholds": {
+    "maximum_center_offset_ratio": 0.04,
+    "maximum_bbox_scale_error": 0.125,
+    "minimum_depth_coverage": 0.835
+  },
+  "passed": false
+}
+semantic image does not preserve the saved depth framing

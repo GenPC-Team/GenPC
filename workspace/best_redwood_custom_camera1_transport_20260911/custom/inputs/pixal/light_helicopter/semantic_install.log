@@ -1,0 +1,78 @@
+/opt/data/private/cr/miniconda3/envs/genpc/lib/python3.10/site-packages/timm/models/layers/__init__.py:49: FutureWarning: Importing from timm.models.layers is deprecated, please import via timm.layers
+  warnings.warn(f"Importing from {__name__} is deprecated, please import via timm.layers", FutureWarning)
+/opt/data/private/cr/miniconda3/envs/genpc/lib/python3.10/site-packages/timm/models/registry.py:4: FutureWarning: Importing from timm.models.registry is deprecated, please import via timm.models
+  warnings.warn(f"Importing from {__name__} is deprecated, please import via timm.models", FutureWarning)
+✓ 背景已移除，保存到: /opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/camera/light_helicopter/img_rmbg.png
+✓ 背景已移除，保存到: /opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/camera/light_helicopter/img_rmbg.png
+{
+  "method": "depth_mask_conditioned_direct_gpt_semantic_install",
+  "ground_truth_used": false,
+  "sample": "light_helicopter",
+  "source_semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/pixal/light_helicopter/gpt_image.png",
+  "source_sha256": "f9bca0c13ec42c582de0daa7a937805b675dae59030f17c8e6f2f54de410ef48",
+  "prompt_file": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/pixal/light_helicopter/gpt_depth_completion_prompt.txt",
+  "prompt": "Generate one complete, realistic RGB object image from the supplied incomplete depth map. The object is a complete light helicopter. Treat every non-background depth pixel and its foreground mask as a hard ControlNet-like spatial constraint. Preserve the input camera viewpoint, perspective, image-plane center, apparent width and height, crop, orientation, visible silhouette, depth ordering, and all observed part locations. Do not rotate, mirror, recenter, rescale, widen, shorten, tilt, or redesign the observed object. Complete only genuinely missing or occluded regions, connect them naturally to the observed structure, and keep a single coherent object on a pure white background. Produce sharp boundaries and realistic materials suitable for image-to-3D reconstruction. Do not add text, logos, extra parts, secondary objects, or cast shadows that change the foreground mask. Additional structural constraints: Keep one fuselage, one main rotor, a continuous tail boom, one tail rotor, and attached landing skids.",
+  "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/camera/light_helicopter/depth.png",
+  "installed_semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/camera/light_helicopter/img.png",
+  "object_mask": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/camera/light_helicopter/light_helicopter_moge_to_raw_partial_object_mask.png",
+  "audit_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/camera/light_helicopter/semantic_depth_audit.png",
+  "audit_colours": {
+    "cyan": "observed depth not covered by semantic foreground",
+    "magenta": "semantic foreground outside observed depth"
+  },
+  "resolution": 512,
+  "initial_framing": {
+    "semantic_bbox_xyxy": [
+      68,
+      176,
+      512,
+      381
+    ],
+    "bbox_scale_xy": [
+      1.0802919708029197,
+      1.1263736263736264
+    ],
+    "centre_offset_ratio": 0.03294360897154883,
+    "mask_iou": 0.6687800073864336,
+    "depth_coverage": 0.9106529209621993
+  },
+  "framing_transform": {
+    "type": "global_image_plane_similarity",
+    "isotropic_scale": 0.998780487804878,
+    "source_centre_xy": [
+      290.0,
+      278.5
+    ],
+    "target_centre_xy": [
+      306.5,
+      282.0
+    ]
+  },
+  "depth_bbox_xyxy": [
+    101,
+    191,
+    512,
+    373
+  ],
+  "semantic_bbox_xyxy": [
+    84,
+    180,
+    512,
+    384
+  ],
+  "centre_offset_ratio": 0.0166015625,
+  "bbox_scale_xy": [
+    1.0413625304136254,
+    1.120879120879121
+  ],
+  "mask_iou": 0.5986460641753438,
+  "depth_coverage": 0.8264185734640852,
+  "semantic_leakage": 0.3152540018750651,
+  "thresholds": {
+    "maximum_center_offset_ratio": 0.04,
+    "maximum_bbox_scale_error": 0.125,
+    "minimum_depth_coverage": 0.835
+  },
+  "passed": false
+}
+semantic image does not preserve the saved depth framing

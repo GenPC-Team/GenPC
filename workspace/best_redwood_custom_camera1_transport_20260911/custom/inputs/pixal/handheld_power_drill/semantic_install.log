@@ -1,0 +1,65 @@
+/opt/data/private/cr/miniconda3/envs/genpc/lib/python3.10/site-packages/timm/models/layers/__init__.py:49: FutureWarning: Importing from timm.models.layers is deprecated, please import via timm.layers
+  warnings.warn(f"Importing from {__name__} is deprecated, please import via timm.layers", FutureWarning)
+/opt/data/private/cr/miniconda3/envs/genpc/lib/python3.10/site-packages/timm/models/registry.py:4: FutureWarning: Importing from timm.models.registry is deprecated, please import via timm.models
+  warnings.warn(f"Importing from {__name__} is deprecated, please import via timm.models", FutureWarning)
+✓ 背景已移除，保存到: /opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/camera/handheld_power_drill/img_rmbg.png
+{
+  "method": "depth_mask_conditioned_direct_gpt_semantic_install",
+  "ground_truth_used": false,
+  "sample": "handheld_power_drill",
+  "source_semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/pixal/handheld_power_drill/gpt_image.png",
+  "source_sha256": "7057b585cca40ffad25a8cc1b1cc749075f5d27f4a97fd2f193d40be669115c7",
+  "prompt_file": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/pixal/handheld_power_drill/gpt_depth_completion_prompt.txt",
+  "prompt": "Generate one complete, realistic RGB object image from the supplied incomplete depth map. The object is a complete cordless handheld power drill. Treat every non-background depth pixel and its foreground mask as a hard ControlNet-like spatial constraint. Preserve the input camera viewpoint, perspective, image-plane center, apparent width and height, crop, orientation, visible silhouette, depth ordering, and all observed part locations. Do not rotate, mirror, recenter, rescale, widen, shorten, tilt, or redesign the observed object. Complete only genuinely missing or occluded regions, connect them naturally to the observed structure, and keep a single coherent object on a pure white background. Produce sharp boundaries and realistic materials suitable for image-to-3D reconstruction. Do not add text, logos, extra parts, secondary objects, or cast shadows that change the foreground mask. Additional structural constraints: Keep the drill body, chuck, handle, trigger region, and battery pack rigidly connected with realistic proportions.",
+  "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/camera/handheld_power_drill/depth.png",
+  "installed_semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/camera/handheld_power_drill/img.png",
+  "object_mask": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/camera/handheld_power_drill/handheld_power_drill_moge_to_raw_partial_object_mask.png",
+  "audit_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/camera/handheld_power_drill/semantic_depth_audit.png",
+  "audit_colours": {
+    "cyan": "observed depth not covered by semantic foreground",
+    "magenta": "semantic foreground outside observed depth"
+  },
+  "resolution": 512,
+  "initial_framing": {
+    "semantic_bbox_xyxy": [
+      113,
+      54,
+      427,
+      474
+    ],
+    "bbox_scale_xy": [
+      1.043189368770764,
+      1.0023866348448687
+    ],
+    "centre_offset_ratio": 0.016858082521125067,
+    "mask_iou": 0.9573600350825903,
+    "depth_coverage": 0.9830093808630394
+  },
+  "framing_transform": null,
+  "depth_bbox_xyxy": [
+    128,
+    56,
+    429,
+    475
+  ],
+  "semantic_bbox_xyxy": [
+    113,
+    54,
+    427,
+    474
+  ],
+  "centre_offset_ratio": 0.016858082521125067,
+  "bbox_scale_xy": [
+    1.043189368770764,
+    1.0023866348448687
+  ],
+  "mask_iou": 0.9573600350825903,
+  "depth_coverage": 0.9830093808630394,
+  "semantic_leakage": 0.02653170427182734,
+  "thresholds": {
+    "maximum_center_offset_ratio": 0.04,
+    "maximum_bbox_scale_error": 0.125,
+    "minimum_depth_coverage": 0.835
+  },
+  "passed": true
+}

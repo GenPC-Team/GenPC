@@ -1,0 +1,77 @@
+/opt/data/private/cr/miniconda3/envs/genpc/lib/python3.10/site-packages/timm/models/layers/__init__.py:49: FutureWarning: Importing from timm.models.layers is deprecated, please import via timm.layers
+  warnings.warn(f"Importing from {__name__} is deprecated, please import via timm.layers", FutureWarning)
+/opt/data/private/cr/miniconda3/envs/genpc/lib/python3.10/site-packages/timm/models/registry.py:4: FutureWarning: Importing from timm.models.registry is deprecated, please import via timm.models
+  warnings.warn(f"Importing from {__name__} is deprecated, please import via timm.models", FutureWarning)
+✓ 背景已移除，保存到: /opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/camera/wolf/img_rmbg.png
+✓ 背景已移除，保存到: /opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/camera/wolf/img_rmbg.png
+{
+  "method": "depth_mask_conditioned_direct_gpt_semantic_install",
+  "ground_truth_used": false,
+  "sample": "wolf",
+  "source_semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/pixal/wolf/gpt_image.png",
+  "source_sha256": "d333a34b9f26661789edbd7f28ca9370f8aecca03db60106fc4e720044b7c36a",
+  "prompt_file": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/pixal/wolf/gpt_depth_completion_prompt.txt",
+  "prompt": "Generate one complete, realistic RGB object image from the supplied incomplete depth map. The object is a complete standing wolf. Treat every non-background depth pixel and its foreground mask as a hard ControlNet-like spatial constraint. Preserve the input camera viewpoint, perspective, image-plane center, apparent width and height, crop, orientation, visible silhouette, depth ordering, and all observed part locations. Do not rotate, mirror, recenter, rescale, widen, shorten, tilt, or redesign the observed object. Complete only genuinely missing or occluded regions, connect them naturally to the observed structure, and keep a single coherent object on a pure white background. Produce sharp boundaries and realistic materials suitable for image-to-3D reconstruction. Do not add text, logos, extra parts, secondary objects, or cast shadows that change the foreground mask. Additional structural constraints: Keep one connected torso, four naturally attached legs, two ears, one head, and one tail.",
+  "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/camera/wolf/depth.png",
+  "installed_semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/camera/wolf/img.png",
+  "object_mask": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/camera/wolf/wolf_moge_to_raw_partial_object_mask.png",
+  "audit_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/camera/wolf/semantic_depth_audit.png",
+  "audit_colours": {
+    "cyan": "observed depth not covered by semantic foreground",
+    "magenta": "semantic foreground outside observed depth"
+  },
+  "resolution": 512,
+  "initial_framing": {
+    "semantic_bbox_xyxy": [
+      213,
+      48,
+      310,
+      472
+    ],
+    "bbox_scale_xy": [
+      1.1411764705882352,
+      1.0119331742243436
+    ],
+    "centre_offset_ratio": 0.004026470337517247,
+    "mask_iou": 0.754778379118997,
+    "depth_coverage": 0.9978263822850156
+  },
+  "framing_transform": {
+    "type": "global_image_plane_similarity",
+    "isotropic_scale": 0.9858247422680413,
+    "source_centre_xy": [
+      261.5,
+      260.0
+    ],
+    "target_centre_xy": [
+      259.5,
+      260.5
+    ]
+  },
+  "depth_bbox_xyxy": [
+    217,
+    51,
+    302,
+    470
+  ],
+  "semantic_bbox_xyxy": [
+    212,
+    52,
+    307,
+    470
+  ],
+  "centre_offset_ratio": 0.0009765625,
+  "bbox_scale_xy": [
+    1.1176470588235294,
+    0.9976133651551312
+  ],
+  "mask_iou": 0.766555652936021,
+  "depth_coverage": 0.9901734365801748,
+  "semantic_leakage": 0.22756817860675427,
+  "thresholds": {
+    "maximum_center_offset_ratio": 0.04,
+    "maximum_bbox_scale_error": 0.125,
+    "minimum_depth_coverage": 0.835
+  },
+  "passed": true
+}

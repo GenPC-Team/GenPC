@@ -1,0 +1,155 @@
+{
+  "method": "camera1_amplified_global_proper_sim3_recovery",
+  "strict_zero_shot": true,
+  "ground_truth_cd_emd_used": false,
+  "nonrigid_deformation_used": false,
+  "fusion_run": false,
+  "applied": true,
+  "proposal_gates_used": false,
+  "objective_improved": true,
+  "inputs": {
+    "partial": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/partial/mirrorless_camera.ply",
+    "registered_prior": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/registration_initial/mirrorless_camera/joint/two_camera_joint_registered_100k.ply",
+    "camera": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/camera/mirrorless_camera/camera.pth",
+    "semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/custom/inputs/camera/mirrorless_camera/img.png"
+  },
+  "wide_tilt_search": false,
+  "max_tilt_degrees": 1.0,
+  "levels": [
+    {
+      "scale_delta": 0.006,
+      "rotation_deg": 0.3,
+      "translation_ratio": 0.006
+    },
+    {
+      "scale_delta": 0.002,
+      "rotation_deg": 0.1,
+      "translation_ratio": 0.002
+    },
+    {
+      "scale_delta": 0.0005,
+      "rotation_deg": 0.025,
+      "translation_ratio": 0.0005
+    }
+  ],
+  "search": {
+    "method": "subpercent_camera1_visible_sim3_coordinate_refinement",
+    "search_points": {
+      "partial": 16384,
+      "prior": 32000
+    },
+    "candidate_workers": 8,
+    "levels": [
+      {
+        "scale_delta": 0.006,
+        "rotation_deg": 0.3,
+        "translation_ratio": 0.006
+      },
+      {
+        "scale_delta": 0.002,
+        "rotation_deg": 0.1,
+        "translation_ratio": 0.002
+      },
+      {
+        "scale_delta": 0.0005,
+        "rotation_deg": 0.025,
+        "translation_ratio": 0.0005
+      }
+    ],
+    "before": 0.4443041274512142,
+    "after": 0.4400163449729304,
+    "trace": [
+      {
+        "level": {
+          "scale_delta": 0.006,
+          "rotation_deg": 0.3,
+          "translation_ratio": 0.006
+        },
+        "action": "trans_y_-1",
+        "score": {
+          "objective": 0.4416974720187618,
+          "projection": {
+            "iou": 0.29290889753049487,
+            "coverage": 0.5486963966067399,
+            "leakage": 0.6141274602097335,
+            "visible_depth_mean": 0.0051556801377143635,
+            "visible_depth_normalized": 0.00376476965008837
+          }
+        }
+      },
+      {
+        "level": {
+          "scale_delta": 0.002,
+          "rotation_deg": 0.1,
+          "translation_ratio": 0.002
+        },
+        "action": "trans_y_-1",
+        "score": {
+          "objective": 0.4400163449729304,
+          "projection": {
+            "iou": 0.29555781169382356,
+            "coverage": 0.5528212312242198,
+            "leakage": 0.6115795575095421,
+            "visible_depth_mean": 0.005134493921502609,
+            "visible_depth_normalized": 0.0037492990968997107
+          }
+        }
+      },
+      {
+        "level": {
+          "scale_delta": 0.0005,
+          "rotation_deg": 0.025,
+          "translation_ratio": 0.0005
+        },
+        "action": "identity",
+        "score": {
+          "objective": 0.4400163449729304,
+          "projection": {
+            "iou": 0.29555781169382356,
+            "coverage": 0.5528212312242198,
+            "leakage": 0.6115795575095421,
+            "visible_depth_mean": 0.005134493921502609,
+            "visible_depth_normalized": 0.0037492990968997107
+          }
+        }
+      }
+    ]
+  },
+  "before": {
+    "objective": 0.43009623744936004,
+    "geometric_objective": 0.21603334518469244,
+    "pair_count": 6083,
+    "projection": {
+      "iou": 0.3014308895117274,
+      "coverage": 0.6361273250836641,
+      "leakage": 0.6357673145994314,
+      "visible_depth_mean": 0.004813064859096387,
+      "visible_depth_normalized": 0.003514585858979607
+    }
+  },
+  "after": {
+    "objective": 0.4262773020239236,
+    "geometric_objective": 0.21550103391122186,
+    "pair_count": 6171,
+    "projection": {
+      "iou": 0.3080857354028086,
+      "coverage": 0.6488287026227721,
+      "leakage": 0.6302610454235003,
+      "visible_depth_mean": 0.004795618422396548,
+      "visible_depth_normalized": 0.00350184615953447
+    }
+  },
+  "final": {
+    "objective": 0.4262773020239236,
+    "geometric_objective": 0.21550103391122186,
+    "pair_count": 6171,
+    "projection": {
+      "iou": 0.3080857354028086,
+      "coverage": 0.6488287026227721,
+      "leakage": 0.6302610454235003,
+      "visible_depth_mean": 0.004795618422396548,
+      "visible_depth_normalized": 0.00350184615953447
+    }
+  },
+  "all_prior_points_preserved": true
+}
