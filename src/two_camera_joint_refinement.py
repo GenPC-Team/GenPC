@@ -6,7 +6,7 @@ those two calibrated transforms as the initialization and optimizes only two
 tiny residual proper Sim(3)s in a three-factor graph:
 
 ``Pixal -- Camera 2 render -- MoGe -- pixel bridge -- partial``
-``Pixal ------------------------ Camera 1 2D+3D ------------------- partial``
+``Pixal -------- Camera 1 observation-consistent registration ----- partial``
 
 There is intentionally no PCA/orientation hypothesis, proposal gate, or
 GT-dependent model selection.  Native MoGe, bridge, and Camera-1 evidence are

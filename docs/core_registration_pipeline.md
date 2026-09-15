@@ -38,8 +38,9 @@ dataset-dependent coordinate convention from being mistaken for geometric
 misalignment.
 
 The initial placement composes native Pixal-to-MoGe geometry, pixel-indexed
-MoGe-to-partial evidence, and a bounded Camera-1 2D+3D refinement. Every global
-transform is a proper similarity,
+MoGe-to-partial evidence, and bounded Camera-1 Observation-Consistent Prior
+Registration. Its projective-consistency and visible-surface-consistency terms
+jointly constrain every global transform to be a proper similarity,
 
 \[
 T(x)=sRx+t, \qquad R\in SO(3),\quad s>0.
@@ -139,6 +140,12 @@ the posterior and partial, proposes only visibility-valid pixel matches, and
 checks both image displacement and camera-depth agreement. The union of these
 positive correspondences expands observed coverage, while their cross-view
 support resolves competing assignments.
+
+For sparse observations whose projected supports do not initially overlap,
+the same camera still proposes its nearest visible pixel correspondences.
+These proposals do not bypass acceptance: the existing camera-depth,
+cross-view support, 3-D residual and collision-free assignment checks remain
+the sole conditions for changing a carrier slot.
 
 A deterministic collision-free assignment maps at most one partial sample to
 each carrier slot and at most one carrier slot to each partial sample. Reliable

@@ -1088,3 +1088,63 @@ It returned a 1254-by-1254 RGB PNG. Exact model checkpoint, seed, steps,
 guidance/CFG, scheduler and native resize policy are `UNKNOWN`, so the saved
 output is required for exact replay. No RMBG, Pixal3D, MoGe, registration,
 fusion or point-cloud postprocessing has been run. No GT, CD or EMD was used.
+
+## 2026-09-12 00:27 CST — accepted Waymo8 sparse-LiDAR MoGe-bridge route
+
+**User approval and scope.** The user judged native MoGe alignment followed by
+camera bridging more reliable than refining the complete prior directly toward
+an extremely sparse partial scan. Preserve this as an isolated Waymo/sparse-
+LiDAR route; do not replace the Redwood/Custom object mainline. After the
+Camera-2-to-Camera-1 bridge, do not run partial-driven joint/final refinement,
+PosteriorAdapter, non-rigid deformation, or carrier-slot fusion.
+
+**Inputs and outputs.** The eight accepted inputs are every `.ply` under
+`workspace/waymo8_original_mainline_20260911/inputs/partial`; they comprise
+three `CAR_*` and five `PEDESTRIAN_*` samples. Their exact Camera-1 depth,
+semantic image, mask, point UV and camera are under the matching
+`inputs/camera/<sample>` directory; Pixal inputs, native MoGe observations,
+GLBs, metadata and sampled priors are under `inputs/pixal/<sample>`. Complete
+native/bridge diagnostics are under
+`workspace/waymo8_sparse_lidar_moge_bridge_20260912/registration/<sample>`.
+The retained final files are
+`workspace/waymo8_sparse_lidar_moge_bridge_20260912/final/<sample>/complete_100k.ply`,
+and the consolidated visual comparison is
+`workspace/waymo8_sparse_lidar_moge_bridge_20260912/bridge_only_vs_mainline_registration.png`.
+All eight final files are byte-identical copies of
+`bridge/two_camera_pixal_moge_bridge_registered_100k.ply`, contain exactly
+100,000 points, and report both partial micro-refinement and non-rigid
+deformation as disabled. Waymo has no paired completion GT in this local
+subset, so CD/EMD are unavailable and were not used.
+
+**Car semantic prompt (verbatim; no separate negative prompt).**
+
+> Use case: depth-constrained semantic completion for 3D reconstruction. The reference is a sparse grayscale depth observation of one car: every visible bright/gray pixel is measured surface evidence, while black pixels are unknown background rather than empty space. Generate a complete, realistic, structurally normal car isolated on a pure white background. HARD CONSTRAINT: preserve the observed local geometry exactly—same camera viewpoint, viewing direction, orientation, pose, image-plane location, bounding-box size, silhouette where observed, wheel/body locations, longitudinal direction, and depth-supported proportions. Do not rotate, mirror, recenter, enlarge, shrink, canonicalize, or reinterpret any observed part. Infer and complete only missing or occluded geometry, producing a continuous plausible body, roof, hood, rear, windows and four wheels with normal road-vehicle proportions. Preserve any depth-supported external structure. If ordinary object priors conflict with observed depth, the observed depth wins. Keep the entire car connected and fully visible. Clean photorealistic semantic RGB image, neutral materials, no road, no people, no scenery, no text, no logo, no watermark, no extra objects, no cropped parts.
+
+**Pedestrian semantic prompt (verbatim; no separate negative prompt).**
+
+> Use case: depth-constrained semantic completion for 3D reconstruction. The reference is a sparse grayscale depth observation of one Pedestrian: every visible bright/gray pixel is measured body/clothing surface evidence, while black pixels are unknown background rather than empty space. Generate one complete, realistic, full-body pedestrian isolated on a pure white background. HARD CONSTRAINT: preserve the observed local geometry exactly—same camera viewpoint, body facing direction, pose, articulation, lean, image-plane position, bounding-box size, observed silhouette, limb locations, and depth-supported proportions. Do not rotate, mirror, recenter, enlarge, shrink, canonicalize, straighten, or replace the observed pose with a standard pose. Infer and complete only missing or occluded body/clothing geometry. If anatomical priors conflict with measured depth, the measured depth wins. Keep the person anatomically plausible, naturally connected and fully visible. Plain neutral clothing, clean photorealistic semantic RGB image; no ground, no scenery, no extra people, no carried object unless supported by depth, no text, logo, watermark, or cropped limbs.
+
+**Generation and postprocessing record.** GPT image checkpoint/version, seed,
+steps, CFG/guidance scale, scheduler and native resize policy are `UNKNOWN`, so
+the saved semantic images are required for exact replay. Pixal3D uses
+`/opt/data/private/cr/lab/GenPC/models/Pixal3D-weights`, DINOv3 at
+`models/dinov3-vitl16-pretrain-lvd1689m`, MoGe at
+`models/moge-2-vitl/model.pt`, RMBG at `models/RMBG-2.0`, xFormers, seed `42`,
+1024 resolution, 300k mesh-face decimation target and 2048 texture size. Its
+sparse-structure/shape/texture samplers each use 12 steps; guidance strengths
+are `7.5/7.5/1.0`, guidance rescale values are `0.7/0.5/0.0`, and rescale-t
+values are `5.0/3.0/3.0`. Per-sample FOV, distance, image size, bounds, hashes
+and exact file paths are serialized in `pixal3d_metadata.json` and
+`pixal_native_moge_info.json`. Registration first uses the cached native MoGe
+observation produced from the exact `pixal3d_input.png`, then composes the
+pixel-indexed Camera-2-to-Camera-1 bridge with the analytic Pixal-to-native-
+MoGe transform. No later ICP, partial refinement, deformation, point deletion,
+resampling, or fusion is applied.
+
+**Exact replay verification.** A clean rerun with `--bridge-only --no-resume`
+and two independent sample workers is stored at
+`workspace/waymo8_sparse_lidar_moge_bridge_rerun_20260912`. All eight jobs
+terminate at `pixal_native_moge_then_camera2_to_camera1_bridge`; every final
+contains 100,000 points and is SHA-256 byte-identical to the first accepted
+run. The rerun batch manifest is `registration/batch_manifest.json`, and its
+uniform final entry points are `final/<sample>/complete_100k.ply`.

@@ -7,10 +7,13 @@ import numpy as np
 from src.posterior_adapter import (
     PosteriorAdapter,
     PosteriorAdapterConfig,
+    _augment_attachment_edges,
     _embedded_arap_posterior,
     _project_small_topology_breaks,
     partial_optimal_transport,
 )
+from src.deformation_graph import local_surface_graph
+from scipy.sparse import csgraph
 
 
 class OrthographicProjector:
@@ -117,3 +120,21 @@ def test_topology_projection_reconnects_a_new_small_fragment_without_moving_stab
     assert info["active"]
     assert np.allclose(repaired[stable], prior[stable])
     assert np.linalg.norm(repaired[-1] - repaired[-4]) < np.linalg.norm(candidate[-1] - candidate[-4])
+
+
+def test_near_contact_components_receive_rotation_carrying_attachment_bundle():
+    # Each plate has more than 32 closer in-component neighbours, so the old
+    # fixed-k cross-component search could not see their nearby contact.
+    x, y = np.meshgrid(np.linspace(0., .09, 12), np.linspace(0., .09, 12), indexing="ij")
+    left = np.c_[x.reshape(-1), y.reshape(-1), np.zeros(x.size)]
+    right = left + np.array([.115, 0., 0.])
+    points = np.concatenate((left, right), axis=0)
+    graph, metric, _ = local_surface_graph(points, neighbours=10, edge_ratio=1.8)
+    before, _ = csgraph.connected_components(graph, directed=False)
+    augmented, _, attachment_edges = _augment_attachment_edges(
+        graph, metric, points, edge_ratio=4.0,
+    )
+    after, _ = csgraph.connected_components(augmented, directed=False)
+    assert before == 2
+    assert after == 1
+    assert attachment_edges >= 3

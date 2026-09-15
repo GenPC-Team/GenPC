@@ -235,7 +235,10 @@ def main() -> None:
             "reason": "fixed_two_camera_joint_objective",
             "parameters": {
                 "style": "same local camera-frame coordinate descent as Pixal--MoGe",
-                "score": "Camera-1 partial 2D+3D primary, Camera-2 Pixal--MoGe weighted auxiliary",
+                "score": (
+                    "Camera-1 projective and visible-surface consistency primary, "
+                    "Camera-2 Pixal--MoGe consistency weighted auxiliary"
+                ),
                 "search_points": int(args.refine_points),
                 "proposal_gate": False,
             },

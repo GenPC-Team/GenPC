@@ -26,6 +26,22 @@ def test_visible_pixel_pairs_recover_same_saved_view_surface_ids():
     assert np.array_equal(pairs[:, 0].astype(int), pairs[:, 1].astype(int))
 
 
+def test_visible_pixel_pairs_can_continue_with_disjoint_projected_support():
+    y, x = np.mgrid[-3:4, -3:4]
+    partial = np.c_[x.ravel() / 10., y.ravel() / 10., np.ones(x.size)]
+    prior = partial.copy()
+    prior[:, 0] += 1.5
+    pairs, info = visible_pixel_pairs(
+        partial,
+        prior,
+        _OrthographicProjector(),
+        max_pixel_distance=1.0,
+        continue_with_nearest=True,
+    )
+    assert len(pairs) >= 6
+    assert info["radius_relaxed"] is True
+
+
 def test_pixel_pair_sim3_candidates_reduce_a_pure_visible_depth_offset():
     y, x = np.mgrid[-4:5, -4:5]
     partial = np.c_[x.ravel() / 12., y.ravel() / 12., 1. + .01 * x.ravel() * y.ravel()]

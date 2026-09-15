@@ -1,4 +1,4 @@
-"""Bidirectional, cycle-checked 2D+3D residual proper-Sim(3) registration.
+"""Bidirectional, cycle-checked observation-consistent prior registration.
 
 The forward problem maps observed partial points into the currently visible
 region of a frozen complete prior.  Only the exact inverse of that forward
@@ -198,7 +198,7 @@ def projection_metrics(partial, complete, projector, diagonal, dilation=1, *,
 
 def visible_score(partial, complete, projector, diagonal, pixel_radius=5.0, *,
                   target_cache: VisibleTargetCache | None = None):
-    """One dimensionless GT-free objective joining visible 2D and 3D cues."""
+    """GT-free objective joining projective and visible-surface consistency."""
     if target_cache is None:
         target_cache = prepare_visible_target(partial, projector)
     pairs = soft_ray_correspondences(

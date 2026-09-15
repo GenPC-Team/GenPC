@@ -1,10 +1,11 @@
 """Saved-camera assets for scene MoGe instance partials.
 
-The scene wrapper never rasterises a depth image.  It only needs the original
-scene camera as projective metadata so that the frozen 2D+3D registration code
-can compare a direct GPT semantic image with the instance partial.  This small
-camera class is deliberately serialisable with :func:`torch.save` and exposes
-the same ``transform`` interface as the historical Kaolin camera.
+The scene wrapper never rasterises a depth image. It only needs the original
+scene camera as projective metadata so that Observation-Consistent Prior
+Registration can compare a direct GPT semantic image with the instance
+partial. This small camera class is deliberately serialisable with
+:func:`torch.save` and exposes the same ``transform`` interface as the
+historical Kaolin camera.
 """
 
 from __future__ import annotations

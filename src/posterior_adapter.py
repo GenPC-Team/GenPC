@@ -79,6 +79,7 @@ class PosteriorAdapterConfig:
     fine_screening: float = .003
     fine_iterations: int = 5
     fine_displacement_ratio: float = .12
+    bending_regularization: float = 0.0
     attachment_edge_ratio: float = 3.2
     minimum_observed_improvement: float = .025
     minimum_edge_compression: float = .55
@@ -95,6 +96,12 @@ class PosteriorAdapterConfig:
     assimilation_iterations: int = 3
     assimilation_displacement_ratio: float = .050
     assimilation_anchor_residual_ratio: float = .075
+    slender_rigidity_projection: bool = False
+    slender_neighbours: int = 128
+    slender_linearity_quantile: float = .95
+    slender_minimum_fraction: float = .003
+    slender_minimum_aspect_ratio: float = 6.0
+    slender_dilation_steps: int = 2
 
     def validate(self) -> None:
         if min(self.partial_samples, self.prior_samples) < 32:
@@ -142,6 +149,16 @@ class PosteriorAdapterConfig:
             self.assimilation_anchor_residual_ratio,
         ) <= 0.:
             raise ValueError("observation assimilation weights must be positive")
+        if self.slender_neighbours < 16 or self.slender_dilation_steps < 0:
+            raise ValueError("slender-structure neighbourhood controls are invalid")
+        if not 0.5 < self.slender_linearity_quantile < 1.:
+            raise ValueError("slender_linearity_quantile must lie in (0.5, 1)")
+        if not 0. < self.slender_minimum_fraction < .25:
+            raise ValueError("slender_minimum_fraction must lie in (0, 0.25)")
+        if self.slender_minimum_aspect_ratio <= 1.:
+            raise ValueError("slender_minimum_aspect_ratio must exceed one")
+        if self.bending_regularization < 0.:
+            raise ValueError("bending_regularization must be non-negative")
 
 
 @dataclass(frozen=True)
@@ -585,7 +602,14 @@ def partial_optimal_transport(
 
 def _augment_attachment_edges(graph: sparse.csr_matrix, metric: sparse.csr_matrix,
                               points: np.ndarray, *, edge_ratio: float) -> tuple[sparse.csr_matrix, sparse.csr_matrix, int]:
-    """Join only near-contact graph components in the original complete prior."""
+    """Join near-contact components with small, rotation-carrying edge bundles.
+
+    Surface sampling can leave a visually attached thin part disconnected from
+    the deformation graph.  A single bridge only transfers translation and
+    behaves like a hinge; a short bundle of nearby bridges also transfers the
+    local rigid rotation.  Candidate bridges are determined solely by rest
+    geometry and local point spacing.
+    """
     component_count, labels = csgraph.connected_components(graph, directed=False)
     if component_count <= 1:
         return graph, metric, 0
@@ -593,7 +617,19 @@ def _augment_attachment_edges(graph: sparse.csr_matrix, metric: sparse.csr_matri
     query_k = min(32, len(points))
     distances, neighbours = cKDTree(points).query(points, k=query_k, workers=-1)
     local_scale = np.median(distances[:, 1:min(query_k, 9)], axis=1)
-    candidates: list[tuple[float, int, int]] = []
+    candidates_by_components: dict[tuple[int, int], dict[tuple[int, int], float]] = {}
+
+    def add_candidate(distance: float, source: int, target: int) -> None:
+        if source == target:
+            return
+        source, target = sorted((int(source), int(target)))
+        left, right = sorted((int(labels[source]), int(labels[target])))
+        if left == right:
+            return
+        group = candidates_by_components.setdefault((left, right), {})
+        pair = (source, target)
+        group[pair] = min(float(distance), group.get(pair, np.inf))
+
     for column in range(1, query_k):
         other = neighbours[:, column]
         cross = labels != labels[other]
@@ -602,9 +638,58 @@ def _augment_attachment_edges(graph: sparse.csr_matrix, metric: sparse.csr_matri
         )
         for source in np.flatnonzero(cross & allowed):
             target = int(other[source])
-            if source < target:
-                candidates.append((float(distances[source, column]), int(source), target))
-    candidates.sort()
+            add_candidate(float(distances[source, column]), int(source), target)
+
+    # Dense components may have more than ``query_k`` same-component
+    # neighbours, hiding a nearby attachment from the global k-NN query.  Find
+    # the exact nearest boundary pairs for geometrically plausible component
+    # pairs.  This is cheap because generated object priors normally contain
+    # only a handful of components and we query the smaller one against the
+    # larger one.
+    component_ids = [np.flatnonzero(labels == label) for label in range(component_count)]
+    component_scale = np.asarray([
+        np.median(local_scale[ids][local_scale[ids] > 0.])
+        if np.any(local_scale[ids] > 0.) else np.inf
+        for ids in component_ids
+    ], dtype=np.float64)
+    lower = np.asarray([points[ids].min(axis=0) for ids in component_ids])
+    upper = np.asarray([points[ids].max(axis=0) for ids in component_ids])
+    for left in range(component_count):
+        for right in range(left + 1, component_count):
+            pair_scale = math.sqrt(max(component_scale[left] * component_scale[right], 1e-18))
+            threshold = float(edge_ratio) * pair_scale
+            bbox_gap = np.maximum(np.maximum(lower[left] - upper[right], lower[right] - upper[left]), 0.)
+            if float(np.linalg.norm(bbox_gap)) > threshold:
+                continue
+            left_ids, right_ids = component_ids[left], component_ids[right]
+            if len(left_ids) <= len(right_ids):
+                query_ids, reference_ids = left_ids, right_ids
+            else:
+                query_ids, reference_ids = right_ids, left_ids
+            pair_distance, pair_neighbour = cKDTree(points[reference_ids]).query(
+                points[query_ids], k=1, workers=-1,
+            )
+            pair_target = reference_ids[np.asarray(pair_neighbour, dtype=np.int64)]
+            pair_limit = float(edge_ratio) * np.sqrt(np.maximum(
+                local_scale[query_ids] * local_scale[pair_target], 1e-18,
+            ))
+            valid = np.flatnonzero(np.asarray(pair_distance) <= pair_limit)
+            if len(valid) == 0:
+                continue
+            # More than three nearby rest-space constraints makes the bridge
+            # rotation-carrying instead of hinge-like.  Keep a few extras for
+            # sparse or nearly collinear thin structures.
+            order = valid[np.argsort(np.asarray(pair_distance)[valid])[:32]]
+            for item in order:
+                add_candidate(
+                    float(pair_distance[item]), int(query_ids[item]), int(pair_target[item]),
+                )
+
+    component_candidates: list[tuple[float, int, int]] = []
+    for (left, right), group in candidates_by_components.items():
+        if group:
+            component_candidates.append((min(group.values()), left, right))
+    component_candidates.sort()
     parent = np.arange(component_count, dtype=np.int64)
 
     def find(value: int) -> int:
@@ -613,13 +698,37 @@ def _augment_attachment_edges(graph: sparse.csr_matrix, metric: sparse.csr_matri
             value = int(parent[value])
         return value
 
-    accepted: list[tuple[float, int, int]] = []
-    for distance, source, target in candidates:
-        left, right = find(int(labels[source])), find(int(labels[target]))
+    accepted_component_pairs: list[tuple[int, int]] = []
+    for _, source_component, target_component in component_candidates:
+        left, right = find(source_component), find(target_component)
         if left == right:
             continue
         parent[right] = left
-        accepted.append((distance, source, target))
+        accepted_component_pairs.append(tuple(sorted((source_component, target_component))))
+
+    accepted: list[tuple[float, int, int]] = []
+    for component_pair in accepted_component_pairs:
+        ranked = sorted(
+            (distance, source, target)
+            for (source, target), distance in candidates_by_components[component_pair].items()
+        )
+        used_source: set[int] = set()
+        used_target: set[int] = set()
+        bundle: list[tuple[float, int, int]] = []
+        for distance, source, target in ranked:
+            # Prefer spatially distinct endpoints so the attachment carries a
+            # local rotation.  If the contact has fewer unique samples, the
+            # nearest bridge below still preserves connectivity.
+            if source in used_source or target in used_target:
+                continue
+            bundle.append((distance, source, target))
+            used_source.add(source)
+            used_target.add(target)
+            if len(bundle) == 6:
+                break
+        if not bundle and ranked:
+            bundle.append(ranked[0])
+        accepted.extend(bundle)
     if not accepted:
         return graph, metric, 0
     source = np.asarray([row[1] for row in accepted], dtype=np.int64)
@@ -760,6 +869,7 @@ def _soft_full_surface_arap(
     minimum_hidden_coverage: float,
     coverage_resolution: int,
     coherent_component_targets: bool,
+    bending_regularization: float = 0.0,
 ) -> tuple[np.ndarray, dict, np.ndarray]:
     """Fit soft observations while ARAP propagates motion over complete support."""
     prior = np.asarray(prior, dtype=np.float64)
@@ -806,6 +916,30 @@ def _soft_full_surface_arap(
     system = laplacian[unknown][:, unknown].tocsr() + sparse.diags(
         np.full(len(unknown), float(screening)) + data_diagonal, format="csr",
     )
+    bending_system = None
+    bending_laplacian_unknown = None
+    bending_fixed_term = None
+    bending_rest_coordinates = None
+    bending_factor = 0.0
+    if float(bending_regularization) > 0.:
+        # Preserve differential coordinates in each point's *co-rotating*
+        # frame.  A world-frame biharmonic term prevents bending but also
+        # incorrectly locks an unsupported thin structure to its old
+        # orientation.  Rotating the rest differential coordinates with the
+        # ARAP frame keeps the anti-bending effect while allowing a connected
+        # structure to inherit rigid motion from observed neighbours.
+        laplacian_unknown = laplacian[:, unknown].tocsr()
+        bending_system = (laplacian_unknown.T @ laplacian_unknown).tocsr()
+        median_degree = max(float(np.median(degree[degree > 0.])), 1e-6)
+        bending_factor = float(bending_regularization) / median_degree
+        bending_system *= bending_factor
+        system = (system + bending_system).tocsr()
+        bending_laplacian_unknown = laplacian_unknown
+        bending_rest_coordinates = laplacian @ prior
+        bending_fixed_term = (
+            laplacian[:, fixed_ids] @ prior[fixed_ids]
+            if len(fixed_ids) else np.zeros_like(prior)
+        )
     rows, cols = sparse.triu(graph, k=1).nonzero()
     edge_weight = np.asarray(graph[rows, cols]).reshape(-1)
     rest_edge = prior[rows] - prior[cols]
@@ -831,6 +965,14 @@ def _soft_full_surface_arap(
         np.add.at(rhs, rows, edge_weight[:, None] * desired)
         np.add.at(rhs, cols, -edge_weight[:, None] * desired)
         rhs_unknown = rhs[unknown] + float(screening) * prior[unknown]
+        if bending_system is not None:
+            rotated_rest_coordinates = np.einsum(
+                "nij,nj->ni", rotations, bending_rest_coordinates,
+            )
+            bending_target = rotated_rest_coordinates - bending_fixed_term
+            rhs_unknown += bending_factor * (
+                bending_laplacian_unknown.T @ bending_target
+            )
         np.add.at(
             rhs_unknown, local_targets,
             (effective_data_weight * weights_unique)[:, None] * targets_unique,
@@ -940,6 +1082,7 @@ def _embedded_arap_posterior(
     maximum_edge_stretch: float,
     minimum_hidden_coverage: float,
     coverage_resolution: int,
+    bending_regularization: float = 0.0,
     coherent_component_targets: bool = True,
 ) -> tuple[np.ndarray, dict, np.ndarray]:
     """Deform the full carrier with a sparse, rotation-aware ARAP graph.
@@ -1005,6 +1148,7 @@ def _embedded_arap_posterior(
         neighbours=int(neighbours), edge_ratio=float(edge_ratio),
         attachment_edge_ratio=float(attachment_edge_ratio),
         data_weight=float(data_weight), screening=float(screening), iterations=int(iterations),
+        bending_regularization=float(bending_regularization),
         maximum_displacement=float(maximum_displacement),
         minimum_improvement=max(.5 * float(minimum_improvement), 1e-4),
         minimum_edge_compression=max(.5 * float(minimum_edge_compression), .20),
@@ -1239,6 +1383,194 @@ def _compact_visible_score(score: dict) -> dict:
     }
 
 
+def _project_slender_regions_rigid(
+    reference: np.ndarray,
+    candidate: np.ndarray,
+    *,
+    neighbours: int,
+    linearity_quantile: float,
+    minimum_fraction: float,
+    minimum_aspect_ratio: float,
+    dilation_steps: int,
+    graph_neighbours: int,
+    graph_edge_ratio: float,
+) -> tuple[np.ndarray, dict, np.ndarray]:
+    """Remove bending from automatically detected elongated structures.
+
+    The detector uses only local covariance anisotropy and graph connectivity.
+    Each sufficiently long region is projected onto the proper rigid motion
+    that best explains its unconstrained deformation.  Graph dilation blends
+    that correction into neighbouring carrier points, preserving attachments
+    without any category, part label, or world-axis convention.
+    """
+    reference = np.asarray(reference, dtype=np.float64)
+    candidate = np.asarray(candidate, dtype=np.float64)
+    count = len(reference)
+    if count < max(32, int(neighbours)):
+        return candidate.copy(), {"active": False, "reason": "insufficient_points"}, np.zeros(count, dtype=bool)
+
+    tree = cKDTree(reference)
+    query_k = min(int(neighbours), count)
+    linearity = np.empty(count, dtype=np.float64)
+    principal_direction = np.empty((count, 3), dtype=np.float64)
+    chunk = 4_096
+    for start in range(0, count, chunk):
+        stop = min(start + chunk, count)
+        _, local_ids = tree.query(reference[start:stop], k=query_k, workers=-1)
+        local = reference[np.asarray(local_ids, dtype=np.int64)]
+        local = local - local.mean(axis=1, keepdims=True)
+        covariance = np.einsum("nki,nkj->nij", local, local) / max(query_k - 1, 1)
+        values, vectors = np.linalg.eigh(covariance)
+        linearity[start:stop] = (values[:, -1] - values[:, -2]) / np.maximum(values[:, -1], 1e-12)
+        principal_direction[start:stop] = vectors[:, :, -1]
+
+    threshold = float(np.quantile(linearity, float(linearity_quantile)))
+    propagation_threshold = float(np.quantile(linearity, .65))
+    high_linearity = np.flatnonzero(linearity >= threshold)
+    minimum_points = max(64, int(math.ceil(float(minimum_fraction) * count)))
+    if len(high_linearity) < minimum_points:
+        return candidate.copy(), {
+            "active": False, "reason": "insufficient_high_linearity_support",
+            "linearity_threshold": threshold, "high_linearity_points": int(len(high_linearity)),
+        }, np.zeros(count, dtype=bool)
+
+    slender_points = reference[high_linearity]
+    slender_tree = cKDTree(slender_points)
+    cluster_k = min(8, len(slender_points))
+    distances, indices = slender_tree.query(slender_points, k=cluster_k, workers=-1)
+    if cluster_k == 1:
+        return candidate.copy(), {"active": False, "reason": "singleton_linearity_support"}, np.zeros(count, dtype=bool)
+    spacing = max(float(np.median(distances[:, 1])), 1e-12)
+    rows = np.repeat(np.arange(len(slender_points), dtype=np.int64), cluster_k - 1)
+    cols = np.asarray(indices[:, 1:], dtype=np.int64).reshape(-1)
+    lengths = np.asarray(distances[:, 1:], dtype=np.float64).reshape(-1)
+    keep = (rows < cols) & (lengths <= 3.0 * spacing)
+    component_graph = sparse.coo_matrix(
+        (np.ones(2 * int(keep.sum())), (
+            np.r_[rows[keep], cols[keep]], np.r_[cols[keep], rows[keep]],
+        )),
+        shape=(len(slender_points), len(slender_points)),
+    ).tocsr()
+    component_count, labels = csgraph.connected_components(component_graph, directed=False)
+
+    surface_graph, _, _ = local_surface_graph(
+        reference, neighbours=int(graph_neighbours), edge_ratio=float(graph_edge_ratio),
+    )
+    best_correction = np.zeros_like(reference)
+    best_weight = np.zeros(count, dtype=np.float64)
+    best_priority = np.full(count, -np.inf, dtype=np.float64)
+    rigid_mask = np.zeros(count, dtype=bool)
+    records: list[dict] = []
+    for component in range(component_count):
+        member_local = np.flatnonzero(labels == component)
+        if len(member_local) < minimum_points:
+            continue
+        member = high_linearity[member_local]
+        source = reference[member]
+        centre = source.mean(axis=0)
+        _, _, basis = np.linalg.svd(source - centre, full_matrices=False)
+        extent = np.ptp((source - centre) @ basis.T, axis=0)
+        aspect = float(extent[0] / max(extent[1], 1e-12))
+        if aspect < float(minimum_aspect_ratio):
+            continue
+
+        source_centre = source.mean(axis=0)
+        target = candidate[member]
+        target_centre = target.mean(axis=0)
+        left, _, right = np.linalg.svd((source - source_centre).T @ (target - target_centre))
+        rotation = right.T @ left.T
+        if np.linalg.det(rotation) < 0.:
+            right[-1] *= -1.
+            rotation = right.T @ left.T
+
+        # Recover the complete surface by propagating through points whose
+        # local principal direction agrees with the detected structure.  This
+        # reaches the blade/rod surface but stops at a differently oriented
+        # body or hub, unlike a broad oriented bounding box.
+        local_all = (reference - centre) @ basis.T
+        local_member = local_all[member]
+        lower, upper = local_member.min(axis=0), local_member.max(axis=0)
+        member_extent = np.maximum(upper - lower, 1e-12)
+        diagonal = max(float(np.linalg.norm(np.ptp(reference, axis=0))), 1e-12)
+        longitudinal = (
+            (local_all[:, 0] >= lower[0] - .08 * member_extent[0])
+            & (local_all[:, 0] <= upper[0] + .08 * member_extent[0])
+        )
+        radial_limit = max(
+            1.25 * float(np.quantile(np.linalg.norm(local_member[:, 1:], axis=1), .99)),
+            .006 * diagonal,
+        )
+        direction_agreement = np.abs(principal_direction @ basis[0])
+        allowed = (
+            longitudinal
+            & (np.linalg.norm(local_all[:, 1:], axis=1) <= radial_limit)
+            & (linearity >= propagation_threshold)
+            & (direction_agreement >= .72)
+        )
+        allowed[member] = True
+        core = np.zeros(count, dtype=bool)
+        frontier = np.zeros(count, dtype=bool)
+        core[member] = True
+        frontier[member] = True
+        for _ in range(32):
+            reached = np.asarray(surface_graph @ frontier.astype(np.float64)).reshape(-1) > 0.
+            reached &= allowed & ~core
+            if not np.any(reached):
+                break
+            core |= reached
+            frontier = reached
+
+        weight = np.zeros(count, dtype=np.float64)
+        frontier = core.copy()
+        weight[core] = 1.0
+        visited = frontier.copy()
+        for step in range(int(dilation_steps)):
+            reached = np.asarray(surface_graph @ frontier.astype(np.float64)).reshape(-1) > 0.
+            reached &= ~visited
+            if not np.any(reached):
+                break
+            weight[reached] = max(weight[reached].max(initial=0.), (dilation_steps - step) / (dilation_steps + 1.0))
+            visited |= reached
+            frontier = reached
+        region = np.flatnonzero(weight > 0.)
+        rigid = (reference[region] - source_centre) @ rotation.T + target_centre
+        correction = rigid - candidate[region]
+        nearest_seed = cKDTree(source).query(reference[region], k=1, workers=-1)[0]
+        seed_spacing = max(_median_spacing(source), 1e-12)
+        priority = weight[region] / (.25 + nearest_seed / seed_spacing)
+        replace = priority > best_priority[region]
+        selected = region[replace]
+        best_priority[selected] = priority[replace]
+        best_weight[selected] = weight[selected]
+        best_correction[selected] = correction[replace]
+        rigid_mask[region] = True
+        records.append({
+            "seed_points": int(len(member)), "rigid_core_points": int(core.sum()),
+            "projected_points": int(len(region)),
+            "aspect_ratio": aspect, "principal_extent": extent.tolist(),
+            "mean_correction": float(np.linalg.norm(correction, axis=1).mean()),
+            "maximum_correction": float(np.linalg.norm(correction, axis=1).max(initial=0.)),
+        })
+
+    if not records:
+        return candidate.copy(), {
+            "active": False, "reason": "no_elongated_component",
+            "linearity_threshold": threshold, "high_linearity_points": int(len(high_linearity)),
+        }, rigid_mask
+    output = candidate.copy()
+    active = best_weight > 0.
+    output[active] += best_weight[active, None] * best_correction[active]
+    return output, {
+        "active": True,
+        "method": "covariance_detected_slender_region_se3_projection",
+        "linearity_threshold": threshold,
+        "high_linearity_points": int(len(high_linearity)),
+        "projected_components": int(len(records)),
+        "projected_points": int(active.sum()),
+        "components": records,
+    }, active
+
+
 class PosteriorAdapter:
     """One category-agnostic coarse-to-fine complete-prior update."""
 
@@ -1305,6 +1637,7 @@ class PosteriorAdapter:
                 neighbours=int(neighbours), edge_ratio=float(edge_ratio),
                 attachment_edge_ratio=float(self.config.attachment_edge_ratio),
                 data_weight=float(data_weight), screening=float(screening), iterations=int(iterations),
+                bending_regularization=float(self.config.bending_regularization),
                 maximum_displacement=float(displacement_ratio) * diagonal,
                 minimum_improvement=float(self.config.minimum_observed_improvement),
                 minimum_edge_compression=float(self.config.minimum_edge_compression),
@@ -1384,6 +1717,7 @@ class PosteriorAdapter:
                     attachment_edge_ratio=float(self.config.attachment_edge_ratio),
                     data_weight=float(self.config.assimilation_data_weight),
                     screening=float(self.config.assimilation_screening),
+                    bending_regularization=float(self.config.bending_regularization),
                     iterations=int(self.config.assimilation_iterations),
                     maximum_displacement=(
                         float(self.config.assimilation_displacement_ratio) * diagonal
@@ -1431,6 +1765,34 @@ class PosteriorAdapter:
                     "assignment": assignment_info,
                     "retained_anchors": int(len(anchors)),
                 }
+        slender_rigidity_mask = np.zeros(len(current), dtype=bool)
+        slender_rigidity_info: dict = {
+            "active": False,
+            "reason": "disabled",
+            "method": "covariance_detected_slender_region_se3_projection",
+        }
+        if bool(self.config.slender_rigidity_projection):
+            before_rigidity = current
+            current, slender_rigidity_info, slender_rigidity_mask = _project_slender_regions_rigid(
+                initial,
+                current,
+                neighbours=int(self.config.slender_neighbours),
+                linearity_quantile=float(self.config.slender_linearity_quantile),
+                minimum_fraction=float(self.config.slender_minimum_fraction),
+                minimum_aspect_ratio=float(self.config.slender_minimum_aspect_ratio),
+                dilation_steps=int(self.config.slender_dilation_steps),
+                graph_neighbours=int(self.config.fine_neighbours),
+                graph_edge_ratio=float(self.config.fine_edge_ratio),
+            )
+            current, rigidity_topology = _project_small_topology_breaks(
+                before_rigidity,
+                current,
+                np.zeros(len(current), dtype=bool),
+                neighbours=int(self.config.fine_neighbours),
+                edge_ratio=float(self.config.fine_edge_ratio),
+                component_threshold=int(component_threshold),
+            )
+            slender_rigidity_info["topology_projection"] = rigidity_topology
         initial_visible = visible_score(partial, initial, projector, diagonal)
         posterior_visible = visible_score(partial, current, projector, diagonal)
         # Keep global visible evidence as an audit signal only.  The posterior
@@ -1502,6 +1864,7 @@ class PosteriorAdapter:
             "fine_displacement": displacements[1],
             "assimilation_displacement": assimilation_displacement,
             "assimilation_anchor": assimilation_anchor_mask,
+            "slender_rigidity": slender_rigidity_mask,
             "transport_partial_ids": final_transport.partial_ids,
             "transport_prior_ids": final_transport.prior_ids,
             "transport_weights": final_transport.weights,
@@ -1528,6 +1891,7 @@ class PosteriorAdapter:
             "integrity": integrity,
             "topology_projection": topology_projection,
             "observation_assimilation": assimilation_info,
+            "slender_rigidity_projection": slender_rigidity_info,
             "posterior_diagnostics": posterior_diagnostics,
             **final_strain,
         }

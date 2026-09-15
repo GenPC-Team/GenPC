@@ -62,6 +62,25 @@ def camera_parameters(points: np.ndarray, azimuth_degrees: float,
     }
 
 
+def roll_camera_parameters(parameters: dict[str, np.ndarray | float],
+                           roll_degrees: float) -> dict[str, np.ndarray | float]:
+    """Roll the physical camera basis so every exported artifact stays aligned."""
+    result = dict(parameters)
+    forward = np.asarray(parameters["target"], dtype=np.float64) - np.asarray(
+        parameters["eye"], dtype=np.float64,
+    )
+    forward /= max(float(np.linalg.norm(forward)), 1e-12)
+    up = np.asarray(parameters["up"], dtype=np.float64)
+    right = np.cross(forward, up)
+    right /= max(float(np.linalg.norm(right)), 1e-12)
+    angle = math.radians(float(roll_degrees))
+    rolled_up = math.cos(angle) * up + math.sin(angle) * right
+    rolled_up /= max(float(np.linalg.norm(rolled_up)), 1e-12)
+    result["up"] = rolled_up
+    result["roll_degrees"] = float(roll_degrees) % 360.0
+    return result
+
+
 def make_camera(parameters: dict[str, np.ndarray | float], resolution: int):
     return kal.render.camera.Camera.from_args(
         eye=torch.as_tensor(parameters["eye"], dtype=torch.float32),
@@ -259,6 +278,10 @@ def main() -> None:
     parser.add_argument("--resolution", type=int, default=512)
     parser.add_argument("--atlas-resolution", type=int, default=192)
     parser.add_argument("--fov-degrees", type=float, default=49.1)
+    parser.add_argument(
+        "--roll-degrees", type=float, choices=(0.0, 90.0, 180.0, 270.0), default=0.0,
+        help="Discrete in-plane camera roll applied consistently to depth, UV, and camera.pth.",
+    )
     parser.add_argument("--render-atlas-only", action="store_true")
     parser.add_argument("--auto-select", action="store_true",
                         help="Select a category-free completion-friendly view from partial geometry.")
@@ -302,7 +325,11 @@ def main() -> None:
             json.dumps(ranking, indent=2) + "\n", encoding="utf-8",
         )
 
-    parameters = camera_parameters(points, float(args.azimuth_degrees), float(args.elevation_degrees), float(args.fov_degrees))
+    parameters = camera_parameters(
+        points, float(args.azimuth_degrees), float(args.elevation_degrees),
+        float(args.fov_degrees),
+    )
+    parameters = roll_camera_parameters(parameters, float(args.roll_degrees))
     camera, uv, _, xy_center, xy_scale = project(points, parameters, int(args.resolution))
     raw, depth, valid, local_support, inpaint_mask, _, point_depth, _, _ = render_depth(
         points, colors, parameters, int(args.resolution)
@@ -327,6 +354,7 @@ def main() -> None:
         "rationale": str(args.rationale),
         "azimuth_degrees": float(args.azimuth_degrees) % 360.,
         "elevation_degrees": float(args.elevation_degrees),
+        "roll_degrees": float(args.roll_degrees) % 360.0,
         "eye": np.asarray(parameters["eye"]).tolist(),
         "target": np.asarray(parameters["target"]).tolist(),
         "up": np.asarray(parameters["up"]).tolist(),

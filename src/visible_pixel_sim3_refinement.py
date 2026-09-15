@@ -32,6 +32,7 @@ def visible_pixel_pairs(
     *,
     max_pixel_distance: float = 2.0,
     max_pairs: int = 10_000,
+    continue_with_nearest: bool = False,
 ) -> tuple[np.ndarray, dict]:
     """Return deterministic partial/prior pairs from Camera-1 visible pixels.
 
@@ -57,8 +58,16 @@ def visible_pixel_pairs(
         raise ValueError("insufficient visible Camera-1 pixels for a direct residual")
     pixel_distance, nearest = cKDTree(np.c_[qx, qy]).query(np.c_[px, py], k=1)
     keep = pixel_distance <= float(max_pixel_distance)
+    radius_relaxed = False
     if int(keep.sum()) < 6:
-        raise ValueError("insufficient nearby visible Camera-1 pixel pairs")
+        if not continue_with_nearest:
+            raise ValueError("insufficient nearby visible Camera-1 pixel pairs")
+        # Keep the view in the deterministic pipeline even when the projected
+        # supports are disjoint. These are only correspondence proposals;
+        # downstream camera-depth and 3-D residual checks still decide whether
+        # any proposal may alter the complete carrier.
+        keep = np.ones(len(pixel_distance), dtype=bool)
+        radius_relaxed = True
     partial_ids = partial_index[py[keep], px[keep]]
     prior_ids = prior_index[qy[nearest[keep]], qx[nearest[keep]]]
     pairs = np.column_stack((partial_ids, prior_ids, prior_ids, pixel_distance[keep]))
@@ -73,6 +82,7 @@ def visible_pixel_pairs(
         "nearby_pixel_pairs": int(keep.sum()),
         "mutual_pixel_pairs": int(len(pairs)),
         "max_pixel_distance": float(max_pixel_distance),
+        "radius_relaxed": bool(radius_relaxed),
         "pair_subsample_limit": int(max_pairs),
     }
 

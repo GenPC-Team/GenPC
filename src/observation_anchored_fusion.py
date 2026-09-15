@@ -51,6 +51,7 @@ def positive_multiview_pairs(
             projector,
             max_pixel_distance=float(config.pixel_radius),
             max_pairs=int(config.max_pairs_per_view),
+            continue_with_nearest=True,
         )
         tables.append(pairs[:, :4])
         partial_uv, partial_depth = projector.project(partial)
