@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Test-time residual re-linearization for a fixed complete prior carrier.
+"""Iterative posterior re-linearization for a fixed complete prior carrier.
 
-This is intentionally a small probe rather than a replacement pipeline.  It
-does not train a generator or learn sample-specific weights.  Each round uses
+This is the fixed post-registration stage of the mainline. It does not train
+a generator or learn sample-specific weights. Each round uses
 the same frozen, class-free :class:`PosteriorAdapter` to recompute partial OT
 and four-view evidence from the current 100k carrier.  The resulting sequence
 is analogous to a damped test-time optimization loop: residuals are
@@ -150,7 +150,7 @@ def main() -> None:
     )
     views = load_manifest_projectors(args.multiview_manifest, resolution=int(args.render_size))
     if len(views) != 4:
-        raise ValueError("test-time posterior re-linearization requires exactly four saved views")
+        raise ValueError("iterative posterior re-linearization requires exactly four saved views")
     base = _load_config(args.config_json)
     # A single scalar uniformly changes only the same local assimilation update
     # already present in the baseline.  It does not widen correspondence gates

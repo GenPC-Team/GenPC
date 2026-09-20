@@ -15,8 +15,7 @@ partial point cloud
   -> camera-aware Pixal--MoGe--partial Sim(3) registration
   -> four informative prior/partial residual views
   -> exact Camera-1 structure-aware Partial OT
-  -> coarse-to-fine prior-preserving posterior deformation
-  -> four-view observation-anchored carrier fusion
+  -> three rounds of prior-preserving posterior re-linearization
   -> complete 100k-point prediction
 ```
 
@@ -67,27 +66,22 @@ partial samples into an equal number of posterior carrier slots. All unmatched
 slots remain unchanged, so observed geometry becomes exact while complete and
 unobserved prior support is retained at a fixed 100k-point density.
 
-## Quick start from a registered prior
+## Quick start from a selected registered prior
 
 Use the project interpreter explicitly:
 
 ```bash
 PY=/opt/data/private/cr/miniconda3/envs/genpc/bin/python
 
-CUDA_VISIBLE_DEVICES=0 $PY scripts/run_posterior_adapter.py \
-  --prior workspace/run/registration/01184/final/camera1_amplified_registered_100k.ply \
+CUDA_VISIBLE_DEVICES=0 $PY scripts/iterative_posterior_tto.py \
+  --prior workspace/run/registration_selected/01184/camera1_amplified_registered_100k.ply \
   --partial data/redwood/partial/01184.ply \
   --camera workspace/run/inputs/camera/01184/camera.pth \
   --semantic workspace/run/inputs/camera/01184/img.png \
   --multiview-manifest workspace/run/residuals/01184/render/render_manifest.json \
   --config-json configs/posterior_mainline.json \
+  --outer-rounds 3 \
   --output-dir workspace/posterior_run/01184
-
-$PY scripts/run_observation_anchored_fusion.py \
-  --posterior workspace/posterior_run/01184/posterior_prior_100k.ply \
-  --partial data/redwood/partial/01184.ply \
-  --multiview-manifest workspace/run/residuals/01184/render/render_manifest.json \
-  --output-dir workspace/final_run/01184
 ```
 
 For heterogeneous datasets, write a JSON case manifest:
@@ -108,18 +102,18 @@ For heterogeneous datasets, write a JSON case manifest:
 Then run the same frozen configuration over all cases:
 
 ```bash
-CUDA_VISIBLE_DEVICES=0 $PY scripts/run_posterior_adapter_batch.py \
-  --case-manifest workspace/cases.json \
+CUDA_VISIBLE_DEVICES=0 $PY scripts/run_iterative_posterior_batch.py \
+  --source-root workspace/best_redwood_custom_camera1_transport_20260911 \
   --output-root workspace/posterior_run \
-  --sample-workers 2
+  --registration-stage selected \
+  --outer-rounds 3
 ```
 
-The pre-fusion posterior is
-`workspace/posterior_run/<sample>/posterior_prior_100k.ply`; the final fused
-prediction is
-`workspace/final_run/<sample>/observation_anchored_fused_100k.ply`. Each sample also
-contains OT pairs, support states, the deformation field, camera overlays, and
-no-GT residual and integrity diagnostics.
+The final prediction is
+`workspace/posterior_run/<sample>/round_03/posterior_prior_100k.ply`. Each
+sample also contains the registered start point, every intermediate carrier,
+OT pairs, support states, the deformation field, camera overlays, and no-GT
+residual and integrity diagnostics.
 
 ## Optional four-view diagnosis
 
@@ -157,12 +151,10 @@ src/posterior_adapter.py              structure OT and posterior deformation
 src/deformation_graph.py              reusable graph and strain primitives
 src/multiview_diagnostics.py          informative camera selection/rendering
 src/multiview_partial_evidence.py     prior-to-partial residual visualization
-scripts/run_posterior_adapter.py      one-sample inference
-scripts/run_posterior_adapter_batch.py dataset-independent batch inference
+scripts/iterative_posterior_tto.py    three-round one-sample re-linearization
+scripts/run_iterative_posterior_batch.py dataset-independent batch inference
 scripts/run_multiview_diagnostics.py  optional four-view audit
-src/observation_anchored_fusion.py     fixed-cardinality observation fusion
-scripts/run_observation_anchored_fusion.py final one-sample fusion
-scripts/run_observation_anchored_fusion_batch.py parallel final fusion
+src/observation_anchored_fusion.py    four-view positive observation evidence
 scripts/run_scene_completion.py       independent scene-level extension
 ```
 

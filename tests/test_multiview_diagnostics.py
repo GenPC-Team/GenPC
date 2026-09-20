@@ -2,8 +2,6 @@ import json
 
 import numpy as np
 
-from scripts.gpt_select_scansalon_view import select_completion_aware_view
-
 from src.multiview_diagnostics import (
     _camera_vectors,
     apply_transform,
@@ -141,15 +139,3 @@ def test_informative_orbit_supports_six_separated_views():
         for previous in yaws[:index]:
             difference = abs((yaw - previous) % 360.0)
             assert min(difference, 360.0 - difference) >= 45.0
-
-
-def test_completion_aware_view_selection_is_category_free_and_deterministic():
-    rng = np.random.default_rng(31)
-    points = rng.normal(size=(600, 3)) * np.array([1.0, 0.45, 0.2])
-    selected_a, ranking_a = select_completion_aware_view(points, resolution=64)
-    selected_b, ranking_b = select_completion_aware_view(points, resolution=64)
-    assert len(ranking_a) == 120
-    assert selected_a == selected_b
-    assert ranking_a == ranking_b
-    assert selected_a["rank"] == 1
-    assert 0.0 <= selected_a["completion_view_score"] <= 1.0

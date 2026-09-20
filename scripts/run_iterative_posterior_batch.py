@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Package and run fixed posterior TTO over retained Redwood/Custom assets.
+"""Package and run iterative posterior re-linearization over saved assets.
 
 The source directory is immutable.  For each case this runner first copies its
 camera-consistent semantic/Pixal inputs, the selected global registration and
 four-view evidence to ``--output-root``; path-bearing JSON files are then made
-local to the package.  The copied registered 100k carrier is the input to three rounds
-of the class-free residual re-linearization probe.  Execution is deliberately
+local to the package. The copied registered 100k carrier is the input to three
+fixed rounds of class-free residual re-linearization. Execution is deliberately
 sequential so a 24 GB GPU sees one PosteriorAdapter process at a time.
 """
 
@@ -22,7 +22,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_SOURCE = ROOT / "workspace" / "best_redwood_custom_camera1_transport_20260911"
-DEFAULT_OUTPUT = ROOT / "workspace" / "tto_relinearized_selected_redwood_custom_20260920"
+DEFAULT_OUTPUT = ROOT / "workspace" / "iterative_posterior_selected_redwood_custom"
 
 
 def _replace_root(value: Any, source: str, destination: str) -> Any:
@@ -134,7 +134,7 @@ def main() -> None:
         "--registration-stage",
         choices=("initial", "selected"),
         default="selected",
-        help="global carrier to use before residual re-linearization",
+        help="global carrier to use before iterative posterior re-linearization",
     )
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--overwrite", action="store_true")
@@ -152,9 +152,9 @@ def main() -> None:
         )
     output_root.mkdir(parents=True, exist_ok=True)
     config_source = ROOT / "configs" / "posterior_mainline.json"
-    probe_source = ROOT / "scripts" / "probe_iterative_posterior_tto.py"
+    solver_source = ROOT / "scripts" / "iterative_posterior_tto.py"
     shutil.copy2(config_source, output_root / config_source.name)
-    shutil.copy2(probe_source, output_root / probe_source.name)
+    shutil.copy2(solver_source, output_root / solver_source.name)
 
     selected_datasets = ("redwood", "custom") if args.dataset == "all" else (args.dataset,)
     records: list[dict[str, Any]] = []
@@ -183,7 +183,7 @@ def main() -> None:
             if output.exists():
                 shutil.rmtree(output)
             command = [
-                sys.executable, str(probe_source),
+                sys.executable, str(solver_source),
                 "--prior", str(paths["prior"]),
                 "--partial", str(paths["partial"]),
                 "--camera", str(paths["camera"]),
@@ -213,7 +213,7 @@ def main() -> None:
             })
 
     experiment = {
-        "method": "fixed_posterior_adapter_test_time_residual_relinearization",
+        "method": "fixed_iterative_posterior_relinearization",
         "strict_zero_shot": True,
         "ground_truth_cd_emd_used": False,
         "source_root": str(source_root),

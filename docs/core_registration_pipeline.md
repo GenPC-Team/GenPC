@@ -1,8 +1,7 @@
 # GenPC++ object completion mainline
 
-This document is the canonical specification of the object-level method.
-Historical TRELLIS, Pixal3D-MV, axis-stretch, component-motion, point-concatenation,
-and metric-routed variants are not part of the released route.
+This document is the canonical specification of the released object-level
+method.
 
 ## 1. Inference contract
 
@@ -12,12 +11,13 @@ images, saved cameras, generated priors, and no-reference residuals. Ground
 truth, CD, EMD, dataset labels, part labels, and sample-specific thresholds are
 forbidden.
 
-The method has three conceptual stages:
+The method has four conceptual stages:
 
 1. create and register a complete image-conditioned prior;
 2. diagnose positive partial evidence in camera-consistent views;
-3. infer a structure-preserving posterior over the complete carrier;
-4. decode reliable measured observations into that fixed complete carrier.
+3. iteratively infer a structure-preserving posterior over the complete carrier;
+4. decode reliable measured observations into that fixed complete carrier when
+   a measurement-assimilated output is requested.
 
 ## 2. Observation and complete prior
 
@@ -133,7 +133,11 @@ prior protection:
 Correspondence and deformation are alternated coarse-to-fine. The solver never
 deletes or concatenates points: all 100k prior slots remain the prediction.
 Unobserved regions preserve relative structure and coverage, but may move with
-their connected support.
+their connected support. The released mainline repeats this same frozen
+PosteriorAdapter update three times: every round re-estimates Partial OT and
+four-view positive evidence from the previous carrier. This fixed
+re-linearization schedule introduces neither training nor a sample-specific
+decision rule.
 
 ## 6. Four-view observation-anchored fusion
 
@@ -183,27 +187,28 @@ inference.
 
 ## 8. Artifact contract
 
-For each sample, `scripts/run_posterior_adapter.py` writes:
+For each sample, `scripts/iterative_posterior_tto.py` writes a registered
+round and three re-linearized rounds:
 
 ```text
-posterior_prior_100k.ply
-coarse_prior_100k.ply
-partial_gray_posterior_red.ply
-partial_ot_pairs.npy
-posterior_field.npz
-posterior_support_status.png
-posterior_saved_view_projection.png
-posterior_virtual_views.png
-posterior_info.json
+round_00_registered/posterior_prior_100k.ply
+round_01/posterior_prior_100k.ply
+round_02/posterior_prior_100k.ply
+round_03/posterior_prior_100k.ply
+round_03/partial_gray_posterior_red.ply
+round_03/posterior_saved_view_projection.png
+round_03/posterior_virtual_views.png
+tto_summary.json
 ```
 
-`posterior_info.json` records the fixed configuration, support counts,
-deformation diagnostics and absolute input/output paths.
+Each `round_info.json` records the fixed configuration, support counts,
+deformation diagnostics and no-GT residual audit. `tto_summary.json` records
+the fixed schedule and the residual trajectory; it is not a GT-based selector.
 The released mainline parameters are stored in
 `configs/posterior_mainline.json`; they enable integrated observation
 assimilation with a dimensionless anchor residual ratio of 0.03.
 
-The final fusion runner additionally writes:
+The optional fixed-cardinality measurement decoder additionally writes:
 
 ```text
 observation_anchored_fused_100k.ply

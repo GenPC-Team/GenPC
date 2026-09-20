@@ -50,11 +50,6 @@ class PosteriorAdapterConfig:
     maximum_3d_ratio: float = .34
     maximum_screen_ratio: float = .28
     maximum_depth_ratio: float = .34
-    # The default posterior only adapts spatially localized residual support.
-    # A structural-registration probe may opt into retaining broad transport
-    # evidence and let a subsequent piecewise-rigid graph field decide which
-    # components are safe to move.  This remains disabled in the mainline.
-    allow_broad_structural_transport: bool = False
     structural_rescue_candidates: int = 48
     structural_rescue_screen_fraction: float = .55
     structural_rescue_depth_fraction: float = .70
@@ -101,17 +96,6 @@ class PosteriorAdapterConfig:
     assimilation_iterations: int = 3
     assimilation_displacement_ratio: float = .050
     assimilation_anchor_residual_ratio: float = .075
-    residual_rigid_consensus: bool = False
-    rigid_consensus_hard_quantile: float = .85
-    rigid_consensus_trials: int = 4_096
-    rigid_consensus_max_models: int = 4
-    rigid_consensus_min_improvement: float = .25
-    rigid_consensus_weight_multiplier: float = 2.5
-    # A consensus rigid field already resolves a coherent local motion.  A
-    # second elastic solve is therefore opt-in: it is useful only when the
-    # remaining residual is demonstrably non-rigid, and otherwise risks
-    # softening a physically rigid appendage.
-    rigid_consensus_post_refinement: bool = False
     slender_rigidity_projection: bool = False
     slender_neighbours: int = 128
     slender_linearity_quantile: float = .95
@@ -165,14 +149,6 @@ class PosteriorAdapterConfig:
             self.assimilation_anchor_residual_ratio,
         ) <= 0.:
             raise ValueError("observation assimilation weights must be positive")
-        if not .5 < self.rigid_consensus_hard_quantile < 1.:
-            raise ValueError("rigid_consensus_hard_quantile must lie in (0.5, 1)")
-        if self.rigid_consensus_trials < 32 or self.rigid_consensus_max_models < 1:
-            raise ValueError("rigid residual consensus controls are invalid")
-        if not 0. < self.rigid_consensus_min_improvement < 1.:
-            raise ValueError("rigid_consensus_min_improvement must lie in (0, 1)")
-        if self.rigid_consensus_weight_multiplier < 1.:
-            raise ValueError("rigid_consensus_weight_multiplier must be at least one")
         if self.slender_neighbours < 16 or self.slender_dilation_steps < 0:
             raise ValueError("slender-structure neighbourhood controls are invalid")
         if not 0.5 < self.slender_linearity_quantile < 1.:
@@ -528,10 +504,7 @@ def partial_optimal_transport(
         len(coherent_rows_np) >= int(config.minimum_transport_pairs)
         and coherent_fraction <= localization_bound
     )
-    broad_structural_transport = bool(
-        not localized_residual_evidence and config.allow_broad_structural_transport
-    )
-    if not localized_residual_evidence and not broad_structural_transport:
+    if not localized_residual_evidence:
         coherent_rows_np = np.empty(0, dtype=np.int64)
     edges: list[tuple[float, float, float, int, int, int]] = []
     for row in coherent_rows_np:
@@ -613,7 +586,6 @@ def partial_optimal_transport(
             "coherent_prior_support_fraction": coherent_prior_fraction,
             "localization_bound": localization_bound,
             "localized_residual_evidence": localized_residual_evidence,
-            "broad_structural_transport": broad_structural_transport,
             "residual_pairs": int(len(selected_rows)),
             "stable_prior": int(stable_mask.sum()),
             "residual_prior": int(residual_mask.sum()),
@@ -832,399 +804,6 @@ def _coherent_targets(source: np.ndarray, target: np.ndarray, *, diagonal: float
         "components": int(len(records)), "regularized_targets": int(regularized),
         "component_records": records,
     }
-
-
-def _proper_rigid_transform(source: np.ndarray, target: np.ndarray) -> tuple[np.ndarray, np.ndarray] | None:
-    """Estimate the proper SE(3) map ``source @ R.T + t`` by Procrustes."""
-    source = np.asarray(source, dtype=np.float64)
-    target = np.asarray(target, dtype=np.float64)
-    if len(source) < 3:
-        return None
-    source_centre = source.mean(axis=0)
-    target_centre = target.mean(axis=0)
-    if np.linalg.matrix_rank(source - source_centre) < 2:
-        return None
-    left, _, right = np.linalg.svd((source - source_centre).T @ (target - target_centre))
-    rotation = right.T @ left.T
-    if np.linalg.det(rotation) < 0.:
-        right[-1] *= -1.
-        rotation = right.T @ left.T
-    return rotation, target_centre - source_centre @ rotation.T
-
-
-def _residual_rigid_consensus_targets(
-    source: np.ndarray,
-    target: np.ndarray,
-    weights: np.ndarray,
-    *,
-    partial_spacing: float,
-    diagonal: float,
-    hard_quantile: float,
-    trials: int,
-    maximum_models: int,
-    minimum_improvement: float,
-    weight_multiplier: float,
-    inlier_tolerance_ratio: float = .006,
-) -> tuple[np.ndarray, np.ndarray, dict, np.ndarray, list[dict[str, np.ndarray]]]:
-    """Replace noisy high-residual anchor targets by locally rigid consensus.
-
-    Each candidate is proposed from positive partial-to-prior anchor pairs.
-    RANSAC never uses a category, a global axis, a part mask, or a reference
-    shape: it only asks whether a spatially connected subset of high-residual
-    anchors agrees on one proper SE(3) map.  Such a map is useful for a rotor,
-    limb, handle, wing, or any other locally rigid structure.  The subsequent
-    embedded ARAP solve still controls the continuous transition to its
-    attachments.
-    """
-    source = np.asarray(source, dtype=np.float64)
-    target = np.asarray(target, dtype=np.float64)
-    weights = np.asarray(weights, dtype=np.float64)
-    result = target.copy()
-    result_weights = weights.copy()
-    selected = np.zeros(len(source), dtype=bool)
-    inactive = {
-        "active": False,
-        "method": "residual_consensus_local_proper_se3",
-        "models": [],
-    }
-    if len(source) < 32:
-        return result, result_weights, {**inactive, "reason": "insufficient_anchors"}, selected, []
-
-    residual = np.linalg.norm(target - source, axis=1)
-    hard_limit = max(
-        float(np.quantile(residual, float(hard_quantile))),
-        3.0 * float(partial_spacing),
-    )
-    hard = np.flatnonzero(residual >= hard_limit)
-    minimum_component = max(24, int(math.ceil(.003 * len(source))))
-    if len(hard) < minimum_component:
-        return result, result_weights, {
-            **inactive, "reason": "insufficient_hard_residual_anchors",
-            "hard_limit": hard_limit, "hard_anchors": int(len(hard)),
-        }, selected, []
-
-    source_hard = source[hard]
-    target_hard = target[hard]
-    hard_spacing = _median_spacing(source_hard)
-    component_radius = max(3.0 * hard_spacing, .012 * float(diagonal))
-    # The inlier tolerance is tied to physical sampling scale and object size,
-    # rather than to an object category or an absolute distance.
-    inlier_tolerance = max(
-        3.0 * float(partial_spacing),
-        float(inlier_tolerance_ratio) * float(diagonal),
-    )
-    rng = np.random.default_rng(0)
-    proposals: list[tuple[float, np.ndarray, np.ndarray, np.ndarray, float, float]] = []
-    seen: set[tuple[int, int, int]] = set()
-
-    def inspect_hypothesis(sample: np.ndarray) -> None:
-        key = tuple(sorted(int(value) for value in sample))
-        if key in seen:
-            return
-        seen.add(key)
-        fit = _proper_rigid_transform(source_hard[sample], target_hard[sample])
-        if fit is None:
-            return
-        rotation, translation = fit
-        error = np.linalg.norm(source_hard @ rotation.T + translation - target_hard, axis=1)
-        inlier_local = np.flatnonzero(error <= inlier_tolerance)
-        if len(inlier_local) < minimum_component:
-            return
-        pairs = cKDTree(source_hard[inlier_local]).query_pairs(component_radius, output_type="ndarray")
-        if len(pairs):
-            graph = sparse.coo_matrix(
-                (np.ones(2 * len(pairs)), (
-                    np.r_[pairs[:, 0], pairs[:, 1]], np.r_[pairs[:, 1], pairs[:, 0]],
-                )), shape=(len(inlier_local), len(inlier_local)),
-            ).tocsr()
-            component_count, labels = csgraph.connected_components(graph, directed=False)
-        else:
-            component_count = len(inlier_local)
-            labels = np.arange(len(inlier_local), dtype=np.int64)
-        for component in range(component_count):
-            member_local = inlier_local[np.flatnonzero(labels == component)]
-            if len(member_local) < minimum_component:
-                continue
-            member = hard[member_local]
-            local_fit = _proper_rigid_transform(source[member], target[member])
-            if local_fit is None:
-                continue
-            local_rotation, local_translation = local_fit
-            before = np.linalg.norm(target[member] - source[member], axis=1)
-            after = np.linalg.norm(
-                source[member] @ local_rotation.T + local_translation - target[member], axis=1,
-            )
-            improvement = 1. - float(np.median(after)) / max(float(np.median(before)), 1e-12)
-            if improvement < float(minimum_improvement):
-                continue
-            centred = source[member] - source[member].mean(axis=0)
-            singular = np.linalg.svd(centred, compute_uv=False)
-            if len(singular) < 2 or singular[1] <= .02 * max(singular[0], 1e-12):
-                continue
-            angle = math.degrees(math.acos(float(np.clip((np.trace(local_rotation) - 1.) * .5, -1., 1.))))
-            # Support, residual reduction, and relative salience rank models;
-            # no semantic score is involved.
-            score = float(len(member)) * improvement * max(float(np.median(before)) / inlier_tolerance, 1.)
-            proposals.append((score, member, local_rotation, local_translation, improvement, angle))
-
-    # Local triples make small rigid structures discoverable; random triples
-    # additionally cover components whose anchors are sparse or separated.
-    local_k = min(12, len(source_hard))
-    if local_k >= 3:
-        neighbours = cKDTree(source_hard).query(source_hard, k=local_k, workers=-1)[1]
-        seed_count = min(len(source_hard), max(256, int(trials) // 4))
-        seed_ids = np.linspace(0, len(source_hard) - 1, seed_count, dtype=np.int64)
-        for seed in seed_ids:
-            pool = np.asarray(neighbours[seed], dtype=np.int64)
-            if len(pool) >= 3:
-                inspect_hypothesis(pool[[0, 1, -1]])
-                inspect_hypothesis(pool[[0, len(pool) // 2, -1]])
-    for _ in range(int(trials)):
-        inspect_hypothesis(rng.choice(len(source_hard), size=3, replace=False))
-
-    proposals.sort(key=lambda item: item[0], reverse=True)
-    records: list[dict] = []
-    runtime_models: list[dict[str, np.ndarray]] = []
-    claimed = np.zeros(len(source), dtype=bool)
-    for score, member, rotation, translation, improvement, angle in proposals:
-        overlap = float(claimed[member].mean())
-        if overlap > .35:
-            continue
-        available = member[~claimed[member]]
-        if len(available) < minimum_component:
-            continue
-        # Refit after non-maximum suppression so overlapping proposals do not
-        # force two incompatible motions onto the same carrier neighbourhood.
-        refined = _proper_rigid_transform(source[available], target[available])
-        if refined is None:
-            continue
-        rotation, translation = refined
-        predicted = source[available] @ rotation.T + translation
-        before = np.linalg.norm(target[available] - source[available], axis=1)
-        after = np.linalg.norm(predicted - target[available], axis=1)
-        improvement = 1. - float(np.median(after)) / max(float(np.median(before)), 1e-12)
-        if improvement < float(minimum_improvement):
-            continue
-        result[available] = predicted
-        result_weights[available] = np.maximum(
-            result_weights[available], float(weight_multiplier) * weights[available],
-        )
-        selected[available] = True
-        claimed[available] = True
-        rotation_degrees = math.degrees(math.acos(float(np.clip(
-            (np.trace(rotation) - 1.) * .5, -1., 1.,
-        ))))
-        records.append({
-            "anchor_count": int(len(available)), "score": float(score),
-            "median_residual_before": float(np.median(before)),
-            "median_residual_after": float(np.median(after)),
-            "median_improvement": float(improvement),
-            "rotation_degrees": float(rotation_degrees),
-            "translation_norm": float(np.linalg.norm(translation)),
-        })
-        runtime_models.append({
-            "anchor_ids": available.copy(),
-            "source": source[available].copy(),
-            "rotation": rotation.copy(),
-            "translation": translation.copy(),
-        })
-        if len(records) >= int(maximum_models):
-            break
-
-    return result, result_weights, {
-        "active": bool(records),
-        "method": "residual_consensus_local_proper_se3",
-        "hard_quantile": float(hard_quantile),
-        "hard_limit": float(hard_limit),
-        "hard_anchors": int(len(hard)),
-        "inlier_tolerance": float(inlier_tolerance),
-        "component_radius": float(component_radius),
-        "minimum_component_anchors": int(minimum_component),
-        "candidate_hypotheses": int(len(seen)),
-        "proposed_models": int(len(proposals)),
-        "selected_models": int(len(records)),
-        "selected_anchors": int(selected.sum()),
-        "models": records,
-    }, selected, runtime_models
-
-
-def _apply_residual_rigid_field(
-    prior: np.ndarray,
-    anchor_prior_ids: np.ndarray,
-    anchor_targets: np.ndarray,
-    runtime_models: Sequence[dict[str, np.ndarray]],
-    *,
-    partial_spacing: float,
-    diagonal: float,
-    stable_anchor_mask: np.ndarray,
-    stable_prior_mask: np.ndarray | None,
-    neighbours: int,
-    edge_ratio: float,
-    minimum_edge_compression: float,
-    maximum_edge_stretch: float,
-    minimum_hidden_coverage: float,
-    coverage_resolution: int,
-) -> tuple[np.ndarray, dict, np.ndarray]:
-    """Apply consensus SE(3) motions as a continuous, attachment-safe field.
-
-    Unlike a pointwise attraction, a point inside a detected consensus core is
-    moved by the same proper rigid transform as its neighbours.  Only a thin
-    distance-normalized collar blends the motion back into the rest surface.
-    This makes a rotated blade, handle, limb, or tail turn as a structure
-    instead of being pulled into a bent curve.
-    """
-    prior = np.asarray(prior, dtype=np.float64)
-    anchor_prior_ids = np.asarray(anchor_prior_ids, dtype=np.int64)
-    anchor_targets = np.asarray(anchor_targets, dtype=np.float64)
-    stable_anchor_mask = np.asarray(stable_anchor_mask, dtype=bool)
-    if stable_prior_mask is None:
-        stable_prior_mask = np.zeros(len(prior), dtype=bool)
-    else:
-        stable_prior_mask = np.asarray(stable_prior_mask, dtype=bool)
-        if stable_prior_mask.shape != (len(prior),):
-            raise ValueError("stable_prior_mask must match the prior carrier")
-    inactive = {
-        "active": False,
-        "method": "residual_consensus_continuous_rigid_field",
-        "models": [],
-    }
-    if not runtime_models:
-        return prior.copy(), {**inactive, "reason": "no_consensus_model"}, np.zeros(len(prior), dtype=bool)
-
-    graph, metric, _ = local_surface_graph(prior, neighbours=int(neighbours), edge_ratio=float(edge_ratio))
-    best_priority = np.full(len(prior), -np.inf, dtype=np.float64)
-    best_weight = np.zeros(len(prior), dtype=np.float64)
-    best_displacement = np.zeros_like(prior)
-    partial_tree = cKDTree(anchor_targets)
-    support_tolerance = max(3.0 * float(partial_spacing), .006 * float(diagonal))
-    graph_spacing = max(float(np.median(metric.data[metric.data > 0.])), 1e-12)
-    collar_width = max(6.0 * float(partial_spacing), .025 * float(diagonal))
-    collar_steps = int(np.clip(math.ceil(collar_width / graph_spacing), 3, 16))
-    stable_ids = anchor_prior_ids[stable_anchor_mask]
-    locked_ids = np.unique(np.r_[stable_ids, np.flatnonzero(stable_prior_mask)])
-    records: list[dict] = []
-    for model in runtime_models:
-        source = np.asarray(model["source"], dtype=np.float64)
-        rotation = np.asarray(model["rotation"], dtype=np.float64)
-        translation = np.asarray(model["translation"], dtype=np.float64)
-        anchor_ids = np.asarray(model["anchor_ids"], dtype=np.int64)
-        if len(source) < 3:
-            continue
-        transformed = prior @ rotation.T + translation
-        transform_distance = partial_tree.query(transformed, k=1, workers=-1)[0]
-        transform_supported = transform_distance <= support_tolerance
-        seed_ids = anchor_prior_ids[anchor_ids]
-        seed_ids = seed_ids[transform_supported[seed_ids]]
-        if len(seed_ids) == 0:
-            continue
-        supported_ids = np.flatnonzero(transform_supported)
-        supported_graph = graph[supported_ids][:, supported_ids].tocsr()
-        _, labels = csgraph.connected_components(supported_graph, directed=False)
-        lookup = np.full(len(prior), -1, dtype=np.int64)
-        lookup[supported_ids] = np.arange(len(supported_ids), dtype=np.int64)
-        seed_labels = np.unique(labels[lookup[seed_ids]])
-        core = np.zeros(len(prior), dtype=bool)
-        core[supported_ids[np.isin(labels, seed_labels)]] = True
-        if int(core.sum()) < 16:
-            continue
-        # Reach only a narrow graph collar outside the transform-consistent
-        # observation support.  This transfers motion across a physical
-        # attachment but cannot jump through empty space to a separate body.
-        weight = core.astype(np.float64)
-        frontier = core.copy()
-        for step in range(collar_steps):
-            reached = np.asarray(graph @ frontier.astype(np.float64)).reshape(-1) > 0.
-            reached &= weight <= 0.
-            if not np.any(reached):
-                break
-            weight[reached] = float(collar_steps - step) / float(collar_steps + 1)
-            frontier = reached
-        displacement = transformed - prior
-        priority = weight * math.sqrt(float(len(source)))
-        replace = priority > best_priority
-        best_priority[replace] = priority[replace]
-        best_weight[replace] = weight[replace]
-        best_displacement[replace] = displacement[replace]
-        rotation_degrees = math.degrees(math.acos(float(np.clip(
-            (np.trace(rotation) - 1.) * .5, -1., 1.,
-        ))))
-        records.append({
-            "anchor_count": int(len(source)), "core_points": int(core.sum()),
-            "collar_points": int((weight > 0.).sum()),
-            "transform_supported_points": int(transform_supported.sum()),
-            "support_tolerance": support_tolerance,
-            "collar_width": collar_width, "collar_steps": collar_steps,
-            "rotation_degrees": float(rotation_degrees),
-            "translation_norm": float(np.linalg.norm(translation)),
-        })
-    if not records:
-        return prior.copy(), {**inactive, "reason": "no_spatial_consensus_core"}, np.zeros(len(prior), dtype=bool)
-
-    # Reliable low-residual observations must not be dragged by a nearby
-    # high-residual component.  The lock is derived from the same anchors and
-    # remains independent of category and coordinate frame.
-    if len(locked_ids):
-        # A binary lock at the boundary of a moving part makes the adjacent
-        # rest edges arbitrarily long.  Lock the reliably explained samples
-        # exactly, but release the motion over a scale-normalized collar.
-        # This is a geometric boundary condition, not an object-part rule.
-        lock_distance = cKDTree(prior[locked_ids]).query(prior, k=1, workers=-1)[0]
-        normalized = np.clip(lock_distance / max(collar_width, 1e-12), 0., 1.)
-        lock_release = normalized * normalized * (3. - 2. * normalized)
-        best_weight *= lock_release
-        best_weight[locked_ids] = 0.
-    candidate = prior + best_weight[:, None] * best_displacement
-    before = np.linalg.norm(prior[anchor_prior_ids] - anchor_targets, axis=1)
-    after = np.linalg.norm(candidate[anchor_prior_ids] - anchor_targets, axis=1)
-    strain = edge_strain(prior, candidate, graph)
-    coverage, coverage_views = _orthographic_coverage(
-        prior, candidate, resolution=int(coverage_resolution),
-    )
-    rows, cols = sparse.triu(graph, k=1).nonzero()
-    edge_ratio_now = np.linalg.norm(candidate[rows] - candidate[cols], axis=1) / np.maximum(
-        np.linalg.norm(prior[rows] - prior[cols], axis=1), 1e-12,
-    )
-    effective = graph.copy().tolil()
-    broken = edge_ratio_now > float(maximum_edge_stretch)
-    if np.any(broken):
-        effective[rows[broken], cols[broken]] = 0.
-        effective[cols[broken], rows[broken]] = 0.
-    original_components, original_labels = csgraph.connected_components(graph, directed=False)
-    candidate_components, candidate_labels = csgraph.connected_components(effective.tocsr(), directed=False)
-    significance = max(32, int(math.ceil(.001 * len(prior))))
-    original_sizes = np.bincount(original_labels, minlength=original_components)
-    candidate_sizes = np.bincount(candidate_labels, minlength=candidate_components)
-    # A proper local rotation changes fixed-frame occupancy even when every
-    # carrier slot and every local metric is retained.  For this rigid field,
-    # graph connectivity and edge strain are the shape-preservation checks;
-    # the fixed-frame occupancy remains a conservative audit floor only.
-    rigid_coverage_floor = min(float(minimum_hidden_coverage), .90)
-    passed = bool(
-        np.median(after) < np.median(before)
-        and strain["edge_stretch_p01"] >= float(minimum_edge_compression)
-        and strain["edge_stretch_p99"] <= float(maximum_edge_stretch)
-        and coverage >= rigid_coverage_floor
-        and int(np.sum(candidate_sizes >= significance)) <= int(np.sum(original_sizes >= significance))
-    )
-    info = {
-        "active": passed,
-        "method": "residual_consensus_continuous_rigid_field",
-        "models": records,
-        "affected_points": int((best_weight > 0.).sum()),
-        "core_points": int((best_weight >= 1. - 1e-8).sum()),
-        "frozen_stable_points": int(len(locked_ids)),
-        "stable_lock_collar_width": float(collar_width),
-        "median_anchor_residual_before": float(np.median(before)),
-        "median_anchor_residual_after": float(np.median(after)),
-        "hidden_coverage_ratio": coverage,
-        "hidden_coverage_per_view": coverage_views,
-        "rigid_coverage_floor": rigid_coverage_floor,
-        "original_significant_components": int(np.sum(original_sizes >= significance)),
-        "candidate_significant_components": int(np.sum(candidate_sizes >= significance)),
-        "rejected_reason": None if passed else "integrity_or_observation_check_failed",
-        **strain,
-    }
-    return (candidate if passed else prior.copy()), info, (best_weight > 0.) if passed else np.zeros(len(prior), dtype=bool)
 
 
 def _solve_preconditioned(matrix: sparse.csr_matrix, rhs: np.ndarray) -> tuple[np.ndarray, list[int]]:
@@ -2082,12 +1661,6 @@ class PosteriorAdapter:
         )
         assimilation_displacement = np.zeros_like(current)
         assimilation_anchor_mask = np.zeros(len(current), dtype=bool)
-        residual_rigid_mask = np.zeros(len(current), dtype=bool)
-        residual_rigid_info: dict = {
-            "active": False,
-            "reason": "disabled",
-            "method": "residual_consensus_local_proper_se3",
-        }
         assimilation_info: dict = {
             "active": False,
             "reason": "disabled",
@@ -2129,96 +1702,37 @@ class PosteriorAdapter:
                 residual_scale = max(float(np.quantile(residual, .50)), _median_spacing(partial))
                 weights = np.exp(-.5 * np.square(residual / max(3.0 * residual_scale, 1e-12)))
                 weights = np.clip(weights, .20, 1.0)
-                targets = partial[partial_ids]
-                before_assimilation = current
-                if bool(self.config.residual_rigid_consensus):
-                    targets, weights, residual_rigid_info, rigid_anchor_mask, runtime_models = _residual_rigid_consensus_targets(
-                        current[prior_ids], targets, weights,
-                        partial_spacing=_median_spacing(partial), diagonal=diagonal,
-                        hard_quantile=float(self.config.rigid_consensus_hard_quantile),
-                        trials=int(self.config.rigid_consensus_trials),
-                        maximum_models=int(self.config.rigid_consensus_max_models),
-                        minimum_improvement=float(self.config.rigid_consensus_min_improvement),
-                        weight_multiplier=float(self.config.rigid_consensus_weight_multiplier),
-                    )
-                    residual_rigid_mask[prior_ids[rigid_anchor_mask]] = True
-                    stable_anchor_mask = residual <= float(np.quantile(
-                        residual, float(self.config.stable_residual_quantile),
-                    ))
-                    rigid_current, rigid_field_info, rigid_field_mask = _apply_residual_rigid_field(
-                        current, prior_ids, partial[partial_ids], runtime_models,
-                        partial_spacing=_median_spacing(partial), diagonal=diagonal,
-                        stable_anchor_mask=stable_anchor_mask,
-                        stable_prior_mask=(
-                            inherited_stable | transports[0].stable_prior_mask
-                        ),
-                        neighbours=int(self.config.fine_neighbours),
-                        edge_ratio=float(self.config.fine_edge_ratio),
-                        minimum_edge_compression=float(self.config.minimum_edge_compression),
-                        maximum_edge_stretch=float(self.config.maximum_edge_stretch),
-                        minimum_hidden_coverage=float(self.config.minimum_hidden_coverage),
-                        coverage_resolution=int(self.config.coverage_resolution),
-                    )
-                    residual_rigid_info["continuous_field"] = rigid_field_info
-                    if bool(rigid_field_info.get("active")):
-                        current = rigid_current
-                        residual_rigid_mask |= rigid_field_mask
-                        assimilation_anchor_mask[prior_ids] = True
-                        # The rigid field has already imposed the coherent
-                        # motion.  Recompute the remaining physical targets at
-                        # its new state for the final small ARAP correction.
-                        residual = np.linalg.norm(partial[partial_ids] - current[prior_ids], axis=1)
-                        residual_scale = max(float(np.quantile(residual, .50)), _median_spacing(partial))
-                        weights = np.exp(-.5 * np.square(
-                            residual / max(3.0 * residual_scale, 1e-12),
-                        ))
-                        weights = np.clip(weights, .20, 1.0)
-                        targets = partial[partial_ids]
-                rigid_field_active = bool(
-                    residual_rigid_info.get("continuous_field", {}).get("active")
+                assimilated, solve_info, assimilated_mask = _embedded_arap_posterior(
+                    current,
+                    prior_ids,
+                    partial[partial_ids],
+                    weights,
+                    np.zeros(len(current), dtype=bool),
+                    node_fraction=float(self.config.fine_node_fraction),
+                    minimum_nodes=int(self.config.minimum_graph_nodes),
+                    maximum_nodes=int(self.config.maximum_graph_nodes),
+                    skinning_neighbours=int(self.config.skinning_neighbours),
+                    neighbours=int(self.config.fine_neighbours),
+                    edge_ratio=float(self.config.fine_edge_ratio),
+                    attachment_edge_ratio=float(self.config.attachment_edge_ratio),
+                    data_weight=float(self.config.assimilation_data_weight),
+                    screening=float(self.config.assimilation_screening),
+                    bending_regularization=float(self.config.bending_regularization),
+                    iterations=int(self.config.assimilation_iterations),
+                    maximum_displacement=(
+                        float(self.config.assimilation_displacement_ratio) * diagonal
+                    ),
+                    minimum_improvement=max(
+                        .25 * float(self.config.minimum_observed_improvement), .0025,
+                    ),
+                    minimum_edge_compression=float(self.config.minimum_edge_compression),
+                    maximum_edge_stretch=float(self.config.maximum_edge_stretch),
+                    minimum_hidden_coverage=float(self.config.minimum_hidden_coverage),
+                    coverage_resolution=int(self.config.coverage_resolution),
+                    coherent_component_targets=False,
                 )
-                run_elastic_refinement = bool(
-                    not rigid_field_active or self.config.rigid_consensus_post_refinement
-                )
-                if run_elastic_refinement:
-                    assimilated, solve_info, assimilated_mask = _embedded_arap_posterior(
-                        current,
-                        prior_ids,
-                        targets,
-                        weights,
-                        np.zeros(len(current), dtype=bool),
-                        node_fraction=float(self.config.fine_node_fraction),
-                        minimum_nodes=int(self.config.minimum_graph_nodes),
-                        maximum_nodes=int(self.config.maximum_graph_nodes),
-                        skinning_neighbours=int(self.config.skinning_neighbours),
-                        neighbours=int(self.config.fine_neighbours),
-                        edge_ratio=float(self.config.fine_edge_ratio),
-                        attachment_edge_ratio=float(self.config.attachment_edge_ratio),
-                        data_weight=float(self.config.assimilation_data_weight),
-                        screening=float(self.config.assimilation_screening),
-                        bending_regularization=float(self.config.bending_regularization),
-                        iterations=int(self.config.assimilation_iterations),
-                        maximum_displacement=(
-                            float(self.config.assimilation_displacement_ratio) * diagonal
-                        ),
-                        minimum_improvement=max(
-                            .25 * float(self.config.minimum_observed_improvement), .0025,
-                        ),
-                        minimum_edge_compression=float(self.config.minimum_edge_compression),
-                        maximum_edge_stretch=float(self.config.maximum_edge_stretch),
-                        minimum_hidden_coverage=float(self.config.minimum_hidden_coverage),
-                        coverage_resolution=int(self.config.coverage_resolution),
-                        coherent_component_targets=False,
-                    )
-                else:
-                    assimilated = current
-                    assimilated_mask = np.zeros(len(current), dtype=bool)
-                    solve_info = {
-                        "active": False,
-                        "reason": "suppressed_after_accepted_rigid_consensus_field",
-                        "method": "hierarchical_embedded_arap_posterior",
-                    }
                 if solve_info.get("active"):
+                    before_assimilation = current
                     current = assimilated
                     assimilation_displacement = current - before_assimilation
                     assimilation_anchor_mask[prior_ids] = True
@@ -2232,16 +1746,14 @@ class PosteriorAdapter:
                     )
                     assimilation_displacement = current - before_assimilation
                 else:
-                    assimilation_displacement = current - before_assimilation
                     assimilation_topology = {"active": False, "reason": "solver_rejected"}
                 assimilation_info = {
-                    "active": bool(solve_info.get("active") or residual_rigid_info.get("continuous_field", {}).get("active")),
+                    "active": bool(solve_info.get("active")),
                     "method": "integrated_four_view_observation_assimilation",
                     "positive_evidence": pair_info,
                     "assignment": assignment_info,
                     "retained_anchors": int(len(anchors)),
                     "solver": solve_info,
-                    "elastic_refinement_ran": run_elastic_refinement,
                     "topology_projection": assimilation_topology,
                 }
             else:
@@ -2319,17 +1831,6 @@ class PosteriorAdapter:
         # stable.
         initial_stable = transports[0].stable_prior_mask
         stable_motion = np.linalg.norm(current[initial_stable] - initial[initial_stable], axis=1)
-        # A supported proper-rigid local motion can rotate a thin appendage
-        # outside its former fixed-frame occupancy without losing carrier
-        # slots or graph connectivity.  In that case the field has already
-        # checked a conservative .90 coverage floor jointly with metric
-        # strain; retain that scale-normalized criterion here as well.
-        rigid_field_active = bool(
-            residual_rigid_info.get("continuous_field", {}).get("active")
-        )
-        final_coverage_floor = min(
-            float(self.config.minimum_hidden_coverage), .90,
-        ) if rigid_field_active else float(self.config.minimum_hidden_coverage)
         integrity = {
             "input_connected_components": int(input_components),
             "output_connected_components": int(output_components),
@@ -2346,12 +1847,11 @@ class PosteriorAdapter:
             "stable_motion_p50": float(np.quantile(stable_motion, .50)) if len(stable_motion) else 0.,
             "stable_motion_p95": float(np.quantile(stable_motion, .95)) if len(stable_motion) else 0.,
             "stable_motion_max": float(stable_motion.max(initial=0.)),
-            "coverage_floor": float(final_coverage_floor),
         }
         integrity["passed"] = bool(
             output_components <= input_components
             and integrity["output_significant_components"] <= integrity["input_significant_components"]
-            and final_coverage >= float(final_coverage_floor)
+            and final_coverage >= float(self.config.minimum_hidden_coverage)
             and len(current) == len(initial)
         )
         masks = {
@@ -2364,7 +1864,6 @@ class PosteriorAdapter:
             "fine_displacement": displacements[1],
             "assimilation_displacement": assimilation_displacement,
             "assimilation_anchor": assimilation_anchor_mask,
-            "residual_rigid_consensus": residual_rigid_mask,
             "slender_rigidity": slender_rigidity_mask,
             "transport_partial_ids": final_transport.partial_ids,
             "transport_prior_ids": final_transport.prior_ids,
@@ -2392,7 +1891,6 @@ class PosteriorAdapter:
             "integrity": integrity,
             "topology_projection": topology_projection,
             "observation_assimilation": assimilation_info,
-            "residual_rigid_consensus": residual_rigid_info,
             "slender_rigidity_projection": slender_rigidity_info,
             "posterior_diagnostics": posterior_diagnostics,
             **final_strain,
