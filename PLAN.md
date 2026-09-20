@@ -50,7 +50,192 @@ mainline work.
 - [ ] Evaluate frozen outputs offline, compare with the accepted generalization
   run, record paths and risks, then commit and push the cleaned mainline.
 
+## Test-time residual re-linearization batch (2026-09-20)
+
+- [x] Apply the visually accepted, class-free three-round residual
+  re-linearization to the retained Redwood10 and Custom10 assets.  Reuse only
+  the saved semantic observations, Pixal priors, Camera-1 registrations and
+  four-view residual manifests from
+  `workspace/best_redwood_custom_camera1_transport_20260911/`; do not
+  regenerate images or priors and do not use GT/CD/EMD during inference.
+  Package all copied inputs, registrations, residual evidence, round outputs,
+  configuration and script in
+  `workspace/tto_relinearized_redwood_custom_20260920/` so the delivery is
+  standalone.  The shared configuration is `configs/posterior_mainline.json`,
+  with three outer rounds and update strength 1.0, exactly as the accepted
+  Seahawk TTO run.  This is an experiment pending batch visual review, not a
+  mainline promotion.  All 20 cases finished: 10 Redwood and 10 Custom.  Each
+  package entry has copied semantic/Pixal/camera/partial inputs, native and
+  bridge registration evidence, four-view residuals, `round_00_registered`,
+  three re-linearization rounds and a no-GT summary.  Validation confirmed
+  every round keeps exactly 100,000 points, all 20 summaries are present, the
+  package carries 10 semantic images and 10 Pixal GLBs per dataset, and copied
+  JSON manifests no longer resolve through the previous experiment directory.
+  Offline-only 16,384-point evaluation of the `round_03` carrier is saved as
+  `metrics/redwood10_tto_round03.{csv,json}` and
+  `metrics/custom10_tto_round03.{csv,json}`.  The initial audit reports
+  Redwood10 `1.5678/2.5804` and Custom10 `10.3660/9.4913` CD-L1/EMD x100, but
+  the Custom number is **not a valid method result**: the batch runner used
+  stale `registration_initial/<id>/final/` carriers instead of the validated
+  post-Sim(3) `registration_selected/<id>/` carriers.  For example, the
+  initial/selected complete diagonal is `.280/1.108` for Light Helicopter and
+  `.299/1.274` for Single Engine Airplane; bounded posterior adaptation cannot
+  recover this global mismatch.  The next run must begin from the selected
+  carrier (and package that stage), then reevaluate.  These metrics did not
+  influence the TTO loop or its output selection.
+- [x] Re-run the same three-round residual re-linearization from the validated
+  `registration_selected/<id>/camera1_amplified_registered_100k.ply` carrier
+  for all Redwood10 and Custom10 cases. Save a separate, self-contained
+  package at `workspace/tto_relinearized_selected_redwood_custom_20260920/`,
+  retain the earlier initial-carrier package as an invalid diagnostic only, and
+  recompute the offline-only 16,384-point CD-L1/EMD reports after all cases
+  finish. No semantic image, Pixal prior, GT-dependent selection, or
+  category-specific setting may change. All 20 final carriers contain exactly
+  100,000 points. The corrected offline-only report is Redwood10
+  `1.4872/2.4083` and Custom10 `1.8567/2.3406` CD-L1/EMD x100, using
+  deterministic 16,384-point FPS with seed 6145. Per-sample CSV/JSON reports
+  are stored in the package `metrics/` directory.
+
 ## From-scratch direct-GPT debug run
+
+## Sparse Custom Seahawk smoke run (2026-09-19)
+
+### Unpromoted residual-motion posterior probe (2026-09-20)
+
+- [ ] Replace the rejected pointwise residual-field/collar probe with one
+  category-free **residual-motion posterior** experiment.  Each four-view
+  prior-to-partial residual arrow is a 3D observation of both direction and
+  magnitude.  The solver must decompose those observations by explanatory
+  motion, rather than decide a motion type from an object class, coordinate
+  axis, or hand-drawn region:
+  - a spatially coherent set whose arrows are explained by one proper SE(3)
+    moves as one structural unit, so a blade, handle, limb, or wing rotates or
+    translates without bending;
+  - a connected set whose arrows instead require a smooth, non-isometric
+    metric change is represented by a low-frequency deformation-graph field,
+    so a short torso, tall backrest, or long appendage changes extent
+    continuously rather than detaching.
+  The two alternatives share the same confidence-weighted Partial OT, stable
+  support, attachment graph, and no-GT residual objective.  The carrier mesh
+  is used only as a geometry scaffold; its sampled 100k points remain the
+  rendering/export carrier.  No category names, part labels, fixed axes, GT,
+  CD, or EMD may enter the classification or solve.
+- [ ] First test the frozen Seahawk inputs, explicitly audit whole-unit motion,
+  attachment strain, and four-view visible error.  Then run the *unchanged*
+  configuration on the frozen Pig inputs before considering any mainline
+  integration.  The existing graph-cut/collar outputs and the first intrinsic
+  Fiedler-hierarchy attempt remain diagnostic only: their arbitrary regions
+  can absorb part of a rotor/body and create excessive strain, so they are
+  rejected as a structural-unit estimator.
+- [x] Implement the first two-level probe in
+  `scripts/probe_residual_modal_posterior.py`: Camera-1 transport supplies a
+  low-frequency metric update, then post-update four-view correspondences
+  with at least two-camera support propose proper SE(3) units.  A unit is a
+  connected, data-improving support with a narrow two-ring attachment
+  transition; it is rejected if its own observed residual does not improve or
+  its graph strain/coverage becomes unsafe.  This is still unpromoted and has
+  no object-name, part, axis, GT, CD or EMD branch.
+- [x] Run the unchanged two-level configuration on frozen Seahawk and Pig:
+  `workspace/seahawk_helicopter_from_scratch_sparse_20260919/`
+  `residual_motion_twolevel_probe_20260920/seahawk_helicopter` and
+  `workspace/domestic_pig_depth_gauge_fixed_20260919/`
+  `residual_motion_twolevel_probe_20260920/domestic_pig`.  Pig's Camera-1
+  metric update reduces its transport residual median `0.17468 -> 0.11827`
+  (32.3%) and accepts one subsequent coherent local motion (1,473 carrier
+  points).  Seahawk accepts two coherent local motions (1,045 carrier points)
+  after its conservative metric pass.  Each output preserves exactly 100,000
+  carrier slots.  Await visual review before deciding whether the residual
+  support model is sufficiently complete to test broader generalization.
+- [x] Add a topology-aware metric gate and an iterative four-view residual
+  loop to the probe only.  The metric gate no longer treats changed prior
+  silhouette as deletion: it constrains carrier count, graph strain and
+  spacing-normalized stable motion.  The residual loop re-estimates
+  two-camera-supported correspondences and proper-motion hypotheses after
+  every accepted update, at most three times, instead of reusing stale rotor
+  residuals.  The accepted Pig record is
+  `workspace/domestic_pig_depth_gauge_fixed_20260919/`
+  `residual_motion_attachment_continuation_probe_20260920/domestic_pig`:
+  alpha `.85`, Camera-1 median residual reduction `62.9%`, and one 2,055-point
+  24.54-degree coherent motion with four-ring attachment continuation.
+  The Seahawk iterative diagnostic is
+  `workspace/seahawk_helicopter_from_scratch_sparse_20260919/`
+  `residual_motion_iterative_probe_20260920/seahawk_helicopter`; its four-view
+  supported-anchor median is `0.00907 -> 0.00528` after three no-GT rounds
+  (versus `0.00792` after one round), while retaining all 100k carrier slots.
+  This remains unpromoted pending review on further identities.
+- [x] Test a replacement for the provisional BIC-only metric decision with an adaptive
+  correntropy transport test in the residual-motion probe only.  A global
+  metric field now requires simultaneous improvement of the median, 75th
+  percentile, and correntropy residual; BIC remains an audit statistic rather
+  than a decision signal.  On the frozen Seahawk this correctly rejects the
+  low-frequency metric warp (whose affine median/correntropy are worse), so
+  only connected local proper-SE(3) units act and the fuselage is not globally
+  dragged.  On the unchanged Pig it retains the metric update (relative
+  median/q75/correntropy gains `28.3%/30.3%/33.4%`, selected alpha `.85`).
+  Outputs are `workspace/seahawk_helicopter_from_scratch_sparse_20260919/`
+  `residual_motion_correntropy_gate_probe_20260920/seahawk_helicopter` and
+  `workspace/domestic_pig_depth_gauge_fixed_20260919/`
+  `residual_motion_correntropy_gate_probe_20260920/domestic_pig`.  Visual
+  review rejected this probe because its subsequent local-motion updates still
+  distort the Pig torso relative to the retained mainline posterior.  It is a
+  rejected test artifact and must not be promoted or used as a baseline.
+- [x] Run a test-only **iterative residual re-linearization** on the accepted
+  Seahawk mainline posterior.  Reuse the unchanged partial, Camera-1,
+  four-view manifest and `PosteriorAdapter` configuration; each round starts
+  from the previous 100k carrier and recomputes the same class-free OT and
+  four-view positive evidence.  Save all rounds and their no-GT residual
+  diagnostics.  Do not change the accepted baseline or promote the loop
+  before visual review.  The first run is
+  `workspace/seahawk_helicopter_from_scratch_sparse_20260919/`
+  `posterior_tto_relinearized_probe_20260920/seahawk_helicopter`: all rounds
+  preserve 100k slots and its no-GT four-view collision-free residual median
+  decreases `0.01391 -> 0.00933 -> 0.00549 -> 0.00395` across the registered
+  input and three re-linearizations.  This is unpromoted pending visual review.
+
+- [x] Add `seahawk_helicopter.glb` as a reproducible Custom datum.  Its
+  normalized complete reference is sampled at 16,384 points and the new
+  oblique saved-camera partial is sampled at 8,192 points; the source camera,
+  raw depth, mask, UVs and `camera.pth` are saved under
+  `data/custom/seahawk_helicopter/`.
+- [x] Run the complete direct-GPT/Pixal/native-MoGe/Observation-Consistent
+  Prior Registration/four-view posterior/fusion route without GT feedback at
+  `workspace/seahawk_helicopter_from_scratch_sparse_20260919/`.  The final
+  fixed-carrier prediction is
+  `fusion_depth_gauge_20260919/seahawk_helicopter/observation_anchored_fused_100k.ply`.
+  Offline-only 16,384-point CD-L1/EMD x100 is `1.6027/3.2960`.
+- [x] Confirm the new partial-count CLI is backwards compatible by regenerating
+  the Seahawk with `--partial-count 8192 --gt-count 16384`; existing Custom
+  entries retain the default 16,384-point observation count.
+- [x] Probe category-independent residual-consensus rigid fields after global
+  registration.  The field estimates local proper SE(3) motions solely from
+  four-view collision-free partial correspondences, freezes low-residual
+  support with a spacing-normalized transition, and preserves all 100k carrier
+  slots.  On sparse Seahawk it reduces Camera-1 visible 3D error
+  `0.02725 -> 0.01886` while retaining connectivity and all initially stable
+  points.  The broad graph-harmonic propagation variant was rejected because
+  it spread a local motion to 96% of the carrier.  The retained local-field
+  probe is at
+  `workspace/seahawk_helicopter_from_scratch_sparse_20260919/`
+  `posterior_transform_supported_rigid_smoothlock_probe_20260919/`.
+  The same configuration on unchanged `domestic_pig` preserves connectivity
+  and reduces no-GT visible objective `0.12627 -> 0.10210`, but its offline
+  CD-L1/EMD x100 slightly regresses `1.6435/2.1145 -> 1.6436/2.1260`.
+  Therefore this remains an opt-in diagnostic probe, not a mainline change.
+
+- [ ] Replace the native Pixal--MoGe fixed 4x depth-gauge cap with the
+  camera-coordinate robust positive-depth calibration, then regression-check
+  the same rule on the current Custom airplane and retained Redwood/Custom
+  assets. This must remain invariant to semantic image resolution and crop;
+  do not introduce a sample-specific scale rule. The 2026-09-19 airplane
+  check passes on both the current 442px preprocessed Pixal input and an
+  independent retained 962px Custom input: the native nearest-surface median
+  improves from `3.4345 -> 0.1840` and `3.9961 -> 0.1269`, respectively.
+  The corrected complete no-GT run is at
+  `workspace/probe_single_engine_airplane_from_scratch_20260919/`
+  `registration_depth_gauge_20260919`, `residuals_depth_gauge_20260919`,
+  `posterior_depth_gauge_20260919`, and `fusion_depth_gauge_20260919`.
+  Remaining risk: run the frozen correction across distinct Redwood and
+  Custom identities before promoting it as the full-batch default.
 
 - [x] Regenerate Redwood 01184 from its partial scan in
   `workspace/from_scratch_01184_debug_20260910`.
@@ -480,3 +665,28 @@ mainline work.
   100k points, passes integrity with `0.8971` hidden coverage, and obtains
   CD-L1/EMD `0.7495/1.4556` (x1e2). Keep this as an isolated visual candidate
   until user review; mainline defaults remain unchanged.
+
+## Structural residual-field probe (unpromoted)
+
+- [x] Replace the earlier finite-collar-only exploratory field with an opt-in
+  category-free structural proposal in
+  `scripts/probe_structural_residual_field.py`: collision-free multi-view
+  residual anchors first vote for local proper SE(3) motions, then an s-t
+  minimum cut over the fixed prior-affinity graph finds the smallest coherent
+  carrier separated from stable support. A short graph collar only smooths
+  the attachment; no class, part, axis, GT, CD, or EMD enters this route.
+- [x] Add greedy proposal validation before composing motions. Each candidate
+  must reduce its own observed-anchor residual by a normalized fraction while
+  preserving the carrier graph's normalized edge-compression/stretch bounds;
+  stable observations are hard locked. This rejected an unsafe large motion
+  in the pig probe while retaining two continuous smaller motions, using the
+  exact same frozen rules as Seahawk.
+- [x] Save the Seahawk diagnostic under
+  `workspace/seahawk_helicopter_from_scratch_sparse_20260919/structural_graph_cut_validated_probe_20260919/seahawk_helicopter`.
+  It moves 22,645/100,000 carrier points through three accepted structural
+  motions, improves the multi-view anchor median `0.01773 -> 0.01592`, and
+  leaves all 1,288 stable points exactly fixed. The matching pig safety probe
+  is `workspace/domestic_pig_depth_gauge_fixed_20260919/structural_graph_cut_validated_probe_20260919/domestic_pig`.
+- [ ] Keep this separate from the mainline until visual assessment confirms
+  that the stronger rotor alignment is worth the local structural change and
+  validation covers further Custom and Redwood identities.

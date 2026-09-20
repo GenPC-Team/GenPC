@@ -1,5 +1,209 @@
 # Accepted project state
 
+## 2026-09-20 17:18:00 CST — accepted Seahawk test-time residual re-linearization
+
+**User approval.** The user judged the three-round Seahawk test-time residual
+re-linearization “效果非常好”.  Preserve every round and its valid input chain.
+This is an accepted diagnostic result, not yet a promoted object-mainline
+replacement.  Do not overwrite the accepted baseline in the next entry or
+reuse rejected residual-motion probes.
+
+**Sample, inputs and outputs.** Sample id: `seahawk_helicopter`.  Fixed inputs
+are `workspace/seahawk_helicopter_from_scratch_sparse_20260919/inputs/partial/seahawk_helicopter.ply`,
+`inputs/camera/seahawk_helicopter/{depth.png,camera.pth,point_uv.npy,mask.png,img.png}`,
+and `residuals_depth_gauge_20260919/seahawk_helicopter/render/render_manifest.json`
+under the same root.  The run output is
+`posterior_tto_relinearized_probe_20260920/seahawk_helicopter`; it contains
+`round_00_registered` and `round_{01,02,03}`, each with
+`posterior_prior_100k.ply`, `partial_gray_posterior_red.ply`, Camera-1 and
+four-view overlays, and `round_info.json`.  The accepted current result is
+round 3: `round_03/{posterior_prior_100k.ply,partial_gray_posterior_red.ply}`.
+All rounds retain exactly 100,000 carrier slots.  The full no-GT audit is
+`tto_summary.json`; no GT, CD, or EMD enters any iteration.  Offline metrics
+for this exact output: `UNKNOWN`.
+
+**Models and generation.** The frozen semantic image is
+`inputs/camera/seahawk_helicopter/img.png`, created from
+`inputs/pixal/seahawk_helicopter/gpt_image_raw.png` at resolution `512`;
+provider-side GPT model identifier, seed, steps, CFG/guidance, scheduler,
+backend, resize policy and negative prompt are `UNKNOWN` / no negative prompt
+recorded.  Frozen Pixal3D paths are `models/Pixal3D-weights`, DINO
+`models/dinov3-vitl16-pretrain-lvd1689m`, MoGe `models/moge-2-vitl/model.pt`,
+and RMBG `models/RMBG-2.0`; seed `42`, requested/actual resolution `1024`,
+xFormers, sparse/shape/texture steps `12/12/12`, guidance `7.5/7.5/1.0`,
+guidance-rescale `.7/.5/.0`, rescale-t `5.0/3.0/3.0`, decimation target
+`300000`, texture size `2048`.  Frozen assets are
+`inputs/pixal/seahawk_helicopter/{gpt_image.png,pixal3d_input.png,pixal3d.glb,pixal3d_sampled_100k.ply,pixal_moge_fp16_observation.npz}`.
+
+**Exact semantic prompt (negative prompt: UNKNOWN/NONE).**
+
+> Generate one complete, realistic RGB object image from the supplied incomplete depth map. The object is a complete Seahawk helicopter with a main rotor, tail boom, tail rotor, cockpit, landing gear, and external equipment. Treat every non-background depth pixel and its foreground mask as a hard ControlNet-like spatial constraint. Preserve the input camera viewpoint, perspective, image-plane center, apparent width and height, crop, orientation, visible silhouette, depth ordering, and all observed part locations. Do not rotate, mirror, recenter, rescale, widen, shorten, tilt, or redesign the observed object. Complete only genuinely missing or occluded regions, connect them naturally to the observed structure, and keep a single coherent object on a pure white background. Produce sharp boundaries and realistic materials suitable for image-to-3D reconstruction. Do not add text, logos, extra parts, secondary objects, or cast shadows that change the foreground mask. Additional structural constraints: preserve the observed diagonal pose, silhouette, framing, camera viewpoint, and all reliable visible structures from the depth image complete only the unobserved portions naturally; do not crop, rotate, mirror, or change the camera
+
+**Test-time optimization configuration.** `scripts/probe_iterative_posterior_tto.py`
+recomputes the same exact-Camera-1 Partial OT and four saved-view positive
+evidence after each round; it trains no weights.  It uses three outer rounds,
+`update_strength=1.0`, `configs/posterior_mainline.json`, and the resolved
+posterior configuration from the preceding baseline entry: `3072/6144`
+partial/prior samples, OT `60` iterations/`.72` relaxation/`.012` floor,
+coarse/fine graph passes `5/5`, and embedded four-view assimilation with data
+weight `2.0`, screening `.004`, three internal iterations, `.05` displacement
+ratio and `.03` anchor-residual ratio.  The four-view collision-free residual
+median is `0.0139061` before optimization and `0.0093267`, `0.0054905`,
+`0.0039487` after rounds 1--3.  This record approves the frozen data/config;
+it does not approve a larger `update_strength` without a new visual review.
+
+
+## 2026-09-20 17:15:34 CST — accepted Seahawk mainline posterior baseline
+
+**User approval.** The user judged the current mainline Seahawk posterior
+result “其实这个效果已经很不错了”.  Preserve this as the visual baseline for
+any stronger-deformation probe.  Do not overwrite its input prior, registered
+placement, or posterior output.  Any increased-strength attempt must write to
+a new directory and retain the same saved cameras and no-GT inputs.
+
+**Sample, inputs and outputs.** Sample id: `seahawk_helicopter`.  Inputs are
+`workspace/seahawk_helicopter_from_scratch_sparse_20260919/inputs/partial/seahawk_helicopter.ply`,
+`inputs/camera/seahawk_helicopter/{depth.png,camera.pth,point_uv.npy,mask.png,img.png}`,
+and the four-view manifest
+`residuals_depth_gauge_20260919/seahawk_helicopter/render/render_manifest.json`
+under the same root.  The frozen registered 100k prior and its gray/red
+comparison are
+`registration_depth_gauge_20260919/seahawk_helicopter/final/camera1_amplified_registered_100k.ply`
+and `camera1_amplified_partial_gray_pixal_red.ply`.  The accepted posterior,
+gray/red comparison, saved-view board, virtual-view board, Partial-OT pairs,
+and field are respectively
+`posterior_depth_gauge_20260919/seahawk_helicopter/{posterior_prior_100k.ply,partial_gray_posterior_red.ply,posterior_saved_view_projection.png,posterior_virtual_views.png,partial_ot_pairs.npy,posterior_field.npz}`.
+The output retains all 100,000 Pixal carrier slots.  Offline CD/EMD for this
+exact accepted output: `UNKNOWN` (not used or recorded for this approval).
+
+**Models and generation.** Direct GPT semantic completion source is
+`inputs/pixal/seahawk_helicopter/gpt_image_raw.png`, installed at
+`inputs/camera/seahawk_helicopter/img.png`, resolution `512`; model identifier,
+seed, steps, CFG/guidance, scheduler, backend, resize policy and negative
+prompt are `UNKNOWN` / no negative prompt recorded.  Pixal3D paths are
+`models/Pixal3D-weights`, DINO `models/dinov3-vitl16-pretrain-lvd1689m`,
+MoGe `models/moge-2-vitl/model.pt`, and RMBG `models/RMBG-2.0`; seed `42`,
+requested/actual resolution `1024`, xFormers backend, sparse/shape/texture
+steps `12/12/12`, guidance `7.5/7.5/1.0`, guidance-rescale
+`.7/.5/.0`, rescale-t `5.0/3.0/3.0`, mesh-decimation target `300000`, texture
+size `2048`.  Native assets are
+`inputs/pixal/seahawk_helicopter/{pixal3d.glb,pixal3d_sampled_100k.ply,pixal_moge_fp16_observation.npz}`.
+
+**Exact semantic prompt (negative prompt: UNKNOWN/NONE).**
+
+> Generate one complete, realistic RGB object image from the supplied incomplete depth map. The object is a complete Seahawk helicopter with a main rotor, tail boom, tail rotor, cockpit, landing gear, and external equipment. Treat every non-background depth pixel and its foreground mask as a hard ControlNet-like spatial constraint. Preserve the input camera viewpoint, perspective, image-plane center, apparent width and height, crop, orientation, visible silhouette, depth ordering, and all observed part locations. Do not rotate, mirror, recenter, rescale, widen, shorten, tilt, or redesign the observed object. Complete only genuinely missing or occluded regions, connect them naturally to the observed structure, and keep a single coherent object on a pure white background. Produce sharp boundaries and realistic materials suitable for image-to-3D reconstruction. Do not add text, logos, extra parts, secondary objects, or cast shadows that change the foreground mask. Additional structural constraints: preserve the observed diagonal pose, silhouette, framing, camera viewpoint, and all reliable visible structures from the depth image complete only the unobserved portions naturally; do not crop, rotate, mirror, or change the camera
+
+**Accepted posterior configuration.** Exact config is preserved in
+`posterior_depth_gauge_20260919/seahawk_helicopter/posterior_info.json` and
+`configs/posterior_mainline.json`: exact-Camera-1 structural Partial OT,
+`3072/6144` partial/prior samples, transport `60` iterations with relaxation
+`.72` and temperature floor `.012`; `24` low-frequency modes with
+regularization `.035`; coarse/fine graph node fractions `.02/.055`, five
+iterations each, data weights `2.5/4.0`, displacement ratios `.28/.12`; graph
+integrity compression/stretch `.55/2.8`; and integrated four-view observation
+assimilation (`6144` samples, data weight `2.0`, screening `.004`, three
+iterations, displacement cap `.05` of partial diagonal).  No GT, CD, EMD,
+category/part rule, fixed axis, or manually selected region enters inference.
+
+
+## 2026-09-20 16:21 CST — accepted Pig residual-motion posterior probe
+
+**User approval.** The user judged the Pig result “效果很好看起来”. Preserve it
+as the accepted *probe* baseline for continuous posterior adaptation. Do not
+promote it to the object-level mainline, replace its frozen input prior, or
+change its normalized residual/attachment rules without a separate
+cross-identity validation. Seahawk remains a separate unapproved stress test.
+
+**Sample, inputs and outputs.** Sample id: `domestic_pig`. The fixed input
+partial and Camera-1 camera are
+`workspace/domestic_pig_depth_gauge_fixed_20260919/inputs/partial/domestic_pig.ply`
+and `inputs/camera/domestic_pig/camera.pth`; the saved depth and installed
+semantic are `inputs/camera/domestic_pig/depth.png` and `img.png` under the
+same root. The frozen complete carrier is
+`registration/domestic_pig/final/camera1_amplified_registered_100k.ply`.
+The approved final carrier is
+`residual_motion_attachment_continuation_probe_20260920/domestic_pig/residual_motion_posterior_100k.ply`;
+the corresponding partial/prior overlay and before/after diagnostic boards are
+`partial_gray_residual_motion_red.ply`, `before_virtual_views.png`, and
+`after_virtual_views.png` in that directory. The metric-stage carrier is
+`stage1_metric_prior_100k.ply`; exact residual, support, graph and transform
+records are `residual_modal_info.json` and `residual_modal_field.npz`.
+
+**Models and generation record.** The semantic source is
+`inputs/pixal/domestic_pig/gpt_image.png`; its GPT image model/checkpoint,
+seed, steps, CFG/guidance, scheduler, native resize policy and negative prompt
+are `UNKNOWN`. The exact positive prompt is saved verbatim at
+`inputs/pixal/domestic_pig/gpt_depth_completion_prompt.txt` and is reproduced
+below; no separate negative prompt exists. The frozen Pixal prior is
+`inputs/pixal/domestic_pig/{pixal3d.glb,pixal3d_sampled_100k.ply,pixal_moge_fp16_observation.npz}`.
+Its metadata records `models/Pixal3D-weights`, DINO
+`models/dinov3-vitl16-pretrain-lvd1689m`, MoGe
+`models/moge-2-vitl/model.pt`, RMBG `models/RMBG-2.0`, xFormers, seed `42`,
+1024px inference, 12 sparse/shape/texture steps, guidance strengths
+`7.5/7.5/1.0`, decimation target `120000`, and texture size `1024`.
+
+**Exact semantic prompt (negative prompt: NONE).**
+
+> Generate one complete, realistic RGB object image from the supplied incomplete depth map. The object is a complete domestic pig. Treat every non-background depth pixel and its foreground mask as a hard ControlNet-like spatial constraint. Preserve the input camera viewpoint, perspective, image-plane center, apparent width and height, crop, orientation, visible silhouette, depth ordering, and all observed part locations. Do not rotate, mirror, recenter, rescale, widen, shorten, tilt, or redesign the observed object. Complete only genuinely missing or occluded regions, connect them naturally to the observed structure, and keep a single coherent object on a pure white background. Produce sharp boundaries and realistic materials suitable for image-to-3D reconstruction. Do not add text, logos, extra parts, secondary objects, or cast shadows that change the foreground mask. Additional structural constraints: Keep one connected torso, four naturally attached legs, two ears, one snout, and one tail.
+
+**Accepted postprocessing.** The probe keeps every one of the 100,000 prior
+carrier slots; it never appends or deletes partial points. It first estimates
+Camera-1 structural OT, then projects its residual targets to a 2,048-node,
+32-mode intrinsic low-frequency graph field. The accepted metric step is
+`alpha=0.85`, reduces the no-GT Camera-1 transport median `0.17467567` to
+`0.06478022`, and satisfies graph compression/stretch `0.45327/2.86119` with
+occupancy retention `.91813`. The post-metric four-view route retains only
+two-camera-supported matches; it accepts one 24.536-degree proper SE(3)
+support (2,055 core points) with a four-ring attachment continuation.
+No GT, CD, EMD, object part label, category rule, fixed axis, or manual region
+is used by the geometry update. Offline metrics are `UNKNOWN` for this exact
+new probe and must not be backfilled from a different run.
+
+## 2026-09-19 18:04:08 CST — native Pixal--MoGe depth-gauge correction accepted for continuation
+
+**User approval.** “ok 现在正常多了 可以跑后续步骤了.” The user visually
+approved the native Pixal--MoGe alignment after replacing the fixed 4x native
+depth-scale cap with camera-coordinate robust positive-depth calibration.
+Continue this sample from the corrected bridge; do not reinstate the fixed
+numeric cap or introduce a sample/category-specific scale rule.
+
+**Sample and outputs.** Sample id: `single_engine_airplane`. The approved
+native comparison is
+`workspace/probe_single_engine_airplane_from_scratch_20260919/registration_depth_gauge_20260919/single_engine_airplane/native/pixal_native_moge_gray_pixal_red.ply`.
+The continuation inputs are the bridge comparison
+`workspace/probe_single_engine_airplane_from_scratch_20260919/registration_depth_gauge_20260919/single_engine_airplane/bridge/two_camera_pixal_moge_partial_gray_pixal_red.ply`
+and registered carrier
+`workspace/probe_single_engine_airplane_from_scratch_20260919/registration_depth_gauge_20260919/single_engine_airplane/bridge/two_camera_pixal_moge_registered_100k.ply`.
+Inputs are
+`workspace/probe_single_engine_airplane_from_scratch_20260919/inputs/partial/single_engine_airplane.ply`,
+`inputs/camera/single_engine_airplane/{depth.png,camera.pth,point_uv.npy,img.png}`, and
+`inputs/pixal/single_engine_airplane/{gpt_image_maskaligned.png,pixal3d_input.png,pixal3d.glb,pixal3d_sampled_100k.ply,pixal_moge_fp16_observation.npz,pixal3d_metadata.json}`
+under the same run root.
+
+**Models and generation.** Semantic completion was GPT image generation;
+provider-side seed, scheduler, CFG, negative prompt and model identifier are
+`UNKNOWN`. Pixal uses `models/Pixal3D-weights`, DINO
+`models/dinov3-vitl16-pretrain-lvd1689m`, MoGe-2
+`models/moge-2-vitl/model.pt`, and RMBG-2.0 `models/RMBG-2.0`; seed `42`,
+requested/actual resolution `1024`, 12 sparse/shape/texture steps, sparse
+guidance `7.5`, shape guidance `7.5`, texture guidance `1.0`, decimation
+target `300000`, and texture size `2048`.
+
+**Exact semantic prompt.**
+
+> Generate one complete, realistic RGB object image from the supplied incomplete depth map. The object is a single-engine light airplane with one propeller, fixed wings, tailplane, vertical tail fin, and tricycle landing gear. Treat every non-background depth pixel and its foreground mask as a hard ControlNet-like spatial constraint. Preserve the input camera viewpoint, perspective, image-plane center, apparent width and height, crop, orientation, visible silhouette, depth ordering, and all observed part locations. Do not rotate, mirror, recenter, rescale, widen, shorten, tilt, or redesign the observed object. Complete only genuinely missing or occluded regions, connect them naturally to the observed structure, and keep a single coherent object on a pure white background. Produce sharp boundaries and realistic materials suitable for image-to-3D reconstruction. Do not add text, logos, extra parts, secondary objects, or cast shadows that change the foreground mask.
+
+**Postprocessing and rationale.** A depth-mask-only horizontal global affine
+of `0.985` was applied to the GPT image before semantic installation; no 3-D
+geometry, GT, CD, or EMD was used. The installed 512px semantic audit passed
+with depth coverage `0.840834`, center offset `0.0009766`, and bbox scales
+`[1.10989, 1.10828]`. The native correction estimates the positive-depth
+median ratio in the shared Pixal camera frame, rather than using image
+resolution/crop or a fixed scale limit. On this 442px Pixal input, nearest
+native-MoGe distance median changed `3.4345 -> 0.1840`; on an independent
+retained 962px Custom Pixal input, it changed `3.9961 -> 0.1269`.
+
+
 ## 2026-09-11 10:49:35 CST — consolidated best Redwood10 and Custom10 delivery
 
 **User request.** Preserve the best previous Redwood and Custom experiments,
@@ -1148,3 +1352,49 @@ terminate at `pixal_native_moge_then_camera2_to_camera1_bridge`; every final
 contains 100,000 points and is SHA-256 byte-identical to the first accepted
 run. The rerun batch manifest is `registration/batch_manifest.json`, and its
 uniform final entry points are `final/<sample>/complete_100k.ply`.
+
+## 2026-09-20 — accepted selected-carrier iterative posterior mainline
+
+**User approval.** The user accepted the corrected selected-carrier,
+three-round residual re-linearization as the object-completion mainline. Keep
+the `registration_selected` start point and the fixed three-round schedule;
+do not revert to the stale `registration_initial` carrier or add category- or
+sample-specific branches without asking.
+
+**Exact artifacts.** The standalone result bundle is
+`workspace/tto_relinearized_selected_redwood_custom_20260920/`. Final carriers
+are `redwood/tto/<id>/round_03/posterior_prior_100k.ply` and
+`custom/tto/<id>/round_03/posterior_prior_100k.ply`; all 20 have exactly
+100,000 points. The complete sample list, no-GT residual histories, source
+paths, and fixed execution parameters are in `experiment_manifest.json`.
+Offline-only reports are
+`metrics/redwood10_tto_selected_round03.{csv,json}` and
+`metrics/custom10_tto_selected_round03.{csv,json}`.
+
+**Inputs and generation record.** This acceptance covers post-registration
+adaptation only; it performs no new semantic-image or 3D generation. The
+unchanged camera, semantic image, Pixal prior, partial and four-view residual
+manifest for every case are copied under the bundle's `redwood/inputs`,
+`redwood/residuals`, `custom/inputs`, and `custom/residuals` directories. Full
+per-case generation prompts, negative prompts, model paths/checkpoints,
+resize policies, and image-generation parameters are the copied source
+artifacts from
+`workspace/best_redwood_custom_camera1_transport_20260911/`; no new prompt,
+seed, scheduler, CFG, resolution, or backend is introduced here. Prompt and
+image-generator parameters for this TTO stage are therefore **NOT APPLICABLE**;
+the only learned geometric component is the already-installed local
+`PosteriorAdapter` implementation, with no checkpoint or task-data training.
+
+**Frozen postprocessing.** The exact start point is
+`registration_selected/<id>/camera1_amplified_registered_100k.ply`, followed
+by three outer residual re-linearization rounds at update strength `1.0` using
+`configs/posterior_mainline.json`. Each round re-estimates class-free partial
+OT and four-view positive evidence, preserves every carrier slot, and uses no
+GT/CD/EMD for inference, action selection, or stopping. Offline evaluation
+uses deterministic 16,384-point FPS (seed `6145`) after inference only.
+
+**Accepted result.** Corrected offline CD-L1/EMD (both x100) are
+`1.4872/2.4083` on Redwood10 and `1.8567/2.3406` on Custom10. These supersede
+the earlier Custom `10.3660/9.4913` audit, which is invalid because it started
+from stale pre-selection carriers. Do not use that earlier Custom report in
+comparisons.

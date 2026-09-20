@@ -39,7 +39,15 @@ def pixal_export_to_camera(distance: float) -> np.ndarray:
 
 
 def analytic_pixal_to_moge_initial(prior: np.ndarray, moge: np.ndarray, distance: float) -> np.ndarray:
-    """Apply the known camera transform and only resolve MoGe's depth gauge."""
+    """Apply the known camera transform and resolve MoGe's depth gauge.
+
+    The image raster size is deliberately absent from this calibration.  Both
+    point sets describe the same prepared Pixal input camera, but their metric
+    gauges differ: Pixal exports a unit-scale asset whereas MoGe recovers a
+    monocular camera-depth gauge.  A robust positive-depth ratio therefore
+    remains valid if the semantic image is resampled, tightly cropped, or has
+    a different native resolution.
+    """
     prior_camera = apply_transform(prior, pixal_export_to_camera(distance))
     source_depth = prior_camera[:, 2]
     target_depth = np.asarray(moge, dtype=np.float64)[:, 2]
@@ -50,8 +58,13 @@ def analytic_pixal_to_moge_initial(prior: np.ndarray, moge: np.ndarray, distance
     # Global monocular scale is free. Scaling *camera-frame* coordinates keeps
     # the known image projection fixed and maps Pixal's conditioned distance to
     # the MoGe depth gauge without inventing an arbitrary 3-D translation.
+    # Do not clamp this observable gauge to a fixed numeric interval: its
+    # magnitude depends on the generated input image and MoGe's depth gauge,
+    # not on object category or geometry.  A former upper cap of 4.0 silently
+    # left valid native MoGe placements at the wrong metric scale.
     scale = float(np.median(target_depth) / np.median(source_depth))
-    scale = float(np.clip(scale, 0.25, 4.0))
+    if not np.isfinite(scale) or scale <= 0.0:
+        raise ValueError("analytic Pixal-to-MoGe depth scale must be positive and finite")
     transform = pixal_export_to_camera(distance)
     transform[:3, :] *= scale
     return transform

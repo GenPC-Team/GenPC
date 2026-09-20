@@ -24,7 +24,7 @@ import torch
 import trimesh
 
 
-POINT_COUNT = 16_384
+DEFAULT_POINT_COUNT = 16_384
 FOV_DEGREES = 50.0
 FRAME_FILL = 0.82
 
@@ -48,6 +48,9 @@ SPECS = (
     SampleSpec("hydra_creature", "hydra_creature", 289.0, 18.0, 614505),
     SampleSpec("domestic_pig", "domestic_pig", 197.0, -22.0, 614506),
     SampleSpec("light_helicopter", "light_helicopter", 311.0, 17.0, 614507),
+    # Same non-orthogonal acquisition convention as the other helicopter.  This
+    # is an input-data camera choice, not a category-specific reconstruction rule.
+    SampleSpec("seahawk_helicopter", "seahawk_helicopter", 311.0, 17.0, 614511),
     SampleSpec("cartoon_fox", "cartoon_fox", 73.0, -26.0, 614508),
     SampleSpec("tyrannosaurus_rex_skeleton", "tyrannosaurus_rex_skeleton", 163.0, 25.0, 614509),
     SampleSpec("wolf", "wolf", 277.0, -18.0, 614510),
@@ -104,7 +107,8 @@ def _fit_camera_distance(vertices: np.ndarray, rotation: np.ndarray, focal: floa
     return high
 
 
-def _raycast_partial(mesh: trimesh.Trimesh, spec: SampleSpec) -> tuple[np.ndarray, np.ndarray, dict[str, object]]:
+def _raycast_partial(mesh: trimesh.Trimesh, spec: SampleSpec,
+                     required_hits: int) -> tuple[np.ndarray, np.ndarray, dict[str, object]]:
     rotation, eye_direction = _camera_rotation(spec.azimuth_degrees, spec.elevation_degrees)
     for resolution in (1024, 1536, 2048):
         focal = 0.5 * (resolution - 1) / math.tan(math.radians(FOV_DEGREES) * 0.5)
@@ -124,7 +128,7 @@ def _raycast_partial(mesh: trimesh.Trimesh, spec: SampleSpec) -> tuple[np.ndarra
         rays = scene.create_rays_pinhole(intrinsic, extrinsic, resolution, resolution)
         hit_distance = scene.cast_rays(rays)["t_hit"].numpy()
         valid = np.isfinite(hit_distance)
-        if int(valid.sum()) >= POINT_COUNT:
+        if int(valid.sum()) >= required_hits:
             ray_values = rays.numpy()
             hits = ray_values[..., :3][valid] + ray_values[..., 3:][valid] * hit_distance[valid, None]
             depth = np.zeros((resolution, resolution), dtype=np.float32)
@@ -146,7 +150,7 @@ def _raycast_partial(mesh: trimesh.Trimesh, spec: SampleSpec) -> tuple[np.ndarra
                 "point_uv_origin": "top-left",
             }
             return hits.astype(np.float64), depth, camera
-    raise RuntimeError(f"{spec.label}: fewer than {POINT_COUNT} ray hits at 2048 px")
+    raise RuntimeError(f"{spec.label}: fewer than {required_hits} ray hits at 2048 px")
 
 
 def _write_depth(path: Path, depth: np.ndarray) -> None:
@@ -165,17 +169,40 @@ def _target_paths(root: Path, spec: SampleSpec) -> tuple[Path, Path, Path]:
     return scan / f"{spec.label}_partial.ply", scan / "depth.npy", scan / "depth.png"
 
 
-def _update_sample_record(root: Path, glb_root: Path, spec: SampleSpec, camera: dict[str, object]) -> None:
+def _write_ground_truth(root: Path, spec: SampleSpec, mesh: trimesh.Trimesh,
+                        point_count: int) -> Path:
+    """Write the normalized complete surface used only for offline evaluation."""
+    gt_path = root / spec.directory / "gt_data" / f"{spec.label}_gt.ply"
+    gt_path.parent.mkdir(parents=True, exist_ok=True)
+    rng = np.random.get_state()
+    try:
+        np.random.seed(spec.seed)
+        points, _ = trimesh.sample.sample_surface(mesh, point_count)
+    finally:
+        np.random.set_state(rng)
+    cloud = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(points.astype(np.float64)))
+    if not o3d.io.write_point_cloud(str(gt_path), cloud, write_ascii=False, compressed=False):
+        raise IOError(f"Could not write {gt_path}")
+    return gt_path
+
+
+def _update_sample_record(root: Path, glb_root: Path, spec: SampleSpec, camera: dict[str, object],
+                          partial_count: int) -> None:
     record_path = root / spec.directory / "sample.json"
-    if not record_path.is_file():
-        return
-    record = json.loads(record_path.read_text())
+    record = json.loads(record_path.read_text()) if record_path.is_file() else {
+        "sample_id": spec.directory,
+        "seed": spec.seed,
+        "normalization": {
+            "normalization": "(point - source_bounds_center) / source_max_extent",
+            "source_bounds": "recorded in source GLB; normalized in sampler",
+        },
+    }
     partial, depth_npy, depth_png = _target_paths(root, spec)
     gt = next((root / spec.directory / "gt_data").glob("*_gt.ply"))
     record["category"] = spec.label.replace("_", " ")
     record["source_glb"] = str((glb_root / f"{spec.label}.glb").resolve())
     record["camera"] = camera
-    record["partial_points"] = POINT_COUNT
+    record["partial_points"] = int(partial_count)
     record["resampled_partial"] = {
         "view": "fixed non-orthogonal pinhole",
         "seed": spec.seed,
@@ -198,7 +225,8 @@ def _update_sample_record(root: Path, glb_root: Path, spec: SampleSpec, camera: 
 
 
 def _update_collection_manifests(root: Path, glb_root: Path,
-                                 records: list[tuple[SampleSpec, dict[str, object]]]) -> None:
+                                 records: list[tuple[SampleSpec, dict[str, object]]],
+                                 partial_count: int) -> None:
     by_directory = {spec.directory: (spec, camera) for spec, camera in records}
     manifest_path = root / "manifest.json"
     if manifest_path.is_file():
@@ -212,7 +240,7 @@ def _update_collection_manifests(root: Path, glb_root: Path,
             gt = next((root / spec.directory / "gt_data").glob("*_gt.ply"))
             item["source_glb"] = str((glb_root / f"{spec.label}.glb").resolve())
             item["camera"] = camera
-            item["partial_points"] = POINT_COUNT
+            item["partial_points"] = int(partial_count)
             outputs = item.setdefault("outputs", {})
             outputs.update({"gt": str(gt.resolve()), "partial": str(partial.resolve()),
                             "depth_npy": str(depth_npy.resolve()), "depth_png": str(depth_png.resolve()),
@@ -235,7 +263,7 @@ def _update_collection_manifests(root: Path, glb_root: Path,
             item["source_glb"] = str((glb_root / f"{spec.label}.glb").resolve())
             construction = item.setdefault("dataset_construction", {})
             construction.update({"partial": "single visible-surface scan via fixed non-orthogonal Open3D pinhole",
-                                 "partial_points": POINT_COUNT, "sensor_camera": camera["eye"],
+                                 "partial_points": int(partial_count), "sensor_camera": camera["eye"],
                                  "sensor_fov_deg": FOV_DEGREES, "sensor_resolution": camera["image_size"],
                                  "visible_surface_points": camera["visible_surface_points"]})
             outputs = item.setdefault("outputs", {})
@@ -284,7 +312,7 @@ def _write_outputs(root: Path, glb_root: Path, spec: SampleSpec, points: np.ndar
         device="cpu",
     )
     torch.save(saved_camera, partial.parent / "camera.pth")
-    _update_sample_record(root, glb_root, spec, camera)
+    _update_sample_record(root, glb_root, spec, camera, len(points))
 
 
 def main() -> None:
@@ -296,26 +324,34 @@ def main() -> None:
     parser.add_argument("--mirror-glb-root", type=Path,
                         help="GLB directory corresponding to --mirror-root (defaults to --mirror-root).")
     parser.add_argument("--samples", nargs="*", choices=[spec.label for spec in SPECS])
+    parser.add_argument("--partial-count", type=int, default=DEFAULT_POINT_COUNT,
+                        help="Number of observed surface points per partial scan.")
+    parser.add_argument("--gt-count", type=int, default=DEFAULT_POINT_COUNT,
+                        help="Number of normalized complete points saved for offline evaluation.")
     args = parser.parse_args()
+    if args.partial_count <= 0 or args.gt_count <= 0:
+        raise ValueError("--partial-count and --gt-count must be positive")
     selected = [spec for spec in SPECS if not args.samples or spec.label in args.samples]
     mirror_glb_root = args.mirror_glb_root or args.mirror_root
     generated: list[tuple[SampleSpec, dict[str, object]]] = []
     for spec in selected:
         mesh = _normalised_mesh(args.glb_root / f"{spec.label}.glb")
-        hits, depth, camera = _raycast_partial(mesh, spec)
-        indices = np.random.default_rng(spec.seed).choice(len(hits), POINT_COUNT, replace=False)
+        _write_ground_truth(args.root, spec, mesh, args.gt_count)
+        hits, depth, camera = _raycast_partial(mesh, spec, args.partial_count)
+        indices = np.random.default_rng(spec.seed).choice(len(hits), args.partial_count, replace=False)
         points = hits[indices]
         _write_outputs(args.root, args.glb_root, spec, points, depth, camera)
         if args.mirror_root is not None:
             if mirror_glb_root is None:
                 raise ValueError("--mirror-glb-root is required when --mirror-root is set")
+            _write_ground_truth(args.mirror_root, spec, mesh, args.gt_count)
             _write_outputs(args.mirror_root, mirror_glb_root, spec, points, depth, camera)
         generated.append((spec, camera))
         print(json.dumps({"sample": spec.label, "view": [spec.azimuth_degrees, spec.elevation_degrees],
                           "visible_points": len(hits), "partial_points": len(points)}, sort_keys=True))
-    _update_collection_manifests(args.root, args.glb_root, generated)
+    _update_collection_manifests(args.root, args.glb_root, generated, args.partial_count)
     if args.mirror_root is not None:
-        _update_collection_manifests(args.mirror_root, mirror_glb_root, generated)
+        _update_collection_manifests(args.mirror_root, mirror_glb_root, generated, args.partial_count)
 
 
 if __name__ == "__main__":

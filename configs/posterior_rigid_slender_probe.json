@@ -1,0 +1,8 @@
+{
+  "integrated_observation_fusion": true,
+  "assimilation_anchor_residual_ratio": 0.075,
+  "assimilation_data_weight": 4.0,
+  "assimilation_iterations": 5,
+  "assimilation_displacement_ratio": 0.14,
+  "slender_rigidity_projection": true
+}

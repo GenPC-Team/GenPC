@@ -39,8 +39,12 @@ misalignment.
 
 The initial placement composes native Pixal-to-MoGe geometry, pixel-indexed
 MoGe-to-partial evidence, and bounded Camera-1 Observation-Consistent Prior
-Registration. Its projective-consistency and visible-surface-consistency terms
-jointly constrain every global transform to be a proper similarity,
+Registration.  Native Pixal-to-MoGe placement first calibrates the free
+monocular metric gauge by the robust ratio of their positive camera depths.
+This calibration is independent of raster resolution, image resampling, and
+foreground crop; it does not impose a fixed numerical scale cap. Its
+projective-consistency and visible-surface-consistency terms jointly constrain
+every global transform to be a proper similarity,
 
 \[
 T(x)=sRx+t, \qquad R\in SO(3),\quad s>0.

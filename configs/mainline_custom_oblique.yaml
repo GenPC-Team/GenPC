@@ -18,6 +18,7 @@ sample_ids:
   - hydra_creature
   - domestic_pig
   - light_helicopter
+  - seahawk_helicopter
   - cartoon_fox
   - tyrannosaurus_rex_skeleton
   - wolf
@@ -29,6 +30,7 @@ prompt_overrides:
   hydra_creature: "three-headed dragon (hydra) with exactly three distinct heads and long necks"
   domestic_pig: "domestic pig"
   light_helicopter: "light helicopter"
+  seahawk_helicopter: "Seahawk helicopter with a main rotor, tail boom, tail rotor, cockpit, landing gear, and external equipment"
   cartoon_fox: "cartoon fox"
   tyrannosaurus_rex_skeleton: "tyrannosaurus rex skeleton"
   wolf: "wolf"

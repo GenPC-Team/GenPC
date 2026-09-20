@@ -4,6 +4,7 @@ import numpy as np
 
 from scripts.run_pixal_native_moge_registration import load_points_and_colors, native_pixal_moge_observation
 from src.pixal_moge_analytic_registration import (
+    analytic_pixal_to_moge_initial,
     pixal_export_to_camera,
     visible_ray_depth_scale_step,
     visible_mask_translation_step,
@@ -25,6 +26,22 @@ def test_pixal_export_camera_transform_has_opencv_positive_forward_depth():
     # appears at positive depth 2 in OpenCV camera coordinates.
     assert transform[2, 3] == 2.0
     assert np.allclose(transform[:3, :3], np.diag([-1., -1., 1.]))
+
+
+def test_analytic_native_scale_uses_observed_depth_gauge_without_fixed_clip():
+    # The calibration operates only in the shared camera coordinate system.
+    # Its correct value must not depend on the input image's raster dimensions
+    # and must support ordinary monocular gauges larger than the old 4x cap.
+    prototype = np.array([[0., 0., 0.], [.2, -.1, .1], [-.1, .1, -.1]])
+    # Match the estimator's minimum valid-object support without changing the
+    # camera-depth distribution.
+    prior = np.repeat(prototype, 32, axis=0)
+    base = pixal_export_to_camera(1.0)
+    expected_scale = 8.5
+    moge = (prior @ base[:3, :3].T + base[:3, 3]) * expected_scale
+    transform = analytic_pixal_to_moge_initial(prior, moge, distance=1.0)
+    assert np.allclose(transform[:3, :3], base[:3, :3] * expected_scale)
+    assert np.allclose(transform[:3, 3], base[:3, 3] * expected_scale)
 
 
 def test_visible_mask_translation_step_moves_prior_towards_target_in_camera_xy():
