@@ -357,6 +357,8 @@ released object-completion route and its immediate maintenance work.
   both selected registration and the final 100k posterior byte-for-byte; the
   SHA-256 audit is stored at
   `reports/reproduction_smoke_01184.json` inside the package.
-- [ ] Remove legacy workspace experiment roots only after the package checksum
-  audit and the complete test suite pass. Preserve the package itself and the
-  paper assets copied inside it.
+- [x] After the package checksum audit and all 95 tests passed, remove the 35
+  legacy workspace experiment roots. `workspace/` now contains only the
+  811 MiB reproduction package (previously approximately 17 GiB). Re-run 01184
+  from that package after deletion and again reproduce selected registration
+  and posterior byte-for-byte, proving that no deleted path is required.

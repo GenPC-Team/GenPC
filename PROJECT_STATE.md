@@ -1788,3 +1788,11 @@ byte-for-byte. The report is
 The complete Python suite passes 95 tests. Retained Fox paper figures,
 textured/blue overlay and textured observation-anchored fused carrier are in
 the package's `paper_assets/cartoon_fox/` directory.
+
+**Cleanup completion.** After the checksum/test gate, 35 legacy experiment
+directories were permanently removed from `workspace/`; they are not
+recoverable from the filesystem. The canonical package was explicitly
+excluded and is now the only workspace directory (811 MiB versus roughly
+17 GiB before cleanup). A second full 01184 replay was then run after deletion
+using only the package and repository code; both hashes above remained exact,
+so the package has no runtime dependency on a removed experiment path.
