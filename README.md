@@ -109,6 +109,35 @@ CUDA_VISIBLE_DEVICES=0 $PY scripts/run_iterative_posterior_batch.py \
   --outer-rounds 3
 ```
 
+Single-pass PosteriorAdapter runs use the `lean` output profile by default.
+It keeps only the final carrier, matched before/after partial overlays,
+Camera-1 image, multi-view board, and JSON audit. Use
+`--output-profile debug` only for a
+focused diagnosis that needs coarse carriers, support masks, OT pairs, or the
+dense deformation field. An existing full experiment can be exposed as a
+compact, zero-copy review tree with `scripts/make_posterior_review_bundle.py`.
+
+For a portable, cleanup-safe replay beginning at the retained Pixal3D stage,
+build a physical-copy package with `scripts/package_mainline_reproduction.py`.
+The accepted Redwood10 + Custom12 package is
+`workspace/compagent_pixal_reproduction_20260925/`. It contains Camera-1
+depth/semantic assets, camera/UV data, partials, Pixal3D GLBs and ordered 100k
+carriers, native MoGe caches, portable four-view camera manifests, selected
+registration checkpoints, final posterior reviews, metrics, and paper assets.
+Replay one sample with:
+
+```bash
+CUDA_VISIBLE_DEVICES=0 $PY scripts/reproduce_packaged_mainline.py \
+  --bundle-root workspace/compagent_pixal_reproduction_20260925 \
+  --dataset redwood --samples 01184 \
+  --output-root workspace/replay_01184
+```
+
+The replay performs the initial Pixal--MoGe registration, the shared monotonic
+Camera-1 broad continuation, and the posterior solve. Its SHA-256 report must
+match the packaged registered carrier and posterior before legacy workspace
+artifacts are removed.
+
 The final prediction is
 `workspace/posterior_run/<sample>/round_03/posterior_prior_100k.ply`. Each
 sample also contains the registered start point, every intermediate carrier,
@@ -147,12 +176,17 @@ CUDA_VISIBLE_DEVICES=0 $PY scripts/evaluate_completions.py \
 ## Repository layout
 
 ```text
-src/posterior_adapter.py              structure OT and posterior deformation
+src/posterior_types.py                immutable posterior configuration/results
+src/partial_transport.py              visibility-aware structural Partial OT
+src/posterior_deformation.py          embedded-ARAP complete-carrier deformation
+src/carrier_protection.py             integrity and residual-motion projection
+src/posterior_adapter.py              posterior stage orchestration facade
 src/deformation_graph.py              reusable graph and strain primitives
 src/multiview_diagnostics.py          informative camera selection/rendering
 src/multiview_partial_evidence.py     prior-to-partial residual visualization
 scripts/iterative_posterior_tto.py    three-round one-sample re-linearization
 scripts/run_iterative_posterior_batch.py dataset-independent batch inference
+scripts/check_posterior_regression.py pointwise frozen-output regression gate
 scripts/run_multiview_diagnostics.py  optional four-view audit
 src/observation_anchored_fusion.py    four-view positive observation evidence
 scripts/run_scene_completion.py       independent scene-level extension

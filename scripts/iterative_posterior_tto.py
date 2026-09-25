@@ -38,6 +38,7 @@ from src.observation_anchored_fusion import (
     positive_multiview_pairs,
 )
 from src.pointcloud_io import jsonable, load_points, write_compare, write_points
+from src.carrier_protection import project_reference_carrier_protection
 from src.posterior_adapter import PosteriorAdapter, PosteriorAdapterConfig
 from src.saved_camera import SavedCameraProjector, draw_projection_overlay
 
@@ -134,13 +135,117 @@ def main() -> None:
         ),
     )
     parser.add_argument("--device", default="cuda")
+    parser.add_argument(
+        "--transport-all-views", action="store_true",
+        help=(
+            "Use all four saved cameras inside Partial OT. The default keeps "
+            "Camera-1-only transport for backward-compatible mainline runs."
+        ),
+    )
     parser.add_argument("--render-size", type=int, default=512)
     parser.add_argument("--padding", type=float, default=.15)
+    parser.add_argument(
+        "--support-projection-strength", type=float, default=1.0,
+        help="Category-free data-weight multiplier for residual-supported prior protection.",
+    )
+    parser.add_argument(
+        "--support-continuation-hops", type=int, default=0,
+        help=(
+            "Optional finite rest-graph continuation for positive residual motion; "
+            "zero keeps the default embedded-ARAP projection."
+        ),
+    )
+    parser.add_argument(
+        "--support-hard-target-constraints", action="store_true",
+        help="Use exact, multi-view residual targets as ARAP graph constraints.",
+    )
+    parser.add_argument(
+        "--support-coherent-raw-field", action="store_true",
+        help=(
+            "Keep only residual-dense, graph-coherent raw posterior motion "
+            "before reference-carrier protection."
+        ),
+    )
+    parser.add_argument(
+        "--support-local-motion-selection", action="store_true",
+        help=(
+            "Select high local-motion positive anchors after removing the raw "
+            "proposal's global Sim(3) drift."
+        ),
+    )
+    parser.add_argument(
+        "--support-motion-smoothing-steps", type=int, default=0,
+        help=(
+            "Optional graph-median smoothing passes on positive local-motion evidence "
+            "before finite continuation; zero keeps raw evidence motion."
+        ),
+    )
+    parser.add_argument(
+        "--support-componentwise-similarity", action="store_true",
+        help=(
+            "Project coherent positive-evidence graph components onto local proper "
+            "Sim(3) motions before smoothing and finite continuation."
+        ),
+    )
+    parser.add_argument(
+        "--support-component-similarity-core-hops", type=int, default=0,
+        help=(
+            "Rest-graph hops used to extend each coherent positive Sim(3) motion "
+            "across its local carrier surface before smooth continuation."
+        ),
+    )
+    parser.add_argument(
+        "--support-component-similarity-gain", type=float, default=1.0,
+        help=(
+            "Dimensionless proper-Sim(3) extrapolation gain for coherent "
+            "positive-evidence components; one preserves the inferred motion."
+        ),
+    )
+    parser.add_argument(
+        "--reference-prior-protection", action="store_true",
+        help=(
+            "Line-search each outer update against the registered complete carrier, "
+            "preserving no-GT surface coverage and graph connectivity."
+        ),
+    )
+    parser.add_argument(
+        "--reference-protection-incremental-update", action="store_true",
+        help=(
+            "Apply each protected local update from the current re-linearized carrier, "
+            "while retaining the registered prior as the immutable integrity reference."
+        ),
+    )
+    parser.add_argument(
+        "--reference-maximum-edge-stretch", type=float,
+        help=(
+            "Optional robust p99 rest-edge stretch budget for the experimental "
+            "complete-prior guard; unset reuses the posterior configuration."
+        ),
+    )
+    parser.add_argument(
+        "--slender-rigidity-projection", action="store_true",
+        help=(
+            "Enable the existing covariance-and-graph-based rigid projection for "
+            "automatically detected elongated structures in this diagnostic run."
+        ),
+    )
     args = parser.parse_args()
     if args.outer_rounds < 1:
         raise ValueError("--outer-rounds must be positive")
     if not 0. < args.update_strength <= 2.0:
         raise ValueError("--update-strength must lie in (0, 2]")
+    if float(args.support_projection_strength) <= 0.:
+        raise ValueError("--support-projection-strength must be positive")
+    if int(args.support_continuation_hops) < 0:
+        raise ValueError("--support-continuation-hops must be non-negative")
+    if int(args.support_motion_smoothing_steps) < 0:
+        raise ValueError("--support-motion-smoothing-steps must be non-negative")
+    if int(args.support_component_similarity_core_hops) < 0:
+        raise ValueError("--support-component-similarity-core-hops must be non-negative")
+    if float(args.support_component_similarity_gain) <= 0.:
+        raise ValueError("--support-component-similarity-gain must be positive")
+    if args.reference_maximum_edge_stretch is not None and float(args.reference_maximum_edge_stretch) <= 1.:
+        raise ValueError("--reference-maximum-edge-stretch must exceed one")
 
     initial = load_points(args.prior)
     partial = load_points(args.partial)
@@ -161,6 +266,7 @@ def main() -> None:
         assimilation_displacement_ratio=min(
             float(base.assimilation_displacement_ratio) * float(args.update_strength), .20,
         ),
+        slender_rigidity_projection=bool(args.slender_rigidity_projection),
     )
     config.validate()
 
@@ -184,10 +290,46 @@ def main() -> None:
 
     for index in range(1, int(args.outer_rounds) + 1):
         adapter = PosteriorAdapter(config, device=args.device)
-        updated, estimate, _ = adapter.run(
+        updated, estimate, masks = adapter.run(
             current, partial, projector,
-            view_projectors=views, transport_projectors=(projector,),
+            view_projectors=views,
+            transport_projectors=views if args.transport_all_views else (projector,),
         )
+        reference_protection = {"active": False, "reason": "disabled"}
+        if bool(args.reference_prior_protection):
+            positive_support = np.asarray(masks["supported_residual"], dtype=bool)
+            if bool(args.support_local_motion_selection):
+                positive_support |= np.asarray(masks["assimilation_anchor"], dtype=bool)
+            updated, reference_protection = project_reference_carrier_protection(
+                initial, updated,
+                neighbours=int(config.fine_neighbours),
+                edge_ratio=float(config.fine_edge_ratio),
+                minimum_hidden_coverage=float(config.minimum_hidden_coverage),
+                minimum_edge_compression=float(config.minimum_edge_compression),
+                maximum_edge_stretch=float(
+                    config.maximum_edge_stretch
+                    if args.reference_maximum_edge_stretch is None
+                    else args.reference_maximum_edge_stretch
+                ),
+                coverage_resolution=int(config.coverage_resolution),
+                # Only reliable *residual* support is allowed to retain its
+                # full raw displacement.  Matched observation anchors are
+                # already explained and remain implicit prior-protection
+                # boundary conditions rather than being pulled again.
+                positive_evidence_mask=positive_support,
+                fallback_carrier=current,
+                update_reference=current if bool(args.reference_protection_incremental_update) else None,
+                deformation_config=config,
+                support_data_weight_scale=float(args.support_projection_strength),
+                support_continuation_hops=int(args.support_continuation_hops),
+                support_hard_target_constraints=bool(args.support_hard_target_constraints),
+                support_coherent_raw_field=bool(args.support_coherent_raw_field),
+                support_local_motion_selection=bool(args.support_local_motion_selection),
+                support_motion_smoothing_steps=int(args.support_motion_smoothing_steps),
+                support_componentwise_similarity=bool(args.support_componentwise_similarity),
+                support_component_similarity_core_hops=int(args.support_component_similarity_core_hops),
+                support_component_similarity_gain=float(args.support_component_similarity_gain),
+            )
         evidence = _round_evidence(partial, updated, views)
         camera1 = visible_score(
             partial, updated, projector,
@@ -203,6 +345,7 @@ def main() -> None:
             "movement_p95": float(np.quantile(movement, .95)),
             "movement_max": float(movement.max(initial=0.)),
             "estimate": estimate,
+            "reference_prior_protection": reference_protection,
         }
         _write_round(
             output / f"round_{index:02d}",
@@ -229,6 +372,23 @@ def main() -> None:
         "resolved_config": asdict(config),
         "outer_rounds": int(args.outer_rounds),
         "update_strength": float(args.update_strength),
+        "transport_all_views": bool(args.transport_all_views),
+        "reference_prior_protection": bool(args.reference_prior_protection),
+        "reference_protection_incremental_update": bool(args.reference_protection_incremental_update),
+        "reference_maximum_edge_stretch": (
+            None if args.reference_maximum_edge_stretch is None
+            else float(args.reference_maximum_edge_stretch)
+        ),
+        "slender_rigidity_projection": bool(args.slender_rigidity_projection),
+        "support_projection_strength": float(args.support_projection_strength),
+        "support_continuation_hops": int(args.support_continuation_hops),
+        "support_hard_target_constraints": bool(args.support_hard_target_constraints),
+        "support_coherent_raw_field": bool(args.support_coherent_raw_field),
+        "support_local_motion_selection": bool(args.support_local_motion_selection),
+        "support_motion_smoothing_steps": int(args.support_motion_smoothing_steps),
+        "support_componentwise_similarity": bool(args.support_componentwise_similarity),
+        "support_component_similarity_core_hops": int(args.support_component_similarity_core_hops),
+        "support_component_similarity_gain": float(args.support_component_similarity_gain),
         "round_00": {"four_view": initial_evidence, "camera1": initial_score},
         "rounds": rounds,
         "best_no_gt_observation_round": int(best_round),

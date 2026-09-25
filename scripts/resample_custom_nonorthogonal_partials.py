@@ -57,6 +57,31 @@ SPECS = (
 )
 
 
+def _parse_sample_spec(value: str) -> SampleSpec:
+    """Parse a reusable ``label:azimuth:elevation:seed`` custom GLB request."""
+    fields = value.split(":")
+    if len(fields) != 4:
+        raise argparse.ArgumentTypeError(
+            "--sample-spec must be LABEL:AZIMUTH_DEGREES:ELEVATION_DEGREES:SEED"
+        )
+    label, azimuth, elevation, seed = fields
+    if not label or Path(label).name != label:
+        raise argparse.ArgumentTypeError("sample label must be a single directory name")
+    try:
+        azimuth_value = float(azimuth)
+        elevation_value = float(elevation)
+        seed_value = int(seed)
+    except ValueError as error:
+        raise argparse.ArgumentTypeError(
+            "sample azimuth/elevation must be floats and seed must be an integer"
+        ) from error
+    if not (np.isfinite(azimuth_value) and np.isfinite(elevation_value)):
+        raise argparse.ArgumentTypeError("sample azimuth/elevation must be finite")
+    if not -89.0 < elevation_value < 89.0:
+        raise argparse.ArgumentTypeError("sample elevation must lie in (-89, 89) degrees")
+    return SampleSpec(label, label, azimuth_value % 360.0, elevation_value, seed_value)
+
+
 def _normalised_mesh(path: Path) -> trimesh.Trimesh:
     scene = trimesh.load(path, force="scene")
     mesh = scene.to_geometry()
@@ -324,6 +349,13 @@ def main() -> None:
     parser.add_argument("--mirror-glb-root", type=Path,
                         help="GLB directory corresponding to --mirror-root (defaults to --mirror-root).")
     parser.add_argument("--samples", nargs="*", choices=[spec.label for spec in SPECS])
+    parser.add_argument(
+        "--sample-spec", action="append", default=[], metavar="LABEL:AZIMUTH:ELEVATION:SEED",
+        help=(
+            "Add a reusable custom GLB sampling request.  The camera is a deterministic "
+            "non-orthogonal pinhole specified directly in degrees; use this for newly added GLBs."
+        ),
+    )
     parser.add_argument("--partial-count", type=int, default=DEFAULT_POINT_COUNT,
                         help="Number of observed surface points per partial scan.")
     parser.add_argument("--gt-count", type=int, default=DEFAULT_POINT_COUNT,
@@ -331,7 +363,17 @@ def main() -> None:
     args = parser.parse_args()
     if args.partial_count <= 0 or args.gt_count <= 0:
         raise ValueError("--partial-count and --gt-count must be positive")
-    selected = [spec for spec in SPECS if not args.samples or spec.label in args.samples]
+    requested = [_parse_sample_spec(value) for value in args.sample_spec]
+    if args.samples:
+        selected = [spec for spec in SPECS if spec.label in args.samples]
+    elif requested:
+        selected = []
+    else:
+        selected = list(SPECS)
+    selected.extend(requested)
+    labels = [spec.label for spec in selected]
+    if len(labels) != len(set(labels)):
+        parser.error("--samples and --sample-spec must not request the same label twice")
     mirror_glb_root = args.mirror_glb_root or args.mirror_root
     generated: list[tuple[SampleSpec, dict[str, object]]] = []
     for spec in selected:

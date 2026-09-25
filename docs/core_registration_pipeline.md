@@ -139,6 +139,25 @@ four-view positive evidence from the previous carrier. This fixed
 re-linearization schedule introduces neither training nor a sample-specific
 decision rule.
 
+### Implementation boundaries
+
+The implementation follows the mathematical stages instead of collecting all
+posterior logic in one file:
+
+- `posterior_types.py` owns the immutable configuration and transport result;
+- `partial_transport.py` owns visibility-aware structural OT and support-state
+  estimation;
+- `posterior_deformation.py` owns embedded-ARAP, attachment edges, coverage,
+  and complete-carrier deformation;
+- `carrier_protection.py` owns reference-carrier integrity, finite residual
+  propagation, topology repair, and optional structure projections;
+- `posterior_adapter.py` is the orchestration facade and audit-record builder.
+
+The facade preserves historical experiment imports. A refactor is accepted
+only when every ordered carrier slot matches the frozen Redwood and Custom
+outputs within the configured numerical tolerance; aggregate CD/EMD gains
+cannot compensate for a regressed sample.
+
 ## 6. Four-view observation-anchored fusion
 
 The posterior deformation resolves shape disagreement, but an adapted prior is
@@ -186,6 +205,23 @@ GT metrics are computed later by a separate process and cannot affect
 inference.
 
 ## 8. Artifact contract
+
+`scripts/run_posterior_adapter.py` and its batch wrapper default to a lean
+six-file contract: final posterior, registered-prior/partial comparison,
+posterior/partial comparison, Camera-1 projection, multi-view projection, and
+the JSON audit. Numerical arrays and
+solver-only visualizations are written only with `--output-profile debug`.
+This changes artifact retention only; it does not change inference.
+
+For environment migration and workspace cleanup,
+`scripts/package_mainline_reproduction.py` materializes a self-contained
+Pixal3D-stage package. It copies rather than symlinks the Camera-1 observation,
+partial, Pixal3D GLB/carrier/metadata, native MoGe cache, selected four-camera
+poses, selected-registration checkpoint, lean posterior review, and inference
+configs. `scripts/reproduce_packaged_mainline.py` replays the fixed initial
+registration followed by the shared monotonic Camera-1 broad continuation and
+then posterior inference. Package integrity is checked by SHA-256 before any
+replay; no GT is included.
 
 For each sample, `scripts/iterative_posterior_tto.py` writes a registered
 round and three re-linearized rounds:

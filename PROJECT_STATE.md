@@ -1398,3 +1398,393 @@ uses deterministic 16,384-point FPS (seed `6145`) after inference only.
 the earlier Custom `10.3660/9.4913` audit, which is invalid because it started
 from stale pre-selection carriers. Do not use that earlier Custom report in
 comparisons.
+
+## 2026-09-21 — accepted cartoon-fox high-resolution posterior-adaptation candidate
+
+**User approval.** The user judged the high-resolution continuous deformation
+for `cartoon_fox` to be materially better ("看起来确实好多了"). Preserve this
+candidate and its exact profile for comparison; it is a focused stress-test
+candidate, not yet a replacement for the accepted shared mainline.
+
+**Inputs.** The fixed partial, GT, Camera-1 calibration, semantic image,
+Pixal carrier, selected registration and four-view residual evidence are,
+respectively:
+`workspace/tto_relinearized_selected_redwood_custom_20260920/custom/inputs/partial/cartoon_fox.ply`,
+`workspace/tto_relinearized_selected_redwood_custom_20260920/custom/gt/cartoon_fox.ply`,
+`workspace/tto_relinearized_selected_redwood_custom_20260920/custom/inputs/camera/cartoon_fox/camera.pth`,
+`workspace/tto_relinearized_selected_redwood_custom_20260920/custom/inputs/camera/cartoon_fox/img.png`,
+`workspace/tto_relinearized_selected_redwood_custom_20260920/custom/inputs/pixal/cartoon_fox/pixal3d_sampled_100k.ply`,
+`workspace/tto_relinearized_selected_redwood_custom_20260920/custom/registration_selected/cartoon_fox/camera1_amplified_registered_100k.ply`, and
+`workspace/tto_relinearized_selected_redwood_custom_20260920/custom/residuals/cartoon_fox/render/render_manifest.json`.
+
+**Semantic generation record.** Pixal3D model/checkpoint:
+`/opt/data/private/cr/lab/GenPC/models/Pixal3D-weights`; model seed `42`;
+requested/actual resolution `1024`; native camera
+`camera_angle_x=0.9110264018111831`, `distance=1.0206727981567383`,
+`mesh_scale=1.0`. The image-completion model/checkpoint, transformer,
+negative prompt, image seed, steps, CFG/guidance, scheduler, backend, and
+resize policy are **UNKNOWN** in the preserved source record. The semantic
+image was recorded at resolution `512`. Its full prompt, copied verbatim, is:
+
+> Generate one complete, realistic RGB object image from the supplied incomplete depth map. The object is a complete seated stylized cartoon fox. Treat every non-background depth pixel and its foreground mask as a hard ControlNet-like spatial constraint. Preserve the input camera viewpoint, perspective, image-plane center, apparent width and height, crop, orientation, visible silhouette, depth ordering, and all observed part locations. Do not rotate, mirror, recenter, rescale, widen, shorten, tilt, or redesign the observed object. Complete only genuinely missing or occluded regions, connect them naturally to the observed structure, and keep a single coherent object on a pure white background. Produce sharp boundaries and realistic materials suitable for image-to-3D reconstruction. Do not add text, logos, extra parts, secondary objects, or cast shadows that change the foreground mask. Additional structural constraints: Keep one connected body, exactly four naturally attached legs or paws, two ears, and one tail.
+
+**Frozen posterior-adaptation execution.** Starting from the selected
+registered 100k carrier, six residual re-linearization rounds were executed
+by `scripts/iterative_posterior_tto.py` on CUDA with render size `512`,
+padding `0.15`, update strength `1.0`, and the category-free profile
+`workspace/fox_posterior_adaptation_20260921/high_resolution_expansive_stable_profile.json`.
+The profile uses 6,144 partial samples, 12,288 prior/assimilation samples,
+32-neighbor normals, 80 transport iterations, 96 structural-rescue candidates,
+12 intrinsic landmarks, 16 intrinsic graph neighbors, normalized residual
+gates, and the recorded coarse/fine/assimilation regularizers. It retains every
+one of the 100,000 prior carrier slots, uses no category or part labels, and
+does not use GT, CD, or EMD during inference.
+
+**Accepted artifacts.** Final carrier:
+`workspace/fox_posterior_adaptation_20260921/high_resolution_expansive_stable/round_06/posterior_prior_100k.ply`.
+The approved partial-gray/prior-red overlay is
+`workspace/fox_posterior_adaptation_20260921/high_resolution_expansive_stable/round_06/partial_gray_posterior_red.ply`; the PCA diagnostic is
+`workspace/fox_posterior_adaptation_20260921/high_resolution_expansive_stable/round_06/partial_gray_posterior_red_pca_768.png`.
+Do not overwrite these outputs without copying them first.
+
+**Offline diagnostic (not used for selection).** With the same 16,384-point
+FPS and seed `6145`, the fixed three-round mainline scores CD-L1/EMD x100
+`2.3662/2.7546`, while this six-round high-resolution candidate scores
+`2.6489/4.1928`; reports are
+`workspace/fox_posterior_adaptation_20260921/metrics/baseline_round03.json`
+and
+`workspace/fox_posterior_adaptation_20260921/metrics/high_resolution_expansive_stable_round06.json`.
+Thus the candidate is visually closer in the approved partial overlay but
+regresses the global GT metrics and must not replace the mainline without a
+separate decision.
+
+## 2026-09-22 — retained cartoon-fox structure-propagated complete-carrier candidate
+
+**User feedback.** The user judged this protected deformation to improve the
+front legs substantially and to improve the tail, while asking for a stronger
+version. Preserve it as the current non-collapsing comparison baseline; it is
+not yet an accepted replacement for the shared mainline.
+
+**Inputs and model record.** The input partial, GT, Camera-1 calibration,
+semantic image, selected Pixal carrier and four-view manifest are exactly the
+same files listed in the preceding 2026-09-21 cartoon-fox entry. Pixal3D is
+`/opt/data/private/cr/lab/GenPC/models/Pixal3D-weights`, seed `42`, at native
+camera `camera_angle_x=0.9110264018111831`, distance
+`1.0206727981567383`, `mesh_scale=1.0`; semantic resolution is `512` and
+Pixal input resolution is `1024`. Image-completion checkpoint, transformer,
+negative prompt, image seed, steps, CFG/guidance, scheduler, backend and
+resize policy are `UNKNOWN` in the source run. The full semantic prompt is:
+
+> Generate one complete, realistic RGB object image from the supplied incomplete depth map. The object is a complete seated stylized cartoon fox. Treat every non-background depth pixel and its foreground mask as a hard ControlNet-like spatial constraint. Preserve the input camera viewpoint, perspective, image-plane center, apparent width and height, crop, orientation, visible silhouette, depth ordering, and all observed part locations. Do not rotate, mirror, recenter, rescale, widen, shorten, tilt, or redesign the observed object. Complete only genuinely missing or occluded regions, connect them naturally to the observed structure, and keep a single coherent object on a pure white background. Produce sharp boundaries and realistic materials suitable for image-to-3D reconstruction. Do not add text, logos, extra parts, secondary objects, or cast shadows that change the foreground mask. Additional structural constraints: Keep one connected body, exactly four naturally attached legs or paws, two ears, and one tail.
+
+**Execution.** `scripts/iterative_posterior_tto.py` ran six CUDA rounds from
+the fixed selected registration using the high-resolution profile above,
+reference-prior protection, incremental re-linearization, local-motion
+selection, component-wise proper Sim(3) projection with `4` rest-graph core
+hops, one graph-median smoothing pass, and `6` continuation hops. The robust
+p99 edge-stretch budget was `10.0`. This remains category-, part- and
+coordinate-free; it reads no GT/CD/EMD during inference, retains all 100,000
+carrier slots, and does not append or delete partial points.
+
+**Retained artifacts.** The before/after comparison is
+`workspace/fox_posterior_adaptation_20260921/local_motion_component_sim3_core4_harmonic6_incremental_stretch10_six_rounds/comparison/fox_before_after_structure_propagation.png`.
+The registered-before overlay is
+`workspace/fox_posterior_adaptation_20260921/local_motion_component_sim3_core4_harmonic6_incremental_stretch10_six_rounds/round_00_registered/partial_gray_posterior_red.ply`;
+the retained round-4 overlay and 100k posterior are
+`workspace/fox_posterior_adaptation_20260921/local_motion_component_sim3_core4_harmonic6_incremental_stretch10_six_rounds/round_04/partial_gray_posterior_red.ply`
+and
+`workspace/fox_posterior_adaptation_20260921/local_motion_component_sim3_core4_harmonic6_incremental_stretch10_six_rounds/round_04/posterior_prior_100k.ply`.
+
+**Offline diagnostic only.** Deterministic 16,384-point FPS, seed `6145`,
+gives CD-L1/EMD x100 `2.2220/2.9622` for round 4, improving on the preceding
+protected candidate's `2.2864/3.0544`. These values were measured only after
+the run and did not select the output or alter its parameters.
+
+## 2026-09-22 — accepted cartoon-fox high-amplitude structured posterior
+
+**User approval.** The user judged the stronger structured deformation to be
+good ("确实不错了"). Preserve this candidate; later strength trials use separate
+output roots and must not overwrite it.
+
+**Inputs and generation record.** Inputs, semantic image, Pixal carrier,
+Pixal3D model `/opt/data/private/cr/lab/GenPC/models/Pixal3D-weights`, seed
+`42`, native camera (`camera_angle_x=0.9110264018111831`, distance
+`1.0206727981567383`, `mesh_scale=1.0`), semantic/Pixal resolutions
+`512/1024`, and all `UNKNOWN` image-generation parameters are exactly those
+listed in the preceding 2026-09-22 fox entry. The full prompt is:
+
+> Generate one complete, realistic RGB object image from the supplied incomplete depth map. The object is a complete seated stylized cartoon fox. Treat every non-background depth pixel and its foreground mask as a hard ControlNet-like spatial constraint. Preserve the input camera viewpoint, perspective, image-plane center, apparent width and height, crop, orientation, visible silhouette, depth ordering, and all observed part locations. Do not rotate, mirror, recenter, rescale, widen, shorten, tilt, or redesign the observed object. Complete only genuinely missing or occluded regions, connect them naturally to the observed structure, and keep a single coherent object on a pure white background. Produce sharp boundaries and realistic materials suitable for image-to-3D reconstruction. Do not add text, logos, extra parts, secondary objects, or cast shadows that change the foreground mask. Additional structural constraints: Keep one connected body, exactly four naturally attached legs or paws, two ears, and one tail.
+
+**Frozen execution.** Six CUDA residual re-linearization rounds used the
+category-free profile
+`workspace/fox_posterior_adaptation_20260921/high_resolution_expansive_stable_profile.json`,
+incremental reference-prior protection, local-motion selection, component-wise
+proper Sim(3) with `6` core hops, zero motion-smoothing passes, `3`
+continuation hops, and robust p99 edge-stretch budget `15.0`. It has no
+category/part rule, fixed coordinate direction, GT/CD/EMD input or point
+addition/deletion; all 100,000 carrier slots remain present.
+
+**Accepted artifacts.** Final overlay and posterior:
+`workspace/fox_posterior_adaptation_20260921/local_motion_component_sim3_core6_harmonic3_incremental_stretch15_six_rounds/round_06/partial_gray_posterior_red.ply`
+and
+`workspace/fox_posterior_adaptation_20260921/local_motion_component_sim3_core6_harmonic3_incremental_stretch15_six_rounds/round_06/posterior_prior_100k.ply`.
+The review board is
+`workspace/fox_posterior_adaptation_20260921/local_motion_component_sim3_core6_harmonic3_incremental_stretch15_six_rounds/comparison/fox_before_after_stretch15.png`.
+
+**Offline diagnostic only.** Deterministic 16,384-point FPS/seed `6145` gives
+CD-L1/EMD x100 `1.9121/2.8281`; coverage is 92.48%. Metrics were measured
+after inference only and did not control any choice.
+
+## 2026-09-22 — accepted cartoon-fox stretch-20 structured posterior
+
+**User approval.** The user judged the stronger `stretch20` deformation to be
+substantially better ("确实好很多了"), while identifying local carrier-density
+holes in the stretched body as the next issue. Preserve this candidate as the
+strongest accepted fox alignment baseline; do not overwrite it.
+
+**Inputs and generation record.** Inputs, model/checkpoint
+`/opt/data/private/cr/lab/GenPC/models/Pixal3D-weights`, seed `42`, native
+camera (`camera_angle_x=0.9110264018111831`, distance
+`1.0206727981567383`, `mesh_scale=1.0`), resolution `512/1024`, and unknown
+image-generation fields are exactly those of the preceding 2026-09-22 entry.
+The full prompt is:
+
+> Generate one complete, realistic RGB object image from the supplied incomplete depth map. The object is a complete seated stylized cartoon fox. Treat every non-background depth pixel and its foreground mask as a hard ControlNet-like spatial constraint. Preserve the input camera viewpoint, perspective, image-plane center, apparent width and height, crop, orientation, visible silhouette, depth ordering, and all observed part locations. Do not rotate, mirror, recenter, rescale, widen, shorten, tilt, or redesign the observed object. Complete only genuinely missing or occluded regions, connect them naturally to the observed structure, and keep a single coherent object on a pure white background. Produce sharp boundaries and realistic materials suitable for image-to-3D reconstruction. Do not add text, logos, extra parts, secondary objects, or cast shadows that change the foreground mask. Additional structural constraints: Keep one connected body, exactly four naturally attached legs or paws, two ears, and one tail.
+
+**Frozen execution.** The class-free six-round CUDA configuration is unchanged
+except for robust p99 edge-stretch budget `20.0`: incremental reference-prior
+protection, local-motion selection, component-wise proper Sim(3), `6`
+core-hops, zero smoothing passes and `3` continuation hops. It retains all
+100,000 original carrier slots and uses neither category/part rules nor
+GT/CD/EMD during inference.
+
+**Accepted artifacts.** Final overlay and posterior:
+`workspace/fox_posterior_adaptation_20260921/local_motion_component_sim3_core6_harmonic3_incremental_stretch20_six_rounds/round_06/partial_gray_posterior_red.ply`
+and
+`workspace/fox_posterior_adaptation_20260921/local_motion_component_sim3_core6_harmonic3_incremental_stretch20_six_rounds/round_06/posterior_prior_100k.ply`.
+The review comparison is
+`workspace/fox_posterior_adaptation_20260921/local_motion_component_sim3_core6_harmonic3_incremental_stretch20_six_rounds/comparison/fox_before_after_stretch20.png`.
+
+**Offline diagnostic only.** Deterministic 16,384-point FPS/seed `6145` gives
+CD-L1/EMD x100 `1.8802/2.8259`, four-view residual `0.01124`, and fixed-frame
+carrier coverage `92.25%`; none were used to control inference.
+
+## 2026-09-22 — accepted fox visibility-gated dense expert distillation
+
+**User approval.** The user judged the combination of local fit and complete
+shape to be substantially better ("可以可以 好很多了"), while requesting a
+slightly stronger displacement at remaining tail/leg boundary samples.
+Preserve this candidate and do not overwrite it; stronger trials use separate
+directories.
+
+**Inputs.** Sample id: `cartoon_fox`. Registered complete carrier:
+`workspace/fox_posterior_adaptation_20260921/local_motion_component_sim3_gain135_core6_harmonic3_incremental_stretch25_six_rounds/round_00_registered/posterior_prior_100k.ply`.
+Strong local-fit teacher:
+`workspace/fox_posterior_adaptation_20260921/high_resolution_expansive_stable/round_06/posterior_prior_100k.ply`.
+Partial, GT, Camera-1, semantic image, Pixal carrier and four-view manifest are:
+`workspace/tto_relinearized_selected_redwood_custom_20260920/custom/inputs/partial/cartoon_fox.ply`,
+`workspace/tto_relinearized_selected_redwood_custom_20260920/custom/gt/cartoon_fox.ply`,
+`workspace/tto_relinearized_selected_redwood_custom_20260920/custom/inputs/camera/cartoon_fox/camera.pth`,
+`workspace/tto_relinearized_selected_redwood_custom_20260920/custom/inputs/camera/cartoon_fox/img.png`,
+`workspace/tto_relinearized_selected_redwood_custom_20260920/custom/inputs/pixal/cartoon_fox/pixal3d_sampled_100k.ply`, and
+`workspace/tto_relinearized_selected_redwood_custom_20260920/custom/residuals/cartoon_fox/render/render_manifest.json`.
+
+**Generation record.** Pixal3D model/checkpoint:
+`/opt/data/private/cr/lab/GenPC/models/Pixal3D-weights`; seed `42`; semantic
+resolution `512`; Pixal input resolution `1024`; native camera
+`camera_angle_x=0.9110264018111831`, distance `1.0206727981567383`, and
+`mesh_scale=1.0`. Image-completion checkpoint, transformer, negative prompt,
+image seed, steps, CFG/guidance, scheduler, backend, and resize policy are
+`UNKNOWN` in the source run. The full recorded semantic prompt is:
+
+> Generate one complete, realistic RGB object image from the supplied incomplete depth map. The object is a complete seated stylized cartoon fox. Treat every non-background depth pixel and its foreground mask as a hard ControlNet-like spatial constraint. Preserve the input camera viewpoint, perspective, image-plane center, apparent width and height, crop, orientation, visible silhouette, depth ordering, and all observed part locations. Do not rotate, mirror, recenter, rescale, widen, shorten, tilt, or redesign the observed object. Complete only genuinely missing or occluded regions, connect them naturally to the observed structure, and keep a single coherent object on a pure white background. Produce sharp boundaries and realistic materials suitable for image-to-3D reconstruction. Do not add text, logos, extra parts, secondary objects, or cast shadows that change the foreground mask. Additional structural constraints: Keep one connected body, exactly four naturally attached legs or paws, two ears, and one tail.
+
+**Postprocessing and exact focused configuration.**
+`scripts/distill_visibility_gated_expert.py` uses the physical Camera-1
+z-buffer only for teacher visibility, residual quantile `0.10`, minimum
+improvement `0.25` median spacings, no visibility dilation, a finite
+transition radius capped at `0.02` partial diagonals (`5` spacings and `0.5`
+times the q75 teacher motion), minimum hidden coverage `0.92`, exact teacher
+targets, embedded ARAP propagation, and fixed complete-prior points outside
+the band. No GT/CD/EMD, category, part, or fixed-axis rule was used. It keeps
+all 100,000 ordered carrier slots; 16,964 teacher points are inherited at full
+amplitude, 46,229 points lie outside the active band, the result has one
+significant component, and normalized coverage is `0.9465`.
+
+**Accepted artifacts.** Output root:
+`workspace/fox_posterior_adaptation_20260921/visibility_gated_dense_expert_distillation_narrow_band/`.
+Final carrier, partial overlay, textured/blue overlay, six-view board and full
+report are respectively `posterior_expert_distilled_100k.ply`,
+`partial_gray_posterior_expert_distilled_red.ply`,
+`partial_blue_posterior_pixal_texture.ply`,
+`posterior_expert_distilled_views.png`, and
+`expert_distillation_report.json` in that directory.
+
+## 2026-09-22 — accepted fox residual-calibrated structural-cohort posterior
+
+**User approval.** The user judged this candidate "非常好了" and requested
+publication-style figures explaining its deformation process. Preserve the
+entire output directory and do not overwrite its carrier, report or overlays.
+
+**Inputs and generation record.** Sample id: `cartoon_fox`. The registered
+carrier, collapsed local-fit teacher, partial, GT, Camera-1, semantic image,
+Pixal carrier, Pixal3D model/checkpoint, native camera, seed, resolutions,
+verbatim semantic prompt, and all `UNKNOWN` image-generation fields are
+exactly those recorded in the preceding accepted fox visibility-gated entry.
+
+**Exact focused configuration.** The accepted output was generated by
+`scripts/distill_visibility_gated_expert.py` with residual quantile `0.10`,
+minimum improvement `0.25` median spacings, no Camera-1 visibility dilation,
+`17` trajectory samples, first-near-optimal trajectory tolerance `0.20`
+spacings, structural-cohort radius `5.0` spacings, cohort minimum motion `0.75`
+spacings, transition spacing/motion/diagonal controls `10.0/1.25/0.04`, hidden
+coverage floor `0.90`, carrier edge-compression floor `0.34`, and node
+edge-compression floor `0.20`. It uses no GT/CD/EMD, category, semantic part,
+or fixed-coordinate rule. Of the complete ordered carrier, 16,964 Camera-1
+teacher points are residual-calibrated, 21,962 geodesically local hidden-side
+cohort points follow their nearest visible structural seed, and 25,353 remote
+carrier points remain fixed. The accepted full-amplitude solve retains all
+100,000 slots, one significant component, normalized hidden-view coverage
+`0.9030`, and robust p01 edge ratio `0.3442`.
+
+**Accepted artifacts.** Output root:
+`workspace/fox_posterior_adaptation_20260921/residual_calibrated_structural_cohort_r5_full/`.
+Final carrier, gray/red overlay, Pixal-textured/blue overlay, multi-view board,
+calibrated targets, cohort samples and exact report are respectively
+`posterior_expert_distilled_100k.ply`,
+`partial_gray_posterior_expert_distilled_red.ply`,
+`partial_blue_posterior_pixal_texture.ply`,
+`posterior_expert_distilled_views.png`, `calibrated_target_points.ply`,
+`structural_cohort_points.ply`, and `expert_distillation_report.json`.
+
+**Equivalent integrated export (confirmed 2026-09-24).** The user identified
+`workspace/fox_residual_proximal_prior_20260923/prior_projection/partial_blue_posterior_pixal_texture.ply`
+as the intended accepted Fox visualization.  Its first 100,000 ordered carrier
+slots are coordinate-identical to the accepted posterior above; the matching
+carrier is `prior_projection/posterior_expert_distilled_100k.ply`.  A requested
+observation-anchored fusion export is stored at
+`workspace/fox_residual_proximal_prior_20260923/fusion/observation_anchored_fused_100k_pixal_texture.ply`.
+It retains 100,000 slots, replaces 12,007 slots with collision-free measured
+partial anchors supported by the four saved cameras, and inherits RGB
+slot-for-slot from the user-confirmed Pixal3D-textured visualization.  Fusion
+uses the shared default parameters recorded in `fusion/fusion_info.json`; it
+does not concatenate points, perform a second deformation, or use GT/CD/EMD.
+The exact export provenance and hashes are in
+`fusion/observation_anchored_fused_100k_pixal_texture_info.json`.
+
+**No-GT diagnostic.** Partial-to-posterior mean nearest-surface residual is
+`0.003927`, improving from `0.004276` for the preceding accepted narrow-band
+candidate. This diagnostic was measured after freezing the output and was not
+used as GT supervision.
+
+## 2026-09-23 18:02 +0800 — accepted domestic-pig structure-preserving posterior
+
+**User approval.** The user judged this rerun "非常非常好了" after rejecting
+the experimental full-amplitude low-frequency candidate for weakening the
+hind-limb structure. Preserve this directory and do not overwrite the final
+carrier or its overlays. For this Pig input, do not append the experimental
+low-frequency expansion unless a new shared, cross-sample gate is explicitly
+validated first.
+
+**Sample and inputs.** Sample id: `domestic_pig`. Registered complete carrier,
+partial, Camera-1, semantic image, four-view manifest, and original textured
+Pixal carrier are respectively:
+`workspace/domestic_pig_depth_gauge_fixed_20260919/registration/domestic_pig/final/camera1_amplified_registered_100k.ply`,
+`workspace/domestic_pig_depth_gauge_fixed_20260919/inputs/partial/domestic_pig.ply`,
+`workspace/domestic_pig_depth_gauge_fixed_20260919/inputs/camera/domestic_pig/camera.pth`,
+`workspace/domestic_pig_depth_gauge_fixed_20260919/inputs/camera/domestic_pig/img.png`,
+`workspace/domestic_pig_depth_gauge_fixed_20260919/residuals/domestic_pig/render/render_manifest.json`, and
+`workspace/domestic_pig_depth_gauge_fixed_20260919/inputs/pixal/domestic_pig/pixal3d_sampled_100k.ply`.
+
+**Semantic generation record.** The recorded method is
+`depth_mask_conditioned_direct_gpt_semantic_completion`. The exact GPT model,
+negative prompt, image seed, number of steps, CFG/guidance, scheduler, backend,
+and resize policy are `UNKNOWN`; therefore the semantic generation itself is
+not exactly reproducible from the surviving metadata. The verbatim prompt is:
+
+> Generate one complete, realistic RGB object image from the supplied incomplete depth map. The object is a complete domestic pig. Treat every non-background depth pixel and its foreground mask as a hard ControlNet-like spatial constraint. Preserve the input camera viewpoint, perspective, image-plane center, apparent width and height, crop, orientation, visible silhouette, depth ordering, and all observed part locations. Do not rotate, mirror, recenter, rescale, widen, shorten, tilt, or redesign the observed object. Complete only genuinely missing or occluded regions, connect them naturally to the observed structure, and keep a single coherent object on a pure white background. Produce sharp boundaries and realistic materials suitable for image-to-3D reconstruction. Do not add text, logos, extra parts, secondary objects, or cast shadows that change the foreground mask. Additional structural constraints: Keep one connected torso, four naturally attached legs, two ears, one snout, and one tail.
+
+**Pixal generation record.** Pixal3D checkpoint:
+`/opt/data/private/cr/lab/GenPC/models/Pixal3D-weights`; DINO:
+`/opt/data/private/cr/lab/GenPC/models/dinov3-vitl16-pretrain-lvd1689m`;
+MoGe: `/opt/data/private/cr/lab/GenPC/models/moge-2-vitl/model.pt`; RMBG:
+`/opt/data/private/cr/lab/GenPC/models/RMBG-2.0`; xFormers backend; seed `42`;
+requested/actual resolution `1024`; decimation target `120000`; texture size
+`1024`. Sparse/shape/texture stages each use `12` steps, guidance strengths
+`7.5/7.5/1.0`, guidance rescale `0.7/0.5/0.0`, and rescale-t `5.0/3.0/3.0`.
+Native camera parameters are `camera_angle_x=0.6790872770960652`, distance
+`1.4155343770980835`, and `mesh_scale=1.0`.
+
+**Accepted posterior execution.** Run `scripts/run_posterior_adapter.py` with
+the preceding inputs, CUDA, and the unchanged shared configuration
+`configs/posterior_mainline.json`. The method uses exact Camera-1 structural
+transport, four-view local observation assimilation, coarse/fine embedded
+ARAP deformation, topology projection, and the complete ordered 100,000-point
+carrier. It uses no category/part rule and no GT/CD/EMD during inference. The
+rerun is point-for-point identical to the previously frozen Pig posterior.
+
+**Accepted artifacts.** Output root:
+`workspace/pig_structure_preserving_mainline_rerun_20260923/`. Final carrier,
+gray/red overlay, Pixal-textured/blue overlay, virtual-view board, saved-view
+projection, support status, OT pairs, deformation field, and complete report
+are respectively `posterior_prior_100k.ply`, `partial_gray_posterior_red.ply`,
+`partial_blue_posterior_pixal_texture.ply`, `posterior_virtual_views.png`,
+`posterior_saved_view_projection.png`, `posterior_support_status.png`,
+`partial_ot_pairs.npy`, `posterior_field.npz`, and `posterior_info.json`.
+
+**Offline diagnostic only.** Deterministic 16,384-point FPS with seed `6145`
+gives CD-L1/EMD x100 `1.6435/2.1145`. The robust 5--95% principal extent is
+`0.8509`, already covering the partial extent `0.8413`; this is why additional
+global expansion is not selected. These measurements were made only after the
+result was frozen and did not guide the posterior solve.
+
+## 2026-09-25 20:35 +0800 — accepted Pixal3D-stage reproduction package
+
+**User approval and scope.** The user approved the cleaned posterior result and
+requested that depth images, semantic images, Pixal3D products and camera
+parameters be retained so the accepted Redwood/Custom route can be replayed
+from Pixal3D before legacy workspace experiments are removed. The canonical
+physical-copy package is
+`workspace/compagent_pixal_reproduction_20260925/`. Do not replace it with
+symlinks or remove it during workspace cleanup.
+
+**Samples and inputs.** The package contains Redwood10 and Custom12 (22
+samples). For every sample, `inputs/camera/<sample>/` contains the original
+depth PNG/array when available, raw depth, semantic image, `camera.pth`,
+`camera.json` when available, `point_uv.npy`, `viewpoint.npy`, masks and audit
+metadata; `inputs/partial/<sample>.ply` is the observed partial;
+`inputs/pixal/<sample>/` contains the exact Pixal input, GPT semantic copy and
+verbatim prompt files, `pixal3d.glb`, `pixal3d_sampled_100k.ply`,
+`pixal3d_metadata.json`, and `pixal_moge_fp16_observation.npz`. Exact source
+paths and SHA-256 values for all 838 retained files are in `manifest.json`.
+
+**Models, prompts and generation parameters.** No image or 3-D model was
+regenerated while building this package. Per-sample Pixal model/checkpoint,
+seed, resolution, decimation, camera and generation parameters are copied
+verbatim in each `pixal3d_metadata.json`. The exact positive prompt is copied
+verbatim in each available `gpt_depth_completion_prompt.txt`/JSON and the
+semantic-install manifest; no negative prompt was newly supplied. Fields not
+recorded by the original generation remain explicitly `UNKNOWN` in the
+historical accepted entries and are not guessed here.
+
+**Postprocessing and replay.** `scripts/reproduce_packaged_mainline.py` starts
+from the retained ordered Pixal carrier/native MoGe observation, runs the
+fixed Pixal--MoGe--partial bridge and Camera-1 initial registration, then runs
+the shared monotonic broad continuation with levels
+`[[0.08,8,0.08],[0.03,3,0.03],[0.01,1,0.01]]`, at most six passes, minimum
+relative improvement `0.025`, 32k search samples and two candidate workers.
+It then runs `configs/posterior_mainline.json`; the accepted Fox visual result
+uses the recorded six-round residual-proximal proposal configuration. Saved
+four-view manifests retain only portable FOV/camera-pose evidence. No GT,
+CD/EMD, category rule or part rule is read during replay.
+
+**Verification.** The complete package has no symlinks and passed SHA-256
+verification. A clean 01184 replay reproduces selected registration SHA-256
+`4914f127a0c04180034fe605c588f9acb7db3e68c47ff6f57fe5673e8cfc6ecf`
+and final posterior SHA-256
+`c3bb208f8eb2d7334a2656fedd880125d2ed5ead3d619d6df24d256bc65ed0e6`
+byte-for-byte. The report is
+`workspace/compagent_pixal_reproduction_20260925/reports/reproduction_smoke_01184.json`.
+The complete Python suite passes 95 tests. Retained Fox paper figures,
+textured/blue overlay and textured observation-anchored fused carrier are in
+the package's `paper_assets/cartoon_fox/` directory.

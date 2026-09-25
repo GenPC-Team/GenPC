@@ -41,6 +41,13 @@ def main() -> None:
     parser.add_argument("--render-size", type=int, default=512)
     parser.add_argument("--padding", type=float, default=.15)
     parser.add_argument(
+        "--output-profile", choices=("lean", "debug"), default="lean",
+        help=(
+            "lean keeps the final carrier and human-readable comparisons; "
+            "debug additionally stores coarse fields, support masks, and OT arrays."
+        ),
+    )
+    parser.add_argument(
         "--integrated-observation-fusion", action="store_true",
         help="Assimilate four-view partial evidence inside the smooth posterior field.",
     )
@@ -95,41 +102,66 @@ def main() -> None:
         transport_projectors=(projector,),
     )
 
-    write_points(output / "posterior_prior_100k.ply", posterior)
-    write_points(output / "coarse_prior_100k.ply", prior + masks["coarse_displacement"])
-    write_compare(output / "partial_gray_posterior_red.ply", partial, posterior)
+    posterior_path = output / "posterior_prior_100k.ply"
+    registered_comparison_path = output / "partial_gray_registered_red.ply"
+    posterior_comparison_path = output / "partial_gray_posterior_red.ply"
+    saved_view_path = output / "posterior_saved_view_projection.png"
+    virtual_views_path = output / "posterior_virtual_views.png"
+    write_points(posterior_path, posterior)
+    write_compare(registered_comparison_path, partial, prior)
+    write_compare(posterior_comparison_path, partial, posterior)
     draw_projection_overlay(
-        output / "posterior_saved_view_projection.png", args.semantic,
+        saved_view_path, args.semantic,
         partial, posterior, projector,
     )
     save_virtual_overlay_board(
-        output / "posterior_virtual_views.png", partial, posterior,
+        virtual_views_path, partial, posterior,
         frame_points=prior,
     )
-    status_masks = {
-        "locked": masks["supported_stable"],
-        "editable": masks["supported_residual"],
-        "protected": masks["unsupported"],
-        "moved": masks["moved"],
+    output_paths = {
+        "posterior": posterior_path,
+        "registered_comparison": registered_comparison_path,
+        "posterior_comparison": posterior_comparison_path,
+        "saved_view": saved_view_path,
+        "virtual_views": virtual_views_path,
     }
-    save_support_overlay(
-        output / "posterior_support_status.png", args.semantic, prior, status_masks, projector,
-    )
-    pair_table = np.c_[
-        masks["transport_partial_ids"], masks["transport_prior_ids"],
-        masks["transport_weights"], masks["transport_costs"],
-    ]
-    np.save(output / "partial_ot_pairs.npy", pair_table)
-    np.savez_compressed(
-        output / "posterior_field.npz", means=posterior.astype(np.float32),
-        **{key: value for key, value in masks.items() if not key.startswith("transport_")},
-    )
+    if args.output_profile == "debug":
+        coarse_path = output / "coarse_prior_100k.ply"
+        support_path = output / "posterior_support_status.png"
+        transport_path = output / "partial_ot_pairs.npy"
+        field_path = output / "posterior_field.npz"
+        write_points(coarse_path, prior + masks["coarse_displacement"])
+        status_masks = {
+            "locked": masks["supported_stable"],
+            "editable": masks["supported_residual"],
+            "protected": masks["unsupported"],
+            "moved": masks["moved"],
+        }
+        save_support_overlay(
+            support_path, args.semantic, prior, status_masks, projector,
+        )
+        pair_table = np.c_[
+            masks["transport_partial_ids"], masks["transport_prior_ids"],
+            masks["transport_weights"], masks["transport_costs"],
+        ]
+        np.save(transport_path, pair_table)
+        np.savez_compressed(
+            field_path, means=posterior.astype(np.float32),
+            **{key: value for key, value in masks.items() if not key.startswith("transport_")},
+        )
+        output_paths.update({
+            "coarse": coarse_path,
+            "support_status": support_path,
+            "transport_pairs": transport_path,
+            "field": field_path,
+        })
     record = {
         "method": "structure_aware_partial_ot_complete_gaussian_posterior",
         "strict_zero_shot": True,
         "ground_truth_cd_emd_used": False,
         "category_or_part_rules_used": False,
         "transport_policy": "exact_camera1",
+        "output_profile": str(args.output_profile),
         "posterior_config": asdict(config),
         "posterior_config_source": (
             str(args.config_json.resolve()) if args.config_json is not None else None
@@ -143,16 +175,7 @@ def main() -> None:
             ),
         },
         "estimate": info,
-        "outputs": {
-            "posterior": str((output / "posterior_prior_100k.ply").resolve()),
-            "coarse": str((output / "coarse_prior_100k.ply").resolve()),
-            "comparison": str((output / "partial_gray_posterior_red.ply").resolve()),
-            "saved_view": str((output / "posterior_saved_view_projection.png").resolve()),
-            "virtual_views": str((output / "posterior_virtual_views.png").resolve()),
-            "support_status": str((output / "posterior_support_status.png").resolve()),
-            "transport_pairs": str((output / "partial_ot_pairs.npy").resolve()),
-            "field": str((output / "posterior_field.npz").resolve()),
-        },
+        "outputs": {key: str(path.resolve()) for key, path in output_paths.items()},
     }
     (output / "posterior_info.json").write_text(
         json.dumps(jsonable(record), indent=2) + "\n", encoding="utf-8",

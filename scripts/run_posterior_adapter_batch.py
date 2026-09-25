@@ -42,7 +42,8 @@ def _estimate_summary(estimate: dict) -> dict:
 def _run_one(paths: dict[str, Path], output_root: Path, sample: str,
              device: str, overwrite: bool,
              integrated_observation_fusion: bool,
-             config_json: Path | None) -> dict:
+             config_json: Path | None,
+             output_profile: str) -> dict:
     missing = [str(path) for path in paths.values() if not path.is_file()]
     if missing:
         raise FileNotFoundError(f"{sample}: missing inputs: {missing}")
@@ -59,6 +60,7 @@ def _run_one(paths: dict[str, Path], output_root: Path, sample: str,
         "--camera", str(paths["camera"]), "--semantic", str(paths["semantic"]),
         "--multiview-manifest", str(paths["multiview_manifest"]),
         "--output-dir", str(output), "--device", str(device),
+        "--output-profile", str(output_profile),
     ]
     if integrated_observation_fusion:
         command.append("--integrated-observation-fusion")
@@ -110,6 +112,10 @@ def main() -> None:
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--overwrite", action="store_true")
     parser.add_argument(
+        "--output-profile", choices=("lean", "debug"), default="lean",
+        help="lean is the reviewable default; debug retains numerical intermediates.",
+    )
+    parser.add_argument(
         "--integrated-observation-fusion",
         action="store_true",
         help="Assimilate four-view partial evidence inside the smooth posterior deformation.",
@@ -144,7 +150,7 @@ def main() -> None:
         futures = {
             executor.submit(
                 _run_one, paths, output_root, sample, str(args.device), bool(args.overwrite),
-                bool(args.integrated_observation_fusion), config_json,
+                bool(args.integrated_observation_fusion), config_json, str(args.output_profile),
             ): sample
             for sample, paths in cases
         }
@@ -171,6 +177,7 @@ def main() -> None:
         "sample_workers": int(args.sample_workers), "samples": records,
         "integrated_observation_fusion": bool(args.integrated_observation_fusion),
         "posterior_config": str(config_json) if config_json is not None else None,
+        "output_profile": str(args.output_profile),
         "transport_policy": "exact_camera1",
     }
     (output_root / "batch_manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
