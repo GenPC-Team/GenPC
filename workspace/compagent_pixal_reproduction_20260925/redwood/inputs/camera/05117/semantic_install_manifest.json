@@ -1,0 +1,60 @@
+{
+  "method": "depth_mask_conditioned_direct_gpt_semantic_install",
+  "ground_truth_used": false,
+  "sample": "05117",
+  "source_semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/tto_relinearized_selected_redwood_custom_20260920/redwood/inputs/pixal/05117/gpt_image.png",
+  "source_sha256": "f65f69d27ea2d1621fdd2c3424ff1925bc34a5f420c51597cc95736ef6750c07",
+  "prompt_file": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/tto_relinearized_selected_redwood_custom_20260920/redwood/inputs/pixal/05117/gpt_depth_completion_prompt.txt",
+  "prompt": "Use case: sketch-to-render. Create one complete, realistic RGB product image of a red dining chair from the supplied incomplete depth map. Image 1 is the sole geometric, camera, and foreground-mask authority. Treat every non-black depth pixel and the complete depth silhouette as a hard ControlNet-like spatial constraint: preserve exactly the camera viewpoint, perspective, image-plane center, apparent width and height, crop, orientation, visible silhouette, depth ordering, seat plane, backrest pose, and every observed leg location. Complete only genuinely missing or occluded surfaces. Keep one coherent chair with a rectangular padded seat, gently curved rectangular backrest, and four naturally attached slender legs on a pure white background. Do not rotate, mirror, recenter, rescale, widen, shorten, tilt, redesign, add armrests, add extra legs, or alter observed part positions. Sharp boundaries, realistic material, no text, logo, watermark, secondary object, or silhouette-changing shadow.",
+  "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/tto_relinearized_selected_redwood_custom_20260920/redwood/inputs/camera/05117/depth.png",
+  "installed_semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/tto_relinearized_selected_redwood_custom_20260920/redwood/inputs/camera/05117/img.png",
+  "object_mask": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/tto_relinearized_selected_redwood_custom_20260920/redwood/inputs/camera/05117/05117_moge_to_raw_partial_object_mask.png",
+  "audit_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/tto_relinearized_selected_redwood_custom_20260920/redwood/inputs/camera/05117/semantic_depth_audit.png",
+  "audit_colours": {
+    "cyan": "observed depth not covered by semantic foreground",
+    "magenta": "semantic foreground outside observed depth"
+  },
+  "resolution": 512,
+  "initial_framing": {
+    "semantic_bbox_xyxy": [
+      127,
+      75,
+      388,
+      437
+    ],
+    "bbox_scale_xy": [
+      0.9961832061068703,
+      0.9972451790633609
+    ],
+    "centre_offset_ratio": 0.003088161777508183,
+    "mask_iou": 0.8721160831746156,
+    "depth_coverage": 0.9080426871652287
+  },
+  "framing_transform": null,
+  "depth_bbox_xyxy": [
+    125,
+    75,
+    387,
+    438
+  ],
+  "semantic_bbox_xyxy": [
+    127,
+    75,
+    388,
+    437
+  ],
+  "centre_offset_ratio": 0.003088161777508183,
+  "bbox_scale_xy": [
+    0.9961832061068703,
+    0.9972451790633609
+  ],
+  "mask_iou": 0.8721160831746156,
+  "depth_coverage": 0.9080426871652287,
+  "semantic_leakage": 0.04339772996489415,
+  "thresholds": {
+    "maximum_center_offset_ratio": 0.04,
+    "maximum_bbox_scale_error": 0.125,
+    "minimum_depth_coverage": 0.84
+  },
+  "passed": true
+}

@@ -1,0 +1,72 @@
+{
+  "summary": {
+    "offline_only": true,
+    "metrics_used_by_mainline": false,
+    "count": 16384,
+    "seed": 6145,
+    "mean_cd_l1_x1e2": 2.2990053053945303,
+    "mean_emd_x1e2": 2.8444230711708465
+  },
+  "samples": [
+    {
+      "sample_id": "cartoon_fox",
+      "cd_l1_x1e2": 2.7667032554745674,
+      "emd_x1e2": 3.240446001291275
+    },
+    {
+      "sample_id": "domestic_pig",
+      "cd_l1_x1e2": 1.6435012221336365,
+      "emd_x1e2": 2.115204930305481
+    },
+    {
+      "sample_id": "dragon_character",
+      "cd_l1_x1e2": 1.340622641146183,
+      "emd_x1e2": 1.7921119928359985
+    },
+    {
+      "sample_id": "handheld_power_drill",
+      "cd_l1_x1e2": 1.7604494467377663,
+      "emd_x1e2": 2.7219217270612717
+    },
+    {
+      "sample_id": "hydra_creature",
+      "cd_l1_x1e2": 1.5209601260721684,
+      "emd_x1e2": 2.4150418117642403
+    },
+    {
+      "sample_id": "king_crab",
+      "cd_l1_x1e2": 5.7899463921785355,
+      "emd_x1e2": 5.159085243940353
+    },
+    {
+      "sample_id": "light_helicopter",
+      "cd_l1_x1e2": 1.1937129311263561,
+      "emd_x1e2": 2.0145323127508163
+    },
+    {
+      "sample_id": "mirrorless_camera",
+      "cd_l1_x1e2": 5.7287514209747314,
+      "emd_x1e2": 5.711290240287781
+    },
+    {
+      "sample_id": "seahawk_helicopter",
+      "cd_l1_x1e2": 1.7987318336963654,
+      "emd_x1e2": 3.5369597375392914
+    },
+    {
+      "sample_id": "single_engine_airplane",
+      "cd_l1_x1e2": 1.0308057069778442,
+      "emd_x1e2": 1.9987072795629501
+    },
+    {
+      "sample_id": "tyrannosaurus_rex_skeleton",
+      "cd_l1_x1e2": 0.7098209112882614,
+      "emd_x1e2": 1.4138199388980865
+    },
+    {
+      "sample_id": "wolf",
+      "cd_l1_x1e2": 2.304057776927948,
+      "emd_x1e2": 2.0139556378126144
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "ground_truth_used": false,
+  "geometry_changed": false,
+  "renderer": "/opt/data/private/cr/lab/paper/figs/architecture/easy3d_sphere_render/build/compagent_easy3d_sphere_renderer",
+  "impostor": "Easy3D PointsDrawable::SPHERE",
+  "point_size": 5.0,
+  "view": "back",
+  "saved_camera_pose": [
+    [
+      0.8508812864786683,
+      0.12891831122276923,
+      -0.5092947136500394,
+      -1.0051372774252314
+    ],
+    [
+      -0.3186112960429771,
+      0.8974281512095277,
+      -0.30513858400809235,
+      -0.6575818438897478
+    ],
+    [
+      0.41771746235251034,
+      0.42190375969896077,
+      0.8046796500456941,
+      1.7169528550616702
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "field_of_view_degrees": 38.0,
+  "zoom_box_normalized": [
+    0.04,
+    0.48,
+    0.58,
+    0.96
+  ],
+  "keypoint_ids": [
+    6214,
+    70120,
+    28614,
+    86846,
+    40017,
+    12947,
+    86588,
+    13415
+  ],
+  "zoom_keypoints": 5,
+  "outputs": {
+    "full": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/fox_residual_proximal_prior_20260923/paper_zoom_easy3d_back_point5/fox_back_easy3d_keypoints.png",
+    "zoom": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/fox_residual_proximal_prior_20260923/paper_zoom_easy3d_back_point5/fox_back_tail_zoom_easy3d_keypoints.png",
+    "composite": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/fox_residual_proximal_prior_20260923/paper_zoom_easy3d_back_point5/fox_back_tail_zoom_easy3d_keypoints_composite.png"
+  }
+}

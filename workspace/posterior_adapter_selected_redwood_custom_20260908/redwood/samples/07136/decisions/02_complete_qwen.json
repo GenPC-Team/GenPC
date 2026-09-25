@@ -1,7 +1,0 @@
-{
-  "state_sha256": "d85b780e5de240ac3c9021c02f7e6ffd9df5cd54b51cc8879b2a63abdda182bc",
-  "action": {"name": "COMPLETE_SEMANTIC", "arguments": {"strategy": "qwen"}},
-  "rationale": "Generate a camera-conditioned semantic completion from the selected high-support antipodal observation; no ground truth or offline metric is consulted.",
-  "planner": "Codex GPT-5.6 Terra",
-  "ground_truth_used": false
-}

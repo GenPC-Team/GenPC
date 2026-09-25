@@ -1,0 +1,20 @@
+{
+  "ground_truth_used": false,
+  "reference": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/fox_residual_proximal_prior_20260923/prior_projection/registered_prior_100k.ply",
+  "posterior": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/fox_residual_proximal_prior_20260923/prior_projection/posterior_expert_distilled_100k.ply",
+  "partial": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/tto_relinearized_selected_redwood_custom_20260920/custom/inputs/partial/cartoon_fox.ply",
+  "view": "back",
+  "impostor": "Easy3D PointsDrawable::SPHERE",
+  "point_size": 5.0,
+  "zoom_point_size": 10.0,
+  "magnitude_units": "median prior spacing",
+  "magnitude_vmax_p98": 75.11915714212681,
+  "direction_glyphs": 30,
+  "direction_length_encoding": "fixed screen length; colour encodes magnitude",
+  "glyph_length_pixels": 72.0,
+  "outputs": {
+    "magnitude_field": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/fox_residual_proximal_prior_20260923/paper_deformation_field_easy3d/fox_deformation_magnitude_field.png",
+    "local_direction_field": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/fox_residual_proximal_prior_20260923/paper_deformation_field_easy3d/fox_tail_leg_direction_field.png",
+    "colorbar": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/fox_residual_proximal_prior_20260923/paper_deformation_field_easy3d/deformation_magnitude_colorbar.png"
+  }
+}

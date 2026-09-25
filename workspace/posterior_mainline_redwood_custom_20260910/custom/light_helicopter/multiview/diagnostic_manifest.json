@@ -1,8 +1,0 @@
-{
-  "method": "camera_consistent_four_view_posterior_diagnostic",
-  "ground_truth_used": false,
-  "render_manifest": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/light_helicopter/multiview/render/render_manifest.json",
-  "evidence_manifest": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/light_helicopter/multiview/evidence/partial_evidence_manifest.json",
-  "covered_partial_points": 10224,
-  "paper_residual_board": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_mainline_redwood_custom_20260910/custom/light_helicopter/multiview/evidence/prior_to_partial_residual_front_side_back_right.png"
-}

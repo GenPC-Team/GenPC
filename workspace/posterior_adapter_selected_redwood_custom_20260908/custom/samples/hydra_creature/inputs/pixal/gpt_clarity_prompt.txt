@@ -1,6 +1,0 @@
-Use case: precise-object-edit
-Asset type: Pixal3D conditioning image
-Primary request: Make the displayed three-headed dragon (hydra) with exactly three distinct heads and long necks visually clearer, sharper, and fully coherent as a realistic complete object while preserving its geometry.
-Input images: Image 1 is the edit target and sole geometry authority.
-Scene/backdrop: pure white studio background.
-Constraints: preserve exactly the input camera viewpoint, object orientation, articulated pose, apparent scale, image-plane center, crop, silhouette, proportions, and every visible component; do not rotate, mirror, recrop, rescale, recenter, add, remove, bend, or reposition any part. Improve only edge clarity, material coherence, and fine visible detail. No text, logo, or watermark.

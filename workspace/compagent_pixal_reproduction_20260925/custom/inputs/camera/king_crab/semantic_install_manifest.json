@@ -1,0 +1,71 @@
+{
+  "method": "depth_mask_conditioned_direct_gpt_semantic_install",
+  "ground_truth_used": false,
+  "sample": "king_crab",
+  "source_semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/king_crab_from_scratch_nonorthogonal_20260921/inputs/pixal/king_crab/gpt_image.png",
+  "source_sha256": "88ccc456cf911b6608064bdad78c60a3cdc57648535cc06a379b292ebba8c953",
+  "prompt_file": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/king_crab_from_scratch_nonorthogonal_20260921/inputs/pixal/king_crab/gpt_depth_completion_prompt.txt",
+  "prompt": "Use case: precise-object-edit.\nAsset type: a camera-consistent semantic reference image for image-to-3D reconstruction.\nInput image 1 role: sparse depth-map edit target.\nPrimary request: replace the black depth visualization with a complete realistic king crab, on a pure white background.\nConstraints: Treat every non-black depth pixel as hard spatial and geometric evidence. Preserve exactly the input camera viewpoint, image-plane orientation, perspective, crop, object center, apparent width and height, visible silhouette, depth ordering, and every observed part location. Do not rotate, mirror, recenter, globally rescale, tilt, or canonicalize the observed king crab. Complete only genuinely missing or occluded regions into one coherent, complete king crab while retaining natural continuous proportions, its many legs and claws, and the observed pose. Avoid: black background, text, logos, shadows, detached parts, duplicated components, extra objects, warped or melted geometry.",
+  "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/king_crab_from_scratch_nonorthogonal_20260921/inputs/camera/king_crab/depth.png",
+  "installed_semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/king_crab_from_scratch_nonorthogonal_20260921/inputs/camera/king_crab/img.png",
+  "object_mask": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/king_crab_from_scratch_nonorthogonal_20260921/inputs/camera/king_crab/king_crab_moge_to_raw_partial_object_mask.png",
+  "audit_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/king_crab_from_scratch_nonorthogonal_20260921/inputs/camera/king_crab/semantic_depth_audit.png",
+  "audit_colours": {
+    "cyan": "observed depth not covered by semantic foreground",
+    "magenta": "semantic foreground outside observed depth"
+  },
+  "resolution": 512,
+  "initial_framing": {
+    "semantic_bbox_xyxy": [
+      44,
+      102,
+      464,
+      407
+    ],
+    "bbox_scale_xy": [
+      1.1538461538461537,
+      1.1338289962825279
+    ],
+    "centre_offset_ratio": 0.005524271728019903,
+    "mask_iou": 0.5924644949309353,
+    "depth_coverage": 0.8828759180517974
+  },
+  "framing_transform": {
+    "type": "global_image_plane_similarity",
+    "isotropic_scale": 0.9750000000000001,
+    "source_centre_xy": [
+      254.0,
+      254.5
+    ],
+    "target_centre_xy": [
+      256.0,
+      256.5
+    ]
+  },
+  "depth_bbox_xyxy": [
+    74,
+    122,
+    438,
+    391
+  ],
+  "semantic_bbox_xyxy": [
+    51,
+    108,
+    461,
+    404
+  ],
+  "centre_offset_ratio": 0.0009765625,
+  "bbox_scale_xy": [
+    1.1263736263736264,
+    1.100371747211896
+  ],
+  "mask_iou": 0.6628093412338794,
+  "depth_coverage": 0.9188248936992656,
+  "semantic_leakage": 0.2959644576082932,
+  "thresholds": {
+    "maximum_center_offset_ratio": 0.04,
+    "maximum_bbox_scale_error": 0.125,
+    "minimum_depth_coverage": 0.835
+  },
+  "passed": false
+}

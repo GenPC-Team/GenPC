@@ -1,7 +1,0 @@
-{
-  "joint_applied": true,
-  "pixel_applied": true,
-  "partial_before": 0.10976433796466598,
-  "partial_after": 0.07331604286168927,
-  "output_dir": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/registration/01184/joint"
-}

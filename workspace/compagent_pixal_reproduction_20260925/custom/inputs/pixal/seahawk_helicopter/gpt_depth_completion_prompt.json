@@ -1,0 +1,17 @@
+{
+  "method": "depth_mask_conditioned_direct_gpt_semantic_completion",
+  "ground_truth_used": false,
+  "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/seahawk_helicopter_from_scratch_sparse_20260919/inputs/camera/seahawk_helicopter/depth.png",
+  "object_description": "a complete Seahawk helicopter with a main rotor, tail boom, tail rotor, cockpit, landing gear, and external equipment",
+  "structural_constraints": [
+    "preserve the observed diagonal pose, silhouette, framing, camera viewpoint, and all reliable visible structures from the depth image",
+    "complete only the unobserved portions naturally; do not crop, rotate, mirror, or change the camera"
+  ],
+  "observation_mode": "single_scan",
+  "prompt": "Generate one complete, realistic RGB object image from the supplied incomplete depth map. The object is a complete Seahawk helicopter with a main rotor, tail boom, tail rotor, cockpit, landing gear, and external equipment. Treat every non-background depth pixel and its foreground mask as a hard ControlNet-like spatial constraint. Preserve the input camera viewpoint, perspective, image-plane center, apparent width and height, crop, orientation, visible silhouette, depth ordering, and all observed part locations. Do not rotate, mirror, recenter, rescale, widen, shorten, tilt, or redesign the observed object. Complete only genuinely missing or occluded regions, connect them naturally to the observed structure, and keep a single coherent object on a pure white background. Produce sharp boundaries and realistic materials suitable for image-to-3D reconstruction. Do not add text, logos, extra parts, secondary objects, or cast shadows that change the foreground mask. Additional structural constraints: preserve the observed diagonal pose, silhouette, framing, camera viewpoint, and all reliable visible structures from the depth image complete only the unobserved portions naturally; do not crop, rotate, mirror, or change the camera",
+  "output_contract": {
+    "semantic_image": "img.png",
+    "camera_and_mask_authority": "input depth raster",
+    "background": "pure white"
+  }
+}

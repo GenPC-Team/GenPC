@@ -1,0 +1,12 @@
+{
+  "geometry": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/fox_residual_proximal_prior_20260923/fusion/observation_anchored_fused_100k.ply",
+  "accepted_visual_reference": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/fox_residual_proximal_prior_20260923/prior_projection/partial_blue_posterior_pixal_texture.ply",
+  "ordered_posterior": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/fox_residual_proximal_prior_20260923/prior_projection/posterior_expert_distilled_100k.ply",
+  "output": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/fox_residual_proximal_prior_20260923/fusion/observation_anchored_fused_100k_pixal_texture.ply",
+  "points": 100000,
+  "rgb_source": "first 100000 ordered posterior slots of accepted Pixal3D-textured overlay",
+  "posterior_overlay_coordinate_max_abs_difference": 0.0,
+  "unique_rgb_values": 30521,
+  "geometry_sha256": "cbce957ef2fd851c795071c6a1bee80e3070d32a087e761d54564dc4fddc784a",
+  "output_sha256": "ae52cb076f724d10a3844dc812a58d3ca79ad0662202ff1e5c13308d025ec5d2"
+}

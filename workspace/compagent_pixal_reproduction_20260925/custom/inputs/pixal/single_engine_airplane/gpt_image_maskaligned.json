@@ -1,0 +1,8 @@
+{
+  "method": "mask_measured_global_image_plane_affine",
+  "source": "depth mask framing only; no GT or category geometry",
+  "axis_scale_xy": [
+    0.985,
+    1.0
+  ]
+}

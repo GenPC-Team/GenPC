@@ -1,0 +1,17 @@
+{
+  "summary": {
+    "offline_only": true,
+    "metrics_used_by_mainline": false,
+    "count": 16384,
+    "seed": 6145,
+    "mean_cd_l1_x1e2": 1.7858903855085373,
+    "mean_emd_x1e2": 2.496994286775589
+  },
+  "samples": [
+    {
+      "sample_id": "cartoon_fox",
+      "cd_l1_x1e2": 1.7858903855085373,
+      "emd_x1e2": 2.496994286775589
+    }
+  ]
+}

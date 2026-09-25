@@ -1,5 +1,0 @@
-input_image: raw_depth.png
-prompt: 生成一张图像，参考图1遮挡情况下的深度图，并遵循以下描述：完整的rubbish bin，纯白背景
-negative_prompt: ' '
-true_cfg_scale: 4.0
-num_inference_steps: 40

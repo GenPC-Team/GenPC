@@ -1,0 +1,60 @@
+{
+  "method": "depth_mask_conditioned_direct_gpt_semantic_install",
+  "ground_truth_used": false,
+  "sample": "dragon_character",
+  "source_semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/tto_relinearized_selected_redwood_custom_20260920/custom/inputs/pixal/dragon_character/gpt_image.png",
+  "source_sha256": "dda2f9684d393e9bb4d3b6105a16a82eff402e7b02aa3104f2b89c475e4242f6",
+  "prompt_file": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/tto_relinearized_selected_redwood_custom_20260920/custom/inputs/pixal/dragon_character/gpt_depth_completion_prompt.txt",
+  "prompt": "Generate one complete, realistic RGB object image from the supplied incomplete depth map. The object is a complete upright winged dragon character. Treat every non-background depth pixel and its foreground mask as a hard ControlNet-like spatial constraint. Preserve the input camera viewpoint, perspective, image-plane center, apparent width and height, crop, orientation, visible silhouette, depth ordering, and all observed part locations. Do not rotate, mirror, recenter, rescale, widen, shorten, tilt, or redesign the observed object. Complete only genuinely missing or occluded regions, connect them naturally to the observed structure, and keep a single coherent object on a pure white background. Produce sharp boundaries and realistic materials suitable for image-to-3D reconstruction. Do not add text, logos, extra parts, secondary objects, or cast shadows that change the foreground mask. Additional structural constraints: Keep one connected body with two wings, two arms, two legs, one head, and one tail.",
+  "depth": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/tto_relinearized_selected_redwood_custom_20260920/custom/inputs/camera/dragon_character/depth.png",
+  "installed_semantic": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/tto_relinearized_selected_redwood_custom_20260920/custom/inputs/camera/dragon_character/img.png",
+  "object_mask": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/tto_relinearized_selected_redwood_custom_20260920/custom/inputs/camera/dragon_character/dragon_character_moge_to_raw_partial_object_mask.png",
+  "audit_overlay": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/tto_relinearized_selected_redwood_custom_20260920/custom/inputs/camera/dragon_character/semantic_depth_audit.png",
+  "audit_colours": {
+    "cyan": "observed depth not covered by semantic foreground",
+    "magenta": "semantic foreground outside observed depth"
+  },
+  "resolution": 512,
+  "initial_framing": {
+    "semantic_bbox_xyxy": [
+      115,
+      22,
+      438,
+      470
+    ],
+    "bbox_scale_xy": [
+      1.0253968253968253,
+      1.0666666666666667
+    ],
+    "centre_offset_ratio": 0.007042092334890604,
+    "mask_iou": 0.8199849428512764,
+    "depth_coverage": 0.9443516095469306
+  },
+  "framing_transform": null,
+  "depth_bbox_xyxy": [
+    122,
+    38,
+    437,
+    458
+  ],
+  "semantic_bbox_xyxy": [
+    115,
+    22,
+    438,
+    470
+  ],
+  "centre_offset_ratio": 0.007042092334890604,
+  "bbox_scale_xy": [
+    1.0253968253968253,
+    1.0666666666666667
+  ],
+  "mask_iou": 0.8199849428512764,
+  "depth_coverage": 0.9443516095469306,
+  "semantic_leakage": 0.13838187702265373,
+  "thresholds": {
+    "maximum_center_offset_ratio": 0.04,
+    "maximum_bbox_scale_error": 0.125,
+    "minimum_depth_coverage": 0.835
+  },
+  "passed": true
+}

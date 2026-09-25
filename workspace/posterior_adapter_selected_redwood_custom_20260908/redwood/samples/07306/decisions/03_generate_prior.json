@@ -1,7 +1,0 @@
-{
-  "state_sha256": "4cd880c36200e80bbbd071d3475d9ab865249b555699c787be20dabfe2d8a0eb",
-  "action": {"name": "GENERATE_PRIOR", "arguments": {}},
-  "rationale": "The opposite-view completion is geometrically simple and preserves nearly all observed depth support. Generate a fresh native prior so its cross-camera visible residual can be compared against the oblique candidate without GT, CD, or EMD.",
-  "planner": "Codex GPT-5.6 Terra",
-  "ground_truth_used": false
-}

@@ -1,7 +1,0 @@
-{
-  "joint_applied": true,
-  "pixel_applied": false,
-  "partial_before": 0.13578182732068136,
-  "partial_after": 0.1281980461257084,
-  "output_dir": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/best_redwood_custom_camera1_transport_20260911/redwood/registration_initial/06127/joint"
-}

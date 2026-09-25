@@ -1,8 +1,0 @@
-{
-  "applied": true,
-  "before": 0.11193940321238853,
-  "after": 0.10935589541261657,
-  "output_dir": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/posterior_adapter_e2e_redwood_custom_20260908/redwood/view_retry/07306/registration/07306/amplified"
-}
-
-[agent-probe elapsed_seconds=8.143]

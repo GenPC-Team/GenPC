@@ -1,0 +1,5 @@
+Use case: precise-object-edit.
+Asset type: a camera-consistent semantic reference image for image-to-3D reconstruction.
+Input image 1 role: sparse depth-map edit target.
+Primary request: replace the black depth visualization with a complete realistic king crab, on a pure white background.
+Constraints: Treat every non-black depth pixel as hard spatial and geometric evidence. Preserve exactly the input camera viewpoint, image-plane orientation, perspective, crop, object center, apparent width and height, visible silhouette, depth ordering, and every observed part location. Do not rotate, mirror, recenter, globally rescale, tilt, or canonicalize the observed king crab. Complete only genuinely missing or occluded regions into one coherent, complete king crab while retaining natural continuous proportions, its many legs and claws, and the observed pose. Avoid: black background, text, logos, shadows, detached parts, duplicated components, extra objects, warped or melted geometry.

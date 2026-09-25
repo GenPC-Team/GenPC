@@ -1,7 +1,0 @@
-{
-  "state_sha256": "651af912f19a7b637735fabfec5c120046ff675268bc583e9795bdac5cf201a0",
-  "action": {"name": "GENERATE_PRIOR", "arguments": {}},
-  "rationale": "The completion is structurally plausible, preserves 98.7% of observed depth support, and exposes the missing long-axis information. Generate a native prior and defer acceptance to geometric verification; no GT metric is used.",
-  "planner": "Codex GPT-5.6 Terra",
-  "ground_truth_used": false
-}

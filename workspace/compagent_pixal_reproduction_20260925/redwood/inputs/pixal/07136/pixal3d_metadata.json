@@ -1,0 +1,60 @@
+{
+  "sample_id": "07136",
+  "input": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/tto_relinearized_selected_redwood_custom_20260920/redwood/inputs/camera/07136/img.png",
+  "preprocessed_input": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/tto_relinearized_selected_redwood_custom_20260920/redwood/inputs/pixal/07136/pixal3d_input.png",
+  "model": "/opt/data/private/cr/lab/GenPC/models/Pixal3D-weights",
+  "dino": "/opt/data/private/cr/lab/GenPC/models/dinov3-vitl16-pretrain-lvd1689m",
+  "moge": "/opt/data/private/cr/lab/GenPC/models/moge-2-vitl/model.pt",
+  "rmbg": "/opt/data/private/cr/lab/GenPC/models/RMBG-2.0",
+  "attention_backend": "xformers",
+  "seed": 42,
+  "requested_resolution": 1024,
+  "actual_resolution": 1024,
+  "decimation_target": 300000,
+  "texture_size": 2048,
+  "sampler_params": {
+    "sparse_structure": {
+      "steps": 12,
+      "guidance_strength": 7.5,
+      "guidance_rescale": 0.7,
+      "rescale_t": 5.0
+    },
+    "shape": {
+      "steps": 12,
+      "guidance_strength": 7.5,
+      "guidance_rescale": 0.5,
+      "rescale_t": 3.0
+    },
+    "texture": {
+      "steps": 12,
+      "guidance_strength": 1.0,
+      "guidance_rescale": 0.0,
+      "rescale_t": 3.0
+    }
+  },
+  "camera": {
+    "camera_angle_x": 0.4476060095169273,
+    "distance": 2.1966819763183594,
+    "mesh_scale": 1.0
+  },
+  "native_moge_observation_cache": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/tto_relinearized_selected_redwood_custom_20260920/redwood/inputs/pixal/07136/pixal_moge_fp16_observation.npz",
+  "native_moge_observation_contract": "FP16 MoGe on pixal3d_input.png; consumed by native registration",
+  "glb": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/tto_relinearized_selected_redwood_custom_20260920/redwood/inputs/pixal/07136/pixal3d.glb",
+  "sampled_ply": "/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/tto_relinearized_selected_redwood_custom_20260920/redwood/inputs/pixal/07136/pixal3d_sampled_100k.ply",
+  "elapsed_seconds": 62.597896337509155,
+  "point_count": 100000,
+  "mesh_vertices": 205008,
+  "mesh_faces": 290027,
+  "bounds": [
+    [
+      -0.33234626054763794,
+      -0.39960673451423645,
+      -0.4885845482349396
+    ],
+    [
+      0.2362901270389557,
+      0.5005265474319458,
+      0.4596918821334839
+    ]
+  ]
+}
