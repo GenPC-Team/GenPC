@@ -1796,3 +1796,65 @@ excluded and is now the only workspace directory (811 MiB versus roughly
 17 GiB before cleanup). A second full 01184 replay was then run after deletion
 using only the package and repository code; both hashes above remained exact,
 so the package has no runtime dependency on a removed experiment path.
+
+## 2026-09-26 00:57 +0800 — accepted continuous final observation fusion
+
+**User approval and scope.** The user requested that the current final fusion
+scheme be saved and pushed as the active shared method after it was run on
+Redwood10 and Custom12. Preserve this category-independent configuration and
+the accepted posterior inputs; do not silently restore the older loose
+exact-slot decoder as the default. `--mode exact` remains available only for
+historical Fox export reproduction.
+
+**Inputs and samples.** Fusion starts from the frozen package at
+`workspace/compagent_pixal_reproduction_20260925/`. Redwood uses
+`redwood/reference_result/<id>/posterior_prior_100k.ply`; Custom uses
+`custom/reference_result/<sample>/posterior_prior_100k.ply`, except
+`cartoon_fox`, which intentionally uses the accepted
+`posterior_expert_distilled_100k.ply`. Physical observations are
+`<dataset>/inputs/partial/`, four-camera contracts are
+`<dataset>/residuals/<sample>/render/render_manifest.json`, and ordered RGB is
+copied from `<dataset>/inputs/pixal/<sample>/pixal3d_sampled_100k.ply`.
+Samples are Redwood10 (`01184`, `05117`, `05452`, `06127`, `06145`, `06188`,
+`06830`, `07136`, `07306`, `09639`) and all 12 packaged Custom samples.
+
+**Models and prompts.** NOT APPLICABLE to this fusion stage: no image model,
+3-D generator, checkpoint, positive prompt, negative prompt, seed, CFG,
+scheduler, or generative resolution is invoked. Upstream semantic/Pixal3D
+assets are unchanged; their exact model metadata, verbatim prompts and known
+generation parameters remain beside each sample in `inputs/pixal/` and
+`inputs/camera/`. Unknown historical fields remain `UNKNOWN` and are not
+inferred here.
+
+**Method and exact shared parameters.** `src/observation_anchored_fusion.py`
+implements `continuous_multiview_observation_fusion`; the single and batch
+runners are `scripts/run_observation_anchored_fusion.py` and
+`scripts/run_observation_anchored_fusion_batch.py`. Four views use pixel radius
+`1.0`, cross-view radius `2.0`, normalized depth gate `0.03`, at least two-view
+support, maximum residual ratio `0.03`, residual quantile `0.90`, partial
+spacing multiplier `6.0`, carrier/partial influence multipliers `12.0/4.0`,
+node fraction `0.04`, node bounds `192/6144`, 10 graph neighbours, edge ratio
+`1.85`, attachment ratio `3.2`, data weight `4.0`, screening `0.004`, three
+iterations, minimum improvement `0.01`, edge compression/stretch bounds
+`0.70/1.80`, minimum hidden coverage `0.98`, and coverage resolution `160`.
+Cross-view collision-free anchors drive a finite-support embedded-ARAP field;
+carrier samples outside the observation band are fixed. No point is appended
+or deleted, and no GT/CD/EMD enters correspondence, line search, or stopping.
+
+**Accepted artifacts and postprocessing.** Local complete outputs are
+`workspace/compagent_pixal_reproduction_20260925/<dataset>/final_fused/<sample>/complete_100k.ply`
+and `complete_100k_pixal_texture.ply`; full no-GT audit files are under the
+sibling `fusion_continuous/` trees. Every geometry output has exactly 100,000
+ordered slots and every textured output has 100,000 slot-aligned RGB values.
+The decoder performs only confidence gating, continuous carrier assimilation,
+and ordered RGB transfer; it does not concatenate, resample, crop, or invoke a
+new shape generator.
+
+**Offline diagnostics only.** Frozen Redwood10 CD-L1/EMD x100 changes from
+`1.5380/2.4835` to `1.5235/2.4716`. Against the actual Custom input carriers
+(including visual-best Fox), Custom12 changes from `2.2173/2.7825` to
+`2.1928/2.7633`; CD improves on 12/12 and EMD on 11/12 samples. Reports are
+`reports/redwood_continuous_fusion_metrics.{csv,json}` and
+`reports/custom_continuous_fusion_metrics.{csv,json}` inside the local package.
+Metrics were computed only after outputs were frozen. Package checksum
+verification passes and the complete test suite passes 96 tests.

@@ -39,7 +39,15 @@ def write_points(path: Path, points: np.ndarray, color=None) -> None:
     cloud = o3d.geometry.PointCloud()
     cloud.points = o3d.utility.Vector3dVector(np.asarray(points, dtype=np.float64))
     if color is not None:
-        cloud.paint_uniform_color(color)
+        colors = np.asarray(color, dtype=np.float64)
+        if colors.shape == (3,):
+            cloud.paint_uniform_color(colors.tolist())
+        elif colors.shape == np.asarray(points).shape:
+            cloud.colors = o3d.utility.Vector3dVector(np.clip(colors, 0.0, 1.0))
+        else:
+            raise ValueError(
+                "color must be one RGB triplet or one RGB triplet per point"
+            )
     if not o3d.io.write_point_cloud(str(path), cloud):
         raise IOError(f"Failed to write point cloud: {path}")
 

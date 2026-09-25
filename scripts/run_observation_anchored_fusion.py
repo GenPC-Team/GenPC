@@ -9,6 +9,7 @@ from pathlib import Path
 import sys
 
 import numpy as np
+import open3d as o3d
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -17,7 +18,9 @@ if str(ROOT) not in sys.path:
 
 from src.multiview_partial_evidence import compose_grid, load_manifest_projectors
 from src.observation_anchored_fusion import (
+    ContinuousObservationFusionConfig,
     ObservationAnchoredFusionConfig,
+    fuse_continuous_observation_field,
     fuse_observation_anchors,
 )
 from src.pointcloud_io import jsonable, load_points, write_compare, write_points
@@ -55,11 +58,26 @@ def main() -> None:
     parser.add_argument("--partial", type=Path, required=True)
     parser.add_argument("--multiview-manifest", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument(
+        "--mode", choices=("continuous", "exact"), default="continuous",
+        help="Continuous finite-support assimilation or the legacy exact-slot decoder.",
+    )
+    parser.add_argument(
+        "--carrier-colors-from", type=Path,
+        help="Optional ordered 100k Pixal carrier whose RGB is copied slot-for-slot.",
+    )
     parser.add_argument("--resolution", type=int, default=512)
     parser.add_argument("--pixel-radius", type=float, default=1.0)
     parser.add_argument("--cross-view-pixel-radius", type=float, default=2.0)
-    parser.add_argument("--cross-view-depth-ratio", type=float, default=0.075)
-    parser.add_argument("--anchor-residual-ratio", type=float, default=0.075)
+    parser.add_argument(
+        "--cross-view-depth-ratio", type=float,
+        help="Defaults to 0.03 in continuous mode and 0.075 in exact mode.",
+    )
+    parser.add_argument(
+        "--anchor-residual-ratio", type=float,
+        help="Defaults to 0.03 in continuous mode and 0.075 in exact mode.",
+    )
+    parser.add_argument("--minimum-view-support", type=int, default=2)
     args = parser.parse_args()
 
     posterior = load_points(args.posterior)
@@ -67,22 +85,57 @@ def main() -> None:
     projectors = load_manifest_projectors(
         args.multiview_manifest, resolution=int(args.resolution),
     )
-    config = ObservationAnchoredFusionConfig(
-        num_views=4,
-        pixel_radius=float(args.pixel_radius),
-        cross_view_pixel_radius=float(args.cross_view_pixel_radius),
-        cross_view_depth_ratio=float(args.cross_view_depth_ratio),
-        anchor_residual_ratio=float(args.anchor_residual_ratio),
-    )
-    fused, anchors, pairs, info = fuse_observation_anchors(
-        posterior, partial, projectors, config=config,
-    )
+    if args.mode == "exact":
+        config = ObservationAnchoredFusionConfig(
+            num_views=4,
+            pixel_radius=float(args.pixel_radius),
+            cross_view_pixel_radius=float(args.cross_view_pixel_radius),
+            cross_view_depth_ratio=(
+                0.075 if args.cross_view_depth_ratio is None
+                else float(args.cross_view_depth_ratio)
+            ),
+            anchor_residual_ratio=(
+                0.075 if args.anchor_residual_ratio is None
+                else float(args.anchor_residual_ratio)
+            ),
+        )
+        fused, anchors, pairs, info = fuse_observation_anchors(
+            posterior, partial, projectors, config=config,
+        )
+    else:
+        config = ContinuousObservationFusionConfig(
+            num_views=4,
+            pixel_radius=float(args.pixel_radius),
+            cross_view_pixel_radius=float(args.cross_view_pixel_radius),
+            cross_view_depth_ratio=(
+                0.03 if args.cross_view_depth_ratio is None
+                else float(args.cross_view_depth_ratio)
+            ),
+            maximum_residual_ratio=(
+                0.03 if args.anchor_residual_ratio is None
+                else float(args.anchor_residual_ratio)
+            ),
+            minimum_view_support=int(args.minimum_view_support),
+        )
+        fused, anchors, pairs, info = fuse_continuous_observation_field(
+            posterior, partial, projectors, config=config,
+        )
     output = args.output_dir
     output.mkdir(parents=True, exist_ok=True)
     prediction = output / "observation_anchored_fused_100k.ply"
     comparison = output / "partial_gray_fused_red.ply"
     overlay = output / "fused_four_view_projection.png"
     write_points(prediction, fused)
+    textured_prediction = None
+    if args.carrier_colors_from is not None:
+        color_cloud = o3d.io.read_point_cloud(str(args.carrier_colors_from))
+        colors = np.asarray(color_cloud.colors, dtype=np.float64)
+        if colors.shape != fused.shape:
+            raise ValueError(
+                "ordered carrier colour source must contain one RGB value per fused slot"
+            )
+        textured_prediction = output / "observation_anchored_fused_100k_pixal_texture.ply"
+        write_points(textured_prediction, fused, colors)
     write_compare(comparison, partial, fused)
     _save_four_view_overlay(overlay, partial, fused, projectors)
     np.save(output / "fusion_anchor_pairs.npy", anchors)
@@ -100,6 +153,9 @@ def main() -> None:
             "four_view_projection": str(overlay.resolve()),
             "anchors": str((output / "fusion_anchor_pairs.npy").resolve()),
             "positive_pairs": str((output / "fusion_positive_pairs.npy").resolve()),
+            "textured_prediction": (
+                str(textured_prediction.resolve()) if textured_prediction is not None else None
+            ),
         },
     }
     (output / "fusion_info.json").write_text(

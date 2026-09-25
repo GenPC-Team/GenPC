@@ -12,6 +12,13 @@ For each Redwood/Custom sample it retains:
 - the accepted registered prior as a numerical checkpoint;
 - the final posterior and the before/after partial-complete overlays.
 
+Running the optional final continuous measurement assimilation writes its
+audit under `<dataset>/fusion_continuous/` and concise geometry/textured 100k
+deliverables under `<dataset>/final_fused/<sample>/`. These reproducible
+derived outputs preserve carrier ordering and are not inputs to registration
+or PosteriorAdapter replay. The Custom Fox decoder starts from its explicitly
+retained visual-best carrier.
+
 Run from the GenPC repository root:
 
 ```bash

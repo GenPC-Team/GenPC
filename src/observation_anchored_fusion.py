@@ -11,7 +11,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 import numpy as np
+from scipy.spatial import cKDTree
 
+from src.partial_transport import _median_spacing
+from src.posterior_deformation import _embedded_arap_posterior
 from src.visible_pixel_sim3_refinement import visible_pixel_pairs
 
 
@@ -25,6 +28,59 @@ class ObservationAnchoredFusionConfig:
     cross_view_depth_ratio: float = 0.075
     anchor_residual_ratio: float = 0.075
     max_pairs_per_view: int = 100_000
+
+
+@dataclass(frozen=True)
+class ContinuousObservationFusionConfig:
+    """Shared controls for structure-preserving measurement assimilation.
+
+    The thresholds are dimensionless or normalized by measured point spacing.
+    They are intentionally category- and dataset-independent.
+    """
+
+    num_views: int = 4
+    pixel_radius: float = 1.0
+    cross_view_pixel_radius: float = 2.0
+    cross_view_depth_ratio: float = 0.03
+    maximum_residual_ratio: float = 0.03
+    minimum_view_support: int = 2
+    residual_quantile: float = 0.90
+    partial_spacing_multiplier: float = 6.0
+    carrier_influence_multiplier: float = 12.0
+    partial_influence_multiplier: float = 4.0
+    max_pairs_per_view: int = 100_000
+    node_fraction: float = 0.04
+    minimum_nodes: int = 192
+    maximum_nodes: int = 6_144
+    neighbours: int = 10
+    edge_ratio: float = 1.85
+    attachment_edge_ratio: float = 3.2
+    data_weight: float = 4.0
+    screening: float = 0.004
+    iterations: int = 3
+    minimum_improvement: float = 0.01
+    minimum_edge_compression: float = 0.70
+    maximum_edge_stretch: float = 1.80
+    minimum_hidden_coverage: float = 0.98
+    coverage_resolution: int = 160
+
+
+def _adaptive_residual_limit(
+    residual: np.ndarray,
+    *,
+    diagonal: float,
+    partial_spacing: float,
+    config: ContinuousObservationFusionConfig,
+) -> float:
+    """Choose a density-aware metric gate without sample-specific units."""
+    values = np.asarray(residual, dtype=np.float64)
+    values = values[np.isfinite(values)]
+    hard_limit = float(config.maximum_residual_ratio) * float(diagonal)
+    if not len(values):
+        return hard_limit
+    density_limit = float(config.partial_spacing_multiplier) * float(partial_spacing)
+    distribution_limit = float(np.quantile(values, float(config.residual_quantile)))
+    return min(hard_limit, max(density_limit, distribution_limit))
 
 
 def positive_multiview_pairs(
@@ -245,3 +301,158 @@ def fuse_observation_anchors(
         },
     }
     return fused, selected, pairs, info
+
+
+def fuse_continuous_observation_field(
+    carrier: np.ndarray,
+    partial: np.ndarray,
+    view_projectors: list,
+    *,
+    config: ContinuousObservationFusionConfig | None = None,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, dict]:
+    """Assimilate reliable measurements through a finite continuous field.
+
+    Cross-view agreement first removes ambiguous image correspondences.  The
+    surviving residual vectors drive the existing embedded-ARAP carrier, while
+    samples outside a density-normalized observation band are fixed boundary
+    conditions.  The solver's line search protects coverage, connectivity and
+    local edge strain, so fusion cannot erase unsupported complete geometry.
+    """
+    config = config or ContinuousObservationFusionConfig()
+    carrier = np.asarray(carrier, dtype=np.float64)
+    partial = np.asarray(partial, dtype=np.float64)
+    if carrier.ndim != 2 or partial.ndim != 2 or carrier.shape[1] != 3 or partial.shape[1] != 3:
+        raise ValueError("carrier and partial must be shaped (N, 3)")
+    if len(carrier) < 32 or len(partial) < 32:
+        raise ValueError("continuous fusion requires at least 32 points per cloud")
+    if len(view_projectors) != int(config.num_views):
+        raise ValueError(
+            f"fusion requires exactly {config.num_views} projectors; "
+            f"received {len(view_projectors)}"
+        )
+    if config.minimum_view_support < 1 or config.minimum_view_support > config.num_views:
+        raise ValueError("minimum_view_support must lie in [1, num_views]")
+
+    diagonal = max(float(np.linalg.norm(np.ptp(partial, axis=0))), 1e-8)
+    partial_spacing = _median_spacing(partial)
+    carrier_spacing = _median_spacing(carrier)
+    pair_config = ObservationAnchoredFusionConfig(
+        num_views=int(config.num_views),
+        pixel_radius=float(config.pixel_radius),
+        cross_view_pixel_radius=float(config.cross_view_pixel_radius),
+        cross_view_depth_ratio=float(config.cross_view_depth_ratio),
+        anchor_residual_ratio=float(config.maximum_residual_ratio),
+        max_pairs_per_view=int(config.max_pairs_per_view),
+    )
+    pairs, multiview_info = positive_multiview_pairs(
+        partial, carrier, list(view_projectors),
+        config=pair_config, diagonal=diagonal,
+    )
+    supported = pairs[pairs[:, 4] >= int(config.minimum_view_support)]
+    if len(supported):
+        partial_ids = supported[:, 0].astype(np.int64)
+        carrier_ids = supported[:, 1].astype(np.int64)
+        residual = np.linalg.norm(partial[partial_ids] - carrier[carrier_ids], axis=1)
+    else:
+        residual = np.empty(0, dtype=np.float64)
+    residual_limit = _adaptive_residual_limit(
+        residual,
+        diagonal=diagonal,
+        partial_spacing=partial_spacing,
+        config=config,
+    )
+    anchors, assignment = collision_free_anchor_pairs(
+        supported, partial, carrier, max_residual=residual_limit,
+    )
+    minimum_anchors = max(32, int(config.minimum_nodes) // 2)
+    if len(anchors) < minimum_anchors:
+        info = {
+            "method": "continuous_multiview_observation_fusion",
+            "active": False,
+            "reason": "insufficient_cross_view_observation_anchors",
+            "ground_truth_used": False,
+            "point_concatenation_used": False,
+            "carrier_slots_before": int(len(carrier)),
+            "carrier_slots_after": int(len(carrier)),
+            "all_carrier_slots_preserved": True,
+            "multiview_positive_evidence": multiview_info,
+            "assignment": assignment,
+            "supported_pairs": int(len(supported)),
+            "residual_limit": float(residual_limit),
+        }
+        return carrier.copy(), anchors, pairs, info
+
+    partial_ids = anchors[:, 0]
+    carrier_ids = anchors[:, 1]
+    influence_radius = max(
+        float(config.carrier_influence_multiplier) * carrier_spacing,
+        float(config.partial_influence_multiplier) * partial_spacing,
+    )
+    anchor_distance = cKDTree(carrier[carrier_ids]).query(
+        carrier, k=1, workers=-1,
+    )[0]
+    stable_mask = anchor_distance > influence_radius
+    stable_mask[carrier_ids] = False
+
+    support_lookup = {
+        (int(row[0]), int(row[1])): float(row[4])
+        for row in supported
+    }
+    target_weights = np.asarray([
+        support_lookup[(int(partial_id), int(carrier_id))] / float(config.num_views)
+        for partial_id, carrier_id in anchors
+    ], dtype=np.float64)
+    fused, solve, moved = _embedded_arap_posterior(
+        carrier,
+        carrier_ids,
+        partial[partial_ids],
+        target_weights,
+        stable_mask,
+        node_fraction=float(config.node_fraction),
+        minimum_nodes=int(config.minimum_nodes),
+        maximum_nodes=int(config.maximum_nodes),
+        skinning_neighbours=4,
+        neighbours=int(config.neighbours),
+        edge_ratio=float(config.edge_ratio),
+        attachment_edge_ratio=float(config.attachment_edge_ratio),
+        data_weight=float(config.data_weight),
+        screening=float(config.screening),
+        iterations=int(config.iterations),
+        maximum_displacement=float(residual_limit),
+        minimum_improvement=float(config.minimum_improvement),
+        minimum_edge_compression=float(config.minimum_edge_compression),
+        maximum_edge_stretch=float(config.maximum_edge_stretch),
+        minimum_hidden_coverage=float(config.minimum_hidden_coverage),
+        coverage_resolution=int(config.coverage_resolution),
+        coherent_component_targets=False,
+        preserve_target_amplitude=True,
+        hard_target_constraints=False,
+    )
+    if not solve.get("active"):
+        fused = carrier.copy()
+        moved = np.zeros(len(carrier), dtype=bool)
+    info = {
+        "method": "continuous_multiview_observation_fusion",
+        "active": bool(solve.get("active")),
+        "reason": solve.get("reason", "accepted"),
+        "ground_truth_used": False,
+        "point_concatenation_used": False,
+        "carrier_slots_before": int(len(carrier)),
+        "carrier_slots_after": int(len(fused)),
+        "all_carrier_slots_preserved": bool(len(fused) == len(carrier)),
+        "multiview_positive_evidence": multiview_info,
+        "assignment": assignment,
+        "supported_pairs": int(len(supported)),
+        "observation_anchors": int(len(anchors)),
+        "stable_carrier_slots": int(stable_mask.sum()),
+        "moved_carrier_slots": int(moved.sum()),
+        "partial_spacing": float(partial_spacing),
+        "carrier_spacing": float(carrier_spacing),
+        "residual_limit": float(residual_limit),
+        "influence_radius": float(influence_radius),
+        "solver": solve,
+        "parameters": {
+            key: value for key, value in vars(config).items()
+        },
+    }
+    return fused, anchors, pairs, info

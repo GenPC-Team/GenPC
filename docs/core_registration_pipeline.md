@@ -158,15 +158,14 @@ only when every ordered carrier slot matches the frozen Redwood and Custom
 outputs within the configured numerical tolerance; aggregate CD/EMD gains
 cannot compensate for a regressed sample.
 
-## 6. Four-view observation-anchored fusion
+## 6. Four-view confidence-gated carrier assimilation
 
 The posterior deformation resolves shape disagreement, but an adapted prior is
 still an estimate rather than a physical measurement. The final decoder reuses
 exactly the four selected cameras from Section 3. In each camera it z-buffers
 the posterior and partial, proposes only visibility-valid pixel matches, and
-checks both image displacement and camera-depth agreement. The union of these
-positive correspondences expands observed coverage, while their cross-view
-support resolves competing assignments.
+checks both image displacement and camera-depth agreement. Only physical pairs
+supported by at least two cameras may influence the final carrier.
 
 For sparse observations whose projected supports do not initially overlap,
 the same camera still proposes its nearest visible pixel correspondences.
@@ -175,21 +174,27 @@ cross-view support, 3-D residual and collision-free assignment checks remain
 the sole conditions for changing a carrier slot.
 
 A deterministic collision-free assignment maps at most one partial sample to
-each carrier slot and at most one carrier slot to each partial sample. Reliable
-assignments replace the corresponding posterior means:
+each carrier slot and at most one carrier slot to each partial sample. Its
+metric gate is the smaller of a dimensionless object-diagonal cap and an
+adaptive measured-density threshold. Reliable residuals then define a finite
+continuous field on the existing embedded-ARAP graph:
 
 \[
-X_i^{\mathrm{final}}=
-\begin{cases}
-P_j,&(j,i)\in\mathcal A,\\
-X_i^*,&\text{otherwise}.
-\end{cases}
+\min_{\Phi}\;\sum_{(j,i)\in\mathcal A}c_{ij}
+\lVert\Phi(X_i^*)-P_j\rVert^2
++\lambda E_{\mathrm{ARAP}}(\Phi)
++\mu\sum_{i\in\mathcal U}\lVert\Phi(X_i^*)-X_i^*\rVert^2.
 \]
 
-This is neither concatenation nor another deformation field. It preserves all
-100k slots, copies unmatched and unobserved posterior geometry exactly, and
-places measured samples directly on the final observed surface. Ground truth
-and offline metrics are not available to correspondence construction.
+Here \(\mathcal U\) contains carrier samples outside a point-spacing-normalized
+observation band, and therefore supplies fixed boundary conditions. A no-GT
+line search accepts the largest field amplitude satisfying hidden-view
+coverage, connectivity, and robust edge-strain bounds. This is neither
+concatenation nor free global deformation: all ordered 100k slots are retained,
+motion decays continuously to zero outside observed support, and unsupported
+complete geometry remains fixed. Ground truth and offline metrics are not
+available to correspondence construction. The former exact slot-replacement
+decoder is retained only as `--mode exact` for historical reproduction.
 
 ## 7. No-GT posterior diagnostics
 
@@ -254,6 +259,10 @@ fusion_anchor_pairs.npy
 fusion_positive_pairs.npy
 fusion_info.json
 ```
+
+When an ordered Pixal3D colour carrier is supplied, it also writes
+`observation_anchored_fused_100k_pixal_texture.ply`; RGB remains associated
+with the same ordered carrier slots after geometry assimilation.
 
 ## 9. Scene-level extension
 

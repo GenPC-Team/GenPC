@@ -59,12 +59,14 @@ carrier slot, anchors already aligned surface, propagates reliable residuals
 through a deformation graph, and protects unobserved structure. Missing
 partial pixels are unknown rather than deletion evidence.
 
-The final fusion is not point concatenation and does not run a second shape
-deformation. The same four saved cameras establish visibility-valid 2-D/depth
-correspondences; a collision-free one-to-one decoder writes reliable measured
-partial samples into an equal number of posterior carrier slots. All unmatched
-slots remain unchanged, so observed geometry becomes exact while complete and
-unobserved prior support is retained at a fixed 100k-point density.
+The final fusion is not point concatenation. The same four saved cameras first
+retain only correspondences supported by at least two views. Their residuals
+drive a finite-support embedded deformation whose boundary is fixed to the
+complete posterior; a no-GT line search protects coverage, connectivity, and
+local edge strain. Thus the observed surface is smoothly assimilated while
+unsupported prior geometry and the ordered 100k carrier are retained. The
+historical exact-slot measurement decoder remains available with `--mode
+exact` for reproducing earlier exports.
 
 ## Quick start from a selected registered prior
 

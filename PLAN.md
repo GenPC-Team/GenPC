@@ -362,3 +362,36 @@ released object-completion route and its immediate maintenance work.
   811 MiB reproduction package (previously approximately 17 GiB). Re-run 01184
   from that package after deletion and again reproduce selected registration
   and posterior byte-for-byte, proving that no deleted path is required.
+
+## Redwood continuous observation fusion (2026-09-25)
+
+- [x] Confirm that the packaged Redwood reference result stops at the complete
+  PosteriorAdapter carrier even though four-view observation assimilation is
+  already used inside posterior inference. Keep the historical exact-slot
+  fusion mode for reproducibility, but do not use its loose one-view-supported
+  replacements as the new default decoder.
+- [x] Add a category-independent continuous fusion decoder. It requires at
+  least two-view correspondence support, derives its residual radius from
+  object scale and measured point spacing, fixes carrier samples outside a
+  finite observation band, and reuses the embedded-ARAP line search to protect
+  hidden coverage, connectivity and robust edge strain. It preserves all
+  ordered carrier slots and can copy Pixal3D texture RGB slot-for-slot.
+- [x] Run the same configuration on Redwood10. Geometry and textured final
+  outputs are in
+  `workspace/compagent_pixal_reproduction_20260925/redwood/final_fused/`,
+  with diagnostics in the sibling `fusion_continuous/` tree. All ten outputs
+  contain exactly 100,000 points; all textured variants contain exactly
+  100,000 RGB values. Frozen offline-only CD-L1/EMD x100 changes from
+  `1.5380/2.4835` before final fusion to `1.5235/2.4716` after fusion. Metrics
+  are recorded in `reports/redwood_continuous_fusion_metrics.{csv,json}` and
+  were not used by inference or parameter selection.
+- [x] Apply the identical frozen fusion configuration to Custom12, using the
+  user-approved residual-proximal visual-best carrier for `cartoon_fox` and
+  the shared posterior carrier for every other sample. Geometry and textured
+  100k outputs are in
+  `workspace/compagent_pixal_reproduction_20260925/custom/final_fused/`, with
+  auditable correspondence/field outputs under `custom/fusion_continuous/`.
+  Every output retains exactly 100,000 carrier slots and RGB values. Against
+  the actual input carriers, frozen offline-only CD-L1/EMD x100 changes from
+  `2.2173/2.7825` to `2.1928/2.7633`; CD improves on 12/12 samples and EMD on
+  11/12. GT was not available to fusion, line search, or stopping.
