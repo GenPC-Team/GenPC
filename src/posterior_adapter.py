@@ -155,15 +155,15 @@ class PosteriorAdapter:
         assimilation_info: dict = {
             "active": False,
             "reason": "disabled",
-            "method": "integrated_four_view_observation_assimilation",
+            "method": "integrated_multiview_observation_assimilation",
         }
         if bool(self.config.integrated_observation_fusion):
-            if view_projectors is None or len(view_projectors) != 4:
+            if view_projectors is None or not 2 <= len(view_projectors) <= 6:
                 raise ValueError(
-                    "integrated observation fusion requires exactly four view projectors"
+                    "agentic observation assimilation requires two to six view projectors"
                 )
             fusion_config = ObservationAnchoredFusionConfig(
-                num_views=4,
+                num_views=len(view_projectors),
                 pixel_radius=float(self.config.assimilation_pixel_radius),
                 cross_view_pixel_radius=float(
                     self.config.assimilation_cross_view_pixel_radius

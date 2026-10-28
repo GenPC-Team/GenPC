@@ -1,5 +1,32 @@
 # Active plan
 
+## Isolated post-registration agentic refinement experiment (2026-10-28)
+
+- [x] Create independent `codex/agentic-posterior-loop` worktree from the
+  committed probe baseline. Read frozen registered priors, partials and saved
+  cameras from the original reproduction package without writing there.
+- [x] Add a bounded, category-free observe/decide/act controller around the
+  existing Partial OT and PosteriorAdapter. It audits four saved views and
+  directed 3-D residual, greedily selects 2–6 active orbit views by incremental
+  physical-partial visibility, and routes between full transport and the
+  existing local observation field. The verifier checks graph integrity,
+  per-view partial coverage, and cumulative reference-prior coverage. The
+  latter has a separate 0.85 floor so a coherently moved part is not rejected
+  solely for leaving its *old* location. This executable prototype uses a
+  deterministic policy because no text-model API credential is available.
+- [x] Compare Redwood 01184, Custom domestic pig and Seahawk with the fixed
+  three-round mainline from the same registered prior. Frozen 100k carriers,
+  decision traces, four-view review images and *offline-only* GT evaluations
+  are under `workspace/agentic_posterior_20261028/`. Final agent outputs are
+  `final_{redwood_01184,domestic_pig,seahawk_helicopter}/agent_selected_posterior_100k.ply`.
+- [x] Record benefits and regressions. Pig and Redwood 01184 improve CD-L1,
+  CD-L2 and EMD over fixed three rounds; Seahawk is nearly tied but slightly
+  worse (CD-L1 0.01552 vs 0.01548). All decisions use only the registered
+  prior, partial, saved camera and multiview evidence. GT is imported only by
+  `scripts/evaluate_agentic_refine.py` after inference. These three development
+  cases do not establish held-out generalization; keep the branch experimental
+  and leave the released mainline unchanged.
+
 Historical exploration is preserved in git commit `f69e38a` and accepted
 artifacts are recorded in `PROJECT_STATE.md`. This file tracks only the
 released object-completion route and its immediate maintenance work.
