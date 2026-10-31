@@ -331,6 +331,26 @@ def test_positive_component_similarity_gain_extrapolates_one_coherent_motion():
     assert np.allclose(amplified[~support], candidate[~support])
 
 
+def test_positive_component_similarity_can_connect_sparse_ot_seeds_geodesically():
+    x = np.linspace(0., 1., 500)
+    reference = np.c_[x, .02 * np.sin(6. * x), np.zeros_like(x)]
+    support = np.zeros(len(reference), dtype=bool)
+    support[np.arange(260, 500, 8)] = True
+    candidate = reference.copy()
+    candidate[x > .5] += np.array([.10, -.04, .02])
+    graph, _, _ = local_surface_graph(reference, neighbours=8, edge_ratio=3.0)
+    _, disconnected, _ = _project_positive_components_to_similarity(
+        reference, candidate, graph, support,
+    )
+    projected, connected, _ = _project_positive_components_to_similarity(
+        reference, candidate, graph, support, connectivity_hops=2,
+    )
+    assert not disconnected["active"]
+    assert connected["active"]
+    assert connected["connectivity_hops"] == 2
+    assert np.allclose(projected[~support], candidate[~support])
+
+
 def test_residual_coherent_raw_field_selects_locally_supported_motion():
     prior, _, moved_ids = _connected_shape()
     candidate = prior.copy()

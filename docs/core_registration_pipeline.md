@@ -264,6 +264,16 @@ When an ordered Pixal3D colour carrier is supplied, it also writes
 `observation_anchored_fused_100k_pixal_texture.ply`; RGB remains associated
 with the same ordered carrier slots after geometry assimilation.
 
+The isolated GPT-refine experiment keeps this decoder as a separate stage,
+using `scripts/fuse_agentic_refine_batch.py` to pair each frozen refined
+carrier with its original partial, saved four-camera manifest and ordered
+Pixal3D colour carrier. This wrapper invokes the unchanged continuous fusion
+solver and writes a separate fused 100k result; it does not concatenate
+points, feed GT to inference, overwrite the unfused carrier, or replace the
+released fixed-three mainline. Future GPT batch experiments may invoke it
+after refine with `--fusion-output-root` in
+`scripts/run_agentic_refine_batch.py`.
+
 ## 9. Scene-level extension
 
 The scene route remains independent. Scene MoGe and instance masks provide a

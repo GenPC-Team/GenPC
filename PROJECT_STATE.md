@@ -1,5 +1,17 @@
 # Accepted project state
 
+## 2026-10-31 23:11 CST — Hydra GPT v7 refinement visually acknowledged
+
+**User approval and scope.** The user rechecked the current Custom Hydra output and said “确实好不少，是我看错了”. Preserve this as an accepted *experimental* Hydra refinement result; it is not authorization to replace the frozen mainline or to claim that Dragon's tail is solved. Do not overwrite the v7 carrier or its fusion output. The earlier concern that the Hydra tail had not moved was a version/inspection mistake: its distal registered-prior points moved (median approximately 0.0767 in the stored coordinate frame), and nearest observed-partial distance for that distal region fell from approximately 0.0727 to 0.00144. These are diagnostic numbers, not agent inputs.
+
+**Exact sample, inputs, outputs.** Sample id `hydra_creature`. Registered complete prior: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/compagent_pixal_reproduction_20260925/custom/reference_registration/hydra_creature/final/camera1_amplified_registered_100k.ply`. Partial: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/compagent_pixal_reproduction_20260925/custom/inputs/partial/hydra_creature.ply`. Camera: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/compagent_pixal_reproduction_20260925/custom/inputs/camera/hydra_creature/camera.pth`. Frozen semantic image: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/compagent_pixal_reproduction_20260925/custom/inputs/camera/hydra_creature/img.png`. Four-view manifest: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/compagent_pixal_reproduction_20260925/custom/residuals/hydra_creature/render/render_manifest.json`. Refined 100k carrier: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-posterior-loop/workspace/gpt_refine_v7_adaptive_all_20261031/agent/custom/hydra_creature/agent_selected_posterior_100k.ply`; trace: same directory `agent_trace.json`; fused carrier: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-posterior-loop/workspace/gpt_refine_v7_adaptive_all_20261031/fusion/custom/hydra_creature/observation_anchored_fused_100k.ply`; textured fused carrier: same directory `observation_anchored_fused_100k_pixal_texture.ply`. No GT was used by the agent or fusion.
+
+**Models, checkpoints, prompts, parameters.** Semantic completion used a direct GPT image model whose exact provider-side model identifier and checkpoint are `UNKNOWN`; negative prompt `UNKNOWN` (none recorded). Its exact recorded positive prompt, copied verbatim, is:
+
+> Generate one complete, realistic RGB object image from the supplied incomplete depth map. The object is a complete three-headed hydra dragon creature. Treat every non-background depth pixel and its foreground mask as a hard ControlNet-like spatial constraint. Preserve the input camera viewpoint, perspective, image-plane center, apparent width and height, crop, orientation, visible silhouette, depth ordering, and all observed part locations. Do not rotate, mirror, recenter, rescale, widen, shorten, tilt, or redesign the observed object. Complete only genuinely missing or occluded regions, connect them naturally to the observed structure, and keep a single coherent object on a pure white background. Produce sharp boundaries and realistic materials suitable for image-to-3D reconstruction. Do not add text, logos, extra parts, secondary objects, or cast shadows that change the foreground mask. Additional structural constraints: Keep exactly three distinct heads on three long necks, all naturally attached to one body with legs and one tail.
+
+The semantic image resolution was 512; image-model seed, steps, CFG/guidance, scheduler, backend, and initial resize policy are `UNKNOWN`. The recorded semantic-install postprocess applied a global image-plane similarity with isotropic scale `0.9013419483101393` and source/target centres `[272.0, 256.5]`/`[262.0, 310.5]`, then RMBG foreground masking; see the frozen `semantic_install.log` in the sample's Pixal input directory. Pixal3D model/checkpoint `/opt/data/private/cr/lab/GenPC/models/Pixal3D-weights`; DINO `/opt/data/private/cr/lab/GenPC/models/dinov3-vitl16-pretrain-lvd1689m`; MoGe `/opt/data/private/cr/lab/GenPC/models/moge-2-vitl/model.pt`; RMBG `/opt/data/private/cr/lab/GenPC/models/RMBG-2.0`; these model paths are recorded in `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/compagent_pixal_reproduction_20260925/custom/inputs/pixal/hydra_creature/pixal3d_metadata.json`. Pixal3D seed `42`, 1024 requested/actual resolution, `xformers`, sparse/shape/texture steps `12/12/12`, guidance `7.5/7.5/1.0`, guidance-rescale `0.7/0.5/0.0`, rescale-t `5.0/3.0/3.0`, decimation target `120000`, texture size `1024`; remaining resize details `UNKNOWN`. The v7 controller used `gpt-6-sol` via Codex, prompt version `v7_evidence_driven_stop` with its exact instruction text in `src/gpt_refine_agent.py` (round-specific assembled text was not persisted verbatim: `UNKNOWN`), no negative prompt, adaptive orbit up to six views, `maximum_rounds=6`, and `minimum_reference_coverage=0.85`. The run accepted three updates (Camera-1 balanced, structured expert from original prior, multiview observation field) and stopped at round four by GPT `ACCEPT`; deterministic OT, graph deformation, and continuous fusion were applied after Camera-1/MoGe registration. Exact controller config: `configs/posterior_mainline.json` and `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/compagent_pixal_reproduction_20260925/configs/residual_proximal_proposal.json`. The v7 run reused the frozen semantic and Pixal3D prior; it did not regenerate them. Upstream semantic image generation is not exactly reproducible because the image-model identifier and settings are unrecorded.
+
 ## 2026-09-20 17:18:00 CST — accepted Seahawk test-time residual re-linearization
 
 **User approval.** The user judged the three-round Seahawk test-time residual
@@ -1858,3 +1870,222 @@ new shape generator.
 `reports/custom_continuous_fusion_metrics.{csv,json}` inside the local package.
 Metrics were computed only after outputs were frozen. Package checksum
 verification passes and the complete test suite passes 96 tests.
+
+## 2026-10-31 15:20 +08:00 — accepted KITTI11 GPT-refine v4 plus continuous fusion (isolated branch)
+
+**User approval and scope.** On 2026-10-31 the user inspected the KITTI results and said the effect was satisfactory. Freeze the 11 completed KITTI outputs listed below as accepted visual results of the isolated `codex/agentic-posterior-loop` experiment. This does NOT promote the GPT policy to the Redwood/Custom mainline and does not authorize replacing its accepted carriers. The batch reuses previously generated semantic images, Pixal3D assets and registered priors; it did not regenerate them.
+
+**Exact input and final output paths.** All paths below are absolute. `final_geometry` and `final_textured` are distinct ordered 100k carriers; the latter copies the corresponding Pixal3D RGB slot-for-slot. `agent_selected_posterior_100k.ply` under the GPT batch root is the *unfused* intermediate; `partial_gray_fused_red.ply` is a visualization, not the final prediction.
+
+- `frame_110_car_0`:
+  - source root: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti`
+  - partial: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/partial/frame_110_car_0.ply`
+  - saved Camera-1: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/camera_selected/frame_110_car_0/camera.pth`; semantic image: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/camera_selected/frame_110_car_0/img.png`
+  - registered prior: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/registration_selected/frame_110_car_0/camera1_amplified_registered_100k.ply`
+  - saved four-view manifest: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/residuals/frame_110_car_0/render/render_manifest.json`
+  - Pixal source and metadata: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/pixal/frame_110_car_0/pixal3d_sampled_100k.ply`; `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/pixal/frame_110_car_0/pixal3d_metadata.json`
+  - unfused GPT refine: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-posterior-loop/workspace/gpt_refine_cross_dataset_v4_20261030/kitti/frame_110_car_0/agent_selected_posterior_100k.ply`
+  - final_geometry: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-posterior-loop/workspace/gpt_refine_fused_v4_20261030/kitti/frame_110_car_0/observation_anchored_fused_100k.ply`
+  - final_textured: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-posterior-loop/workspace/gpt_refine_fused_v4_20261030/kitti/frame_110_car_0/observation_anchored_fused_100k_pixal_texture.ply`
+  - semantic installation manifest: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/camera_selected/frame_110_car_0/semantic_install_manifest.json`
+
+- `frame_11_car_0`:
+  - source root: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti`
+  - partial: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/partial/frame_11_car_0.ply`
+  - saved Camera-1: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/camera_selected/frame_11_car_0/camera.pth`; semantic image: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/camera_selected/frame_11_car_0/img.png`
+  - registered prior: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/registration_selected/frame_11_car_0/camera1_amplified_registered_100k.ply`
+  - saved four-view manifest: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/residuals/frame_11_car_0/render/render_manifest.json`
+  - Pixal source and metadata: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/pixal/frame_11_car_0/pixal3d_sampled_100k.ply`; `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/pixal/frame_11_car_0/pixal3d_metadata.json`
+  - unfused GPT refine: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-posterior-loop/workspace/gpt_refine_cross_dataset_v4_20261030/kitti/frame_11_car_0/agent_selected_posterior_100k.ply`
+  - final_geometry: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-posterior-loop/workspace/gpt_refine_fused_v4_20261030/kitti/frame_11_car_0/observation_anchored_fused_100k.ply`
+  - final_textured: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-posterior-loop/workspace/gpt_refine_fused_v4_20261030/kitti/frame_11_car_0/observation_anchored_fused_100k_pixal_texture.ply`
+  - semantic installation manifest: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/camera_selected/frame_11_car_0/semantic_install_manifest.json`
+
+- `frame_122_car_0`:
+  - source root: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti`
+  - partial: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/partial/frame_122_car_0.ply`
+  - saved Camera-1: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/camera_selected/frame_122_car_0/camera.pth`; semantic image: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/camera_selected/frame_122_car_0/img.png`
+  - registered prior: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/registration_selected/frame_122_car_0/camera1_amplified_registered_100k.ply`
+  - saved four-view manifest: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/residuals/frame_122_car_0/render/render_manifest.json`
+  - Pixal source and metadata: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/pixal/frame_122_car_0/pixal3d_sampled_100k.ply`; `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/pixal/frame_122_car_0/pixal3d_metadata.json`
+  - unfused GPT refine: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-posterior-loop/workspace/gpt_refine_cross_dataset_v4_20261030/kitti/frame_122_car_0/agent_selected_posterior_100k.ply`
+  - final_geometry: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-posterior-loop/workspace/gpt_refine_fused_v4_20261030/kitti/frame_122_car_0/observation_anchored_fused_100k.ply`
+  - final_textured: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-posterior-loop/workspace/gpt_refine_fused_v4_20261030/kitti/frame_122_car_0/observation_anchored_fused_100k_pixal_texture.ply`
+  - semantic installation manifest: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/camera_selected/frame_122_car_0/semantic_install_manifest.json`
+
+- `frame_135_car_1`:
+  - source root: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/real_scan_pilot_20261005/kitti`
+  - partial: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/real_scan_pilot_20261005/kitti/inputs/partial/frame_135_car_1.ply`
+  - saved Camera-1: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/real_scan_pilot_20261005/kitti/inputs/camera/frame_135_car_1/camera.pth`; semantic image: `UNKNOWN/not supplied to frozen refine run`
+  - registered prior: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/real_scan_pilot_20261005/kitti/registration_selected/frame_135_car_1/camera1_amplified_registered_100k.ply`
+  - saved four-view manifest: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/real_scan_pilot_20261005/kitti/residuals/frame_135_car_1/render/render_manifest.json`
+  - Pixal source and metadata: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/real_scan_pilot_20261005/kitti/inputs/pixal/frame_135_car_1/pixal3d_sampled_100k.ply`; `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/real_scan_pilot_20261005/kitti/inputs/pixal/frame_135_car_1/pixal3d_metadata.json`
+  - unfused GPT refine: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-posterior-loop/workspace/gpt_refine_cross_dataset_v4_20261030/kitti/frame_135_car_1/agent_selected_posterior_100k.ply`
+  - final_geometry: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-posterior-loop/workspace/gpt_refine_fused_v4_20261030/kitti/frame_135_car_1/observation_anchored_fused_100k.ply`
+  - final_textured: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-posterior-loop/workspace/gpt_refine_fused_v4_20261030/kitti/frame_135_car_1/observation_anchored_fused_100k_pixal_texture.ply`
+  - semantic installation manifest: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/real_scan_pilot_20261005/kitti/inputs/camera_selected/frame_135_car_1/semantic_install_manifest.json`
+
+- `frame_149_car_1`:
+  - source root: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti`
+  - partial: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/partial/frame_149_car_1.ply`
+  - saved Camera-1: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/camera_selected/frame_149_car_1/camera.pth`; semantic image: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/camera_selected/frame_149_car_1/img.png`
+  - registered prior: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/registration_selected/frame_149_car_1/camera1_amplified_registered_100k.ply`
+  - saved four-view manifest: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/residuals/frame_149_car_1/render/render_manifest.json`
+  - Pixal source and metadata: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/pixal/frame_149_car_1/pixal3d_sampled_100k.ply`; `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/pixal/frame_149_car_1/pixal3d_metadata.json`
+  - unfused GPT refine: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-posterior-loop/workspace/gpt_refine_cross_dataset_v4_20261030/kitti/frame_149_car_1/agent_selected_posterior_100k.ply`
+  - final_geometry: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-posterior-loop/workspace/gpt_refine_fused_v4_20261030/kitti/frame_149_car_1/observation_anchored_fused_100k.ply`
+  - final_textured: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-posterior-loop/workspace/gpt_refine_fused_v4_20261030/kitti/frame_149_car_1/observation_anchored_fused_100k_pixal_texture.ply`
+  - semantic installation manifest: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/camera_selected/frame_149_car_1/semantic_install_manifest.json`
+
+- `frame_324_car_0`:
+  - source root: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/real_scan_pilot_20261005/kitti`
+  - partial: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/real_scan_pilot_20261005/kitti/inputs/partial/frame_324_car_0.ply`
+  - saved Camera-1: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/real_scan_pilot_20261005/kitti/inputs/camera_selected/frame_324_car_0/camera.pth`; semantic image: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/real_scan_pilot_20261005/kitti/inputs/camera_selected/frame_324_car_0/img.png`
+  - registered prior: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/real_scan_pilot_20261005/kitti/registration_selected/frame_324_car_0/camera1_amplified_registered_100k.ply`
+  - saved four-view manifest: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/real_scan_pilot_20261005/kitti/residuals/frame_324_car_0/render/render_manifest.json`
+  - Pixal source and metadata: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/real_scan_pilot_20261005/kitti/inputs/pixal/frame_324_car_0/pixal3d_sampled_100k.ply`; `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/real_scan_pilot_20261005/kitti/inputs/pixal/frame_324_car_0/pixal3d_metadata.json`
+  - unfused GPT refine: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-posterior-loop/workspace/gpt_refine_cross_dataset_v4_20261030/kitti/frame_324_car_0/agent_selected_posterior_100k.ply`
+  - final_geometry: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-posterior-loop/workspace/gpt_refine_fused_v4_20261030/kitti/frame_324_car_0/observation_anchored_fused_100k.ply`
+  - final_textured: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-posterior-loop/workspace/gpt_refine_fused_v4_20261030/kitti/frame_324_car_0/observation_anchored_fused_100k_pixal_texture.ply`
+  - semantic installation manifest: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/real_scan_pilot_20261005/kitti/inputs/camera_selected/frame_324_car_0/semantic_install_manifest.json`
+
+- `frame_45_car_0`:
+  - source root: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti`
+  - partial: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/partial/frame_45_car_0.ply`
+  - saved Camera-1: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/camera_selected/frame_45_car_0/camera.pth`; semantic image: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/camera_selected/frame_45_car_0/img.png`
+  - registered prior: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/registration_selected/frame_45_car_0/camera1_amplified_registered_100k.ply`
+  - saved four-view manifest: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/residuals/frame_45_car_0/render/render_manifest.json`
+  - Pixal source and metadata: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/pixal/frame_45_car_0/pixal3d_sampled_100k.ply`; `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/pixal/frame_45_car_0/pixal3d_metadata.json`
+  - unfused GPT refine: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-posterior-loop/workspace/gpt_refine_cross_dataset_v4_20261030/kitti/frame_45_car_0/agent_selected_posterior_100k.ply`
+  - final_geometry: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-posterior-loop/workspace/gpt_refine_fused_v4_20261030/kitti/frame_45_car_0/observation_anchored_fused_100k.ply`
+  - final_textured: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-posterior-loop/workspace/gpt_refine_fused_v4_20261030/kitti/frame_45_car_0/observation_anchored_fused_100k_pixal_texture.ply`
+  - semantic installation manifest: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/camera_selected/frame_45_car_0/semantic_install_manifest.json`
+
+- `frame_66_car_0`:
+  - source root: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti`
+  - partial: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/partial/frame_66_car_0.ply`
+  - saved Camera-1: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/camera_selected/frame_66_car_0/camera.pth`; semantic image: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/camera_selected/frame_66_car_0/img.png`
+  - registered prior: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/registration_selected/frame_66_car_0/camera1_amplified_registered_100k.ply`
+  - saved four-view manifest: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/residuals/frame_66_car_0/render/render_manifest.json`
+  - Pixal source and metadata: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/pixal/frame_66_car_0/pixal3d_sampled_100k.ply`; `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/pixal/frame_66_car_0/pixal3d_metadata.json`
+  - unfused GPT refine: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-posterior-loop/workspace/gpt_refine_cross_dataset_v4_20261030/kitti/frame_66_car_0/agent_selected_posterior_100k.ply`
+  - final_geometry: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-posterior-loop/workspace/gpt_refine_fused_v4_20261030/kitti/frame_66_car_0/observation_anchored_fused_100k.ply`
+  - final_textured: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-posterior-loop/workspace/gpt_refine_fused_v4_20261030/kitti/frame_66_car_0/observation_anchored_fused_100k_pixal_texture.ply`
+  - semantic installation manifest: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/camera_selected/frame_66_car_0/semantic_install_manifest.json`
+
+- `frame_74_car_1`:
+  - source root: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti`
+  - partial: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/partial/frame_74_car_1.ply`
+  - saved Camera-1: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/camera_selected/frame_74_car_1/camera.pth`; semantic image: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/camera_selected/frame_74_car_1/img.png`
+  - registered prior: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/registration_selected/frame_74_car_1/camera1_amplified_registered_100k.ply`
+  - saved four-view manifest: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/residuals/frame_74_car_1/render/render_manifest.json`
+  - Pixal source and metadata: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/pixal/frame_74_car_1/pixal3d_sampled_100k.ply`; `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/pixal/frame_74_car_1/pixal3d_metadata.json`
+  - unfused GPT refine: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-posterior-loop/workspace/gpt_refine_cross_dataset_v4_20261030/kitti/frame_74_car_1/agent_selected_posterior_100k.ply`
+  - final_geometry: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-posterior-loop/workspace/gpt_refine_fused_v4_20261030/kitti/frame_74_car_1/observation_anchored_fused_100k.ply`
+  - final_textured: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-posterior-loop/workspace/gpt_refine_fused_v4_20261030/kitti/frame_74_car_1/observation_anchored_fused_100k_pixal_texture.ply`
+  - semantic installation manifest: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/camera_selected/frame_74_car_1/semantic_install_manifest.json`
+
+- `frame_75_car_1`:
+  - source root: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti`
+  - partial: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/partial/frame_75_car_1.ply`
+  - saved Camera-1: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/camera_selected/frame_75_car_1/camera.pth`; semantic image: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/camera_selected/frame_75_car_1/img.png`
+  - registered prior: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/registration_selected/frame_75_car_1/camera1_amplified_registered_100k.ply`
+  - saved four-view manifest: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/residuals/frame_75_car_1/render/render_manifest.json`
+  - Pixal source and metadata: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/pixal/frame_75_car_1/pixal3d_sampled_100k.ply`; `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/pixal/frame_75_car_1/pixal3d_metadata.json`
+  - unfused GPT refine: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-posterior-loop/workspace/gpt_refine_cross_dataset_v4_20261030/kitti/frame_75_car_1/agent_selected_posterior_100k.ply`
+  - final_geometry: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-posterior-loop/workspace/gpt_refine_fused_v4_20261030/kitti/frame_75_car_1/observation_anchored_fused_100k.ply`
+  - final_textured: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-posterior-loop/workspace/gpt_refine_fused_v4_20261030/kitti/frame_75_car_1/observation_anchored_fused_100k_pixal_texture.ply`
+  - semantic installation manifest: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/camera_selected/frame_75_car_1/semantic_install_manifest.json`
+
+- `frame_9_car_0`:
+  - source root: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti`
+  - partial: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/partial/frame_9_car_0.ply`
+  - saved Camera-1: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/camera_selected/frame_9_car_0/camera.pth`; semantic image: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/camera_selected/frame_9_car_0/img.png`
+  - registered prior: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/registration_selected/frame_9_car_0/camera1_amplified_registered_100k.ply`
+  - saved four-view manifest: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/residuals/frame_9_car_0/render/render_manifest.json`
+  - Pixal source and metadata: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/pixal/frame_9_car_0/pixal3d_sampled_100k.ply`; `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/pixal/frame_9_car_0/pixal3d_metadata.json`
+  - unfused GPT refine: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-posterior-loop/workspace/gpt_refine_cross_dataset_v4_20261030/kitti/frame_9_car_0/agent_selected_posterior_100k.ply`
+  - final_geometry: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-posterior-loop/workspace/gpt_refine_fused_v4_20261030/kitti/frame_9_car_0/observation_anchored_fused_100k.ply`
+  - final_textured: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-posterior-loop/workspace/gpt_refine_fused_v4_20261030/kitti/frame_9_car_0/observation_anchored_fused_100k_pixal_texture.ply`
+  - semantic installation manifest: `/opt/data/private/cr/lab/GenPC/.codex-worktrees/agentic-01184-probe/workspace/kitti_waymo_style_rerun_20261010/kitti/inputs/camera_selected/frame_9_car_0/semantic_install_manifest.json`
+
+**Models/checkpoints and parameters.** Semantic completion provenance is the per-sample `semantic_install_manifest.json` (`source_semantic` and verbatim `prompt`); exact GPT image model checkpoint/version, seed, steps, guidance, scheduler and independent negative-prompt field are `UNKNOWN` because not recorded. Hence the *upstream semantic generation* is not exactly reproducible from the retained metadata alone, although its installed images are frozen. Pixal3D uses `/opt/data/private/cr/lab/GenPC/models/Pixal3D-weights`; DINOv3 `/opt/data/private/cr/lab/GenPC/models/dinov3-vitl16-pretrain-lvd1689m`; MoGe `/opt/data/private/cr/lab/GenPC/models/moge-2-vitl/model.pt`; RMBG `/opt/data/private/cr/lab/GenPC/models/RMBG-2.0`. The 11 Pixal metadata files agree on seed `42`, requested/actual resolution `1024`, decimation target `300000`, texture size `2048`, xformers backend, and 100000-point sampling. Sparse-structure sampler: 12 steps, strength 7.5, rescale .7, rescale_t 5.0; shape: 12, 7.5, .5, 3.0; texture: 12, 1.0, 0.0, 3.0. Exact per-sample Pixal camera values and GLB paths are in each `pixal3d_metadata.json`. No separate text prompt is used for Pixal3D image-conditioned generation.
+
+**GPT refine and fusion.** Model `gpt-6-sol` through logged-in `codex` provider; checkpoint/transformer path: `UNKNOWN` (not exposed by Codex). The frozen batch policy is `v4_view_visibility_options`, at most three rounds, four saved-camera diagnostic panels, discrete choice of saved four views or up to six adaptive orbit views, Camera-1 or all-active-view transport route, and conservative/balanced/expansive presets. The deterministic solver computes Partial OT, embedded-ARAP posterior proposals, and no-GT integrity checks. The exact per-round GPT decisions, chosen cameras, observed residuals, hard checks, and accepted rounds are in each `agent_trace.json` under `workspace/gpt_refine_cross_dataset_v4_20261030/kitti/<sample>/`. Dynamic per-call payload serialization and stochastic model state were not separately archived: `UNKNOWN` for exact bitwise decision replay. The final decoder is the existing `continuous_multiview_observation_fusion` with four original saved cameras, at least two-view support, collision-free anchors, finite observation band and integrity-gated embedded-ARAP field. Parameters and acceptance audit for each case are in its `fusion_info.json`; no point concatenation/deletion and no GT/CD/EMD at inference. The output source mapping is `workspace/gpt_refine_fused_v4_20261030/fusion_batch_index.json`.
+
+**Postprocessing.** Each semantic image is installed with the corresponding recorded depth-mask framing transform (when present), then RMBG/Pixal3D produces the textured mesh, 100k sampled carrier and native MoGe observation. Registration composes Pixal-to-MoGe and MoGe-to-partial camera evidence with Camera-1 proper-Sim(3) refinement; its frozen selected 100k prior is the `registered prior` listed above. The GPT loop may change its active orbit views per round, but the final fusion uses the original four-view manifest. Ordered RGB transfer is the only colour postprocessing. Any unrecorded coordinate flip or extra crop is `UNKNOWN`; do not infer one from filenames. The user-approved result is the *fused* carrier, not merely GPT's unfused posterior.
+
+**Verbatim upstream semantic prompts.** These seven distinct strings are copied exactly from the 11 semantic installation manifests; sample IDs specify reuse. `Avoid` clauses are part of the positive prompt text, not a separately recorded negative prompt.
+
+Samples: `frame_110_car_0`
+```text
+Use case: precise-object-edit
+Asset type: geometry-conditioned semantic image for single-view 3D reconstruction.
+Input image: Image 1 is the exact sparse grayscale depth observation and the edit target.
+Primary request: Convert the observed vehicle into one complete, realistic ordinary road car on a clean white background.
+Composition/framing: Preserve exactly the vehicle pose, facing direction, camera elevation, perspective, image-plane center, bounding-box width and height, body length-to-height ratio, roof slope, windshield and A-pillar slope visible in Image 1.
+Geometry constraint: Every non-black depth pixel in Image 1 must land on the corresponding vehicle surface in the result. Preserve the observed roof, front and rear windshield, A-pillars, side windows, hood, trunk, lower body edge and visible wheel locations. Infer sedan/SUV/van type from the depth silhouette. Only complete holes, the hidden far side, and occluded wheels.
+Style: photorealistic catalog-like vehicle, solid medium blue paint, natural material detail, even soft lighting.
+Constraints: one vehicle only; do not translate, rotate, mirror, crop, enlarge, shorten, widen or raise the vehicle; do not change the camera view.
+Avoid: road, ground plane, cast shadow, scenery, text, logos, watermark, people, extra objects, motion blur, stylization.
+```
+
+Samples: `frame_11_car_0`
+```text
+Use case: precise-object-edit
+Asset type: corrected geometry-conditioned semantic image for single-view 3D reconstruction.
+Input images: Image 1 is the authoritative sparse depth geometry and camera pose. Image 2 is only an appearance reference for the existing silver car.
+Primary request: Re-render the complete car from Image 2 so that its projection tightly follows Image 1.
+Critical correction: the car in Image 2 extends too far horizontally outside the observed depth support. Keep the same camera elevation, facing direction, roof/window/A-pillar geometry and vehicle identity, but tighten the full car silhouette horizontally by about 8 percent around the Image-1 center. Do not increase its height. Make the depth silhouette pass through the corresponding hood, windows, roof, trunk, lower body and visible wheel surfaces.
+Composition: exact Image-1 center, perspective, width-to-height relation and tilt; clean white background.
+Constraints: one complete photorealistic silver road car only; retain windows and both visible wheels; only fill genuinely missing or hidden surfaces.
+Avoid: pose change, camera change, rotation, mirroring, crop, road, ground plane, cast shadow, scenery, text, logos, watermark, extra objects, blur.
+```
+
+Samples: `frame_122_car_0`, `frame_149_car_1`, `frame_45_car_0`, `frame_66_car_0`, `frame_9_car_0`
+```text
+编辑图1中的车辆深度图，生成一辆完整、真实、普通道路乘用车，纯白背景。图1是必须严格服从的 Camera-1 几何观测，不是风格参考：保持车辆在图中的相同视角、相同朝向、相同中心、相同宽高、相同车身长宽比和相同倾斜程度。所有非黑深度像素必须落在对应车辆表面上。严格保留深度图支持的车顶轮廓、前后挡风玻璃、A柱、侧窗、发动机盖、后备箱、车身下沿和可见车轮的位置、斜率与透视关系；根据深度轮廓判断它是轿车、SUV还是厢式车，不要统一改成另一种车型。只补全深度图缺失的背面、孔洞和被遮挡车轮，不要把车身变高、变宽、变短、平移、旋转、镜像或改成不同视角，也不要用更大的外轮廓包住深度图。不要道路、地面、阴影、文字、标志、人物或其他物体。
+```
+
+Samples: `frame_135_car_1`
+```text
+Generate one complete, realistic RGB object image from the supplied incomplete depth map. The object is a passenger car. Treat every non-background depth pixel and its foreground mask as a hard ControlNet-like spatial constraint. Preserve the input camera viewpoint, perspective, image-plane center, apparent width and height, crop, orientation, visible silhouette, depth ordering, and all observed part locations. Do not rotate, mirror, recenter, rescale, widen, shorten, tilt, or redesign the observed object. Complete only genuinely missing or occluded regions, connect them naturally to the observed structure, and keep a single coherent object on a pure white background. Produce sharp boundaries and realistic materials suitable for image-to-3D reconstruction. Do not add text, logos, extra parts, secondary objects, or cast shadows that change the foreground mask.
+```
+
+Samples: `frame_324_car_0`
+```text
+Use case: sketch-to-render. Edit target: attached sparse grayscale LiDAR depth projection of exactly one passenger car. Generate a realistic RGB camera-consistent completion on pure white background for 3D reconstruction. Keep the observed horizontal long-axis, visible side or three-quarter orientation, roofline, scan-supported side surfaces, pixel position, apparent size and all nonblack positive LiDAR returns. The black gaps and missing wheels/lower body are unknown, so infer a plausible complete ordinary road car without erasing the observed part. Preserve the saved camera and facing direction; do not rotate, shift or zoom it. No road, other objects, people, text or watermark.
+```
+
+Samples: `frame_74_car_1`
+```text
+Use case: precise-object-edit
+Asset type: geometry-conditioned semantic image for single-view 3D reconstruction.
+Input image: Image 1 is the exact sparse grayscale depth observation and the edit target.
+Primary request: Convert the observed vehicle into one complete, realistic ordinary road car on a clean white background.
+Composition/framing: Preserve exactly the vehicle pose, facing direction, camera elevation, perspective, image-plane center, bounding-box width and height, body length-to-height ratio, roof slope, windshield and A-pillar slope visible in Image 1.
+Geometry constraint: Every non-black depth pixel in Image 1 must land on the corresponding vehicle surface in the result. Preserve the observed roof, front and rear windshield, A-pillars, side windows, hood, trunk, lower body edge and visible wheel locations. Infer sedan/SUV/van type from the depth silhouette. Only complete holes, the hidden far side, and occluded wheels.
+Style: photorealistic catalog-like vehicle, solid metallic green paint, natural material detail, even soft lighting.
+Constraints: one vehicle only; do not translate, rotate, mirror, crop, enlarge, shorten, widen or raise the vehicle; do not change the camera view.
+Avoid: road, ground plane, cast shadow, scenery, text, logos, watermark, people, extra objects, motion blur, stylization.
+```
+
+Samples: `frame_75_car_1`
+```text
+Use case: precise-object-edit
+Asset type: corrected geometry-conditioned semantic image for single-view 3D reconstruction.
+Input images: Image 1 is the authoritative sparse depth geometry and camera pose. Image 2 is only an appearance reference for the existing deep red car.
+Primary request: Re-render the complete car from Image 2 so that its projection tightly follows Image 1.
+Critical correction: the car in Image 2 extends too far horizontally outside the observed depth support. Keep the same camera elevation, facing direction, roof/window/A-pillar geometry and vehicle identity, but tighten the full car silhouette horizontally by about 8 percent around the Image-1 center. Do not increase its height. Make the depth silhouette pass through the corresponding hood, windows, roof, trunk, lower body and visible wheel surfaces.
+Composition: exact Image-1 center, perspective, width-to-height relation and tilt; clean white background.
+Constraints: one complete photorealistic deep red road car only; retain windows and both visible wheels; only fill genuinely missing or hidden surfaces.
+Avoid: pose change, camera change, rotation, mirroring, crop, road, ground plane, cast shadow, scenery, text, logos, watermark, extra objects, blur.
+```
+
+**Verbatim static GPT refine instruction.** This is the full frozen shared instruction string used by the v4 decision loop. The per-call observation JSON and image board varied by sample/round and are represented by the saved traces/boards; exact raw request bytes are `UNKNOWN`.
+
+```text
+You are the decision maker for a test-time 3D partial-to-complete refinement loop. The input is an already registered complete prior, not ground truth. The blue points are observed partial samples. Coherent blue-only regions that repeat across views are strong positive evidence of a structural mismatch, not noise. Red-only geometry is not necessarily wrong because unobserved surfaces must remain complete. Purple means screen-space overlap. Read all four fixed-camera panels and their numeric evidence. Choose only the specified discrete action, profile, and correspondence route. UPDATE_POSTERIOR runs structure-preserving Partial OT and PosteriorAdapter. REFINE_OBSERVED runs a narrow local observation field only when most of the prior is already aligned and the remaining 3D residual is small with a heavy outlier tail. A substantial p90 distance or coherent limb, tail, or object-extent discrepancy calls for UPDATE_POSTERIOR, which can move low-frequency structure. ACCEPT stops without changing the current carrier; do not stop merely because one small local step had little gain while coherent blue-only structure still remains. CAMERA1 is the actual saved acquisition camera with the calibrated physical depth and scale relation. The other orbit views are synthetic diagnostic projections and may use different framing; they provide evidence for local assimilation but are not automatically reliable as additional global OT cameras. For broad structural or extent mismatch, prefer CAMERA1 transport and use auxiliary views to audit and assimilate the result. Choose ALL_ACTIVE_VIEWS for OT only if the supplied evidence clearly supports their calibration for this purpose; do not equate more views with better correspondence by default. CONSERVATIVE, BALANCED, and EXPANSIVE are preset strengths, not free parameters. SAVED_FOUR uses exactly the four supplied cameras; ADAPTIVE_ORBIT adds up to six same-orbit views selected by visible positive partial evidence. Compare the two view options' measured unique visible partial fractions when choosing; a meaningful gain in physical partial visibility supports ADAPTIVE_ORBIT, while negligible gain favors the simpler saved four. More cameras are not automatically better. The goal is both observed fit and a complete, coherent shape: neither ignoring a real observed part nor collapsing hidden prior geometry is acceptable. Do not predict transforms, coordinates, thresholds, or semantic part labels. Prefer preserving coherent prior structure over fitting a few noisy partial points. Never claim access to GT, CD, or EMD. Keep reasons short and evidence-specific.
+```
+
+**Verification and preservation.** The fusion index reports 11/11 KITTI records completed; each geometry and textured output exists with exactly 100000 vertices. Preserve the original source roots, batch index, GPT traces, fusion index, semantic installation manifests, Pixal metadata, and all final PLYs. Do not silently substitute the later v5 feasible-review probe for these v4 accepted outputs. KITTI matched GT metrics were not established, so this acceptance is visual, not a measured CD/EMD claim.

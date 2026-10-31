@@ -1,5 +1,180 @@
 # Active plan
 
+## GPT v7 batch throughput without changing geometry (2026-10-31)
+
+- [x] Profile the ongoing batch. The expensive optional structural route runs a six-round residual-proximal proposal plus graph projection; among the first 23 completed cases it was attempted 21 times but accepted only 3. A single KITTI case spent roughly 2m47s in that route. The batch also processed samples serially. Do not skip the route based on dataset/category: Fox, Hydra, and light helicopter benefited from it.
+- [x] Add resume-safe two-worker per-sample scheduling to `scripts/run_agentic_refine_batch.py`, capped at two workers for the 24GB GPU. Each case keeps the identical GPT controller, six-round safety ceiling, structural candidate, verifier, and output schema; only the independent case scheduling changes. Shared `batch_index.json` is written by the parent after each finished case. New scheduler/resume test and full suite pass (112 tests).
+- [x] Resume the existing 53-case v7 run with two workers after Redwood 01184 finished. The parallel parent reused completed carriers without rerunning their geometry; observed GPU use stayed within 24 GB. Four cases hit transient Codex/GPT request errors, then succeeded in a one-worker, resume-safe retry. Final refine index: 53/53 complete. Fusion and no-GT audit also completed; the runner and finalizer have exited.
+
+## GPT v7 adaptive-stop all-available-samples run (2026-10-31)
+
+- [x] Replace the fixed three-round ceiling with an explicitly bounded evidence-driven loop: GPT can choose `ACCEPT` at any observation, a hard verifier can reject/stop a route, two consecutive accepted updates with negligible four-view coverage, p90 and p99 gains stop as a plateau, and six rounds is only the safety ceiling. Record the stop reason and per-step progress without GT. The initial v6 batch at `workspace/gpt_refine_v6_all_20261031/` was stopped during the first Fox case before any completed output to avoid mixing strategies; its incomplete files are retained as an audit trail. The v7 policy passes 111 repository tests.
+- [x] Run the no-GT GPT v7 refine controller with the opt-in structured proposal on all 53 complete input chains: Custom 12, KITTI 11, Redwood 10, ScanNet 10, Waymo 10. Per-case inputs, labeled boards, decision traces, stop reasons, and ordered 100k carriers are under `workspace/gpt_refine_v7_adaptive_all_20261031/agent/`; accepted mainline outputs were not modified. The 12 older KITTI/Waymo partials without matching priors/manifests remain listed as incomplete inputs, not silently substituted. `agent/batch_index.json` has 53 complete records; `no_gt_batch_audit.json` reports no issues. All 53 carrier files exist with 100,000 vertices. Fox CD-L1 0.01691 and Pig 0.01472 were checked offline after freezing, not used by the agent.
+- [x] Run separate accepted continuous observation fusion at `workspace/gpt_refine_v7_adaptive_all_20261031/fusion/`. `fusion/fusion_batch_index.json` has 53 complete records; all 53 fused geometry and 53 Pixal-textured PLYs exist with 100,000 vertices. The 49 previously fused cases were reused and only the four recovered cases recomputed. No-GT audit and terminal process checks passed.
+
+## GPT refine observation and structural-route correction (2026-10-31)
+
+- [x] Make each GPT diagnostic view explicitly separate observed partial projection, complete prior projection, and registered overlay; label colors and camera identity so the model cannot conflate positive observation with unobserved prior geometry. The new four-view board uses blue A=physical partial, red B=complete prior, and C=same-camera overlay, with an explicit warning that red-only is unobserved rather than wrong. Verified on Fox and Pig boards in `workspace/gpt_refine_pilot_20261031/` and covered by `tests/test_gpt_refine_agent.py`.
+- [x] Add an opt-in structured geometric proposal route for persistent coherent residuals, reusing the existing residual-proximal/embedded-graph solver from the original registered prior rather than adding a new model or free-form GPT coordinates. Keep the accepted fixed-three and previous GPT outputs unchanged. The agent selects a bounded route; deterministic coverage and integrity checks accept or reject it. A rejected or failed structured solver falls back to observation-field and Camera-1 candidates, as Pig demonstrated in `workspace/gpt_refine_pilot_20261031/domestic_pig/live_v6_fallback/`. The branch remains experimental and is not promoted to mainline.
+- [x] Run Fox from the same frozen registered prior, review four-view tail evidence and verify no-GT completeness, then compare frozen Fox/Pig/Redwood controls offline. Fox's GPT v6 carrier has 100k points and offline CD-L1 0.01774 versus v4 0.02382; its separate continuous-fusion output is CD-L1 0.01769. Pig's fallback carrier has 100k points and CD-L1 0.01489 versus v4 0.01516, while CD-L2 is slightly worse. Redwood 06830's v6 carrier has 100k points and CD-L1/CD-L2/EMD 0.01549/0.00131/0.02685 versus v4 0.02332/0.00215/0.04092, but still trails the fixed-three control 0.01501/0.00108/0.02678. Four-view final evidence was visually checked, and the full test suite passes 110 tests. GT was used only after freezing inference. This is an encouraging three-case pilot, not enough to promote the experimental policy to mainline; Redwood's residual gap and the structured candidate's runtime are risks.
+
+## Part-coherent refine and post-refine fusion (2026-10-30)
+
+- [x] Connect the frozen GPT-refine 100k carrier to the accepted continuous
+  four-view observation fusion as a separate, resumable stage. Reuse the exact
+  partial, camera manifest, and ordered Pixal3D colours; keep unfused and fused
+  files distinct and audit all carrier slots. No GT in inference.
+  `scripts/fuse_agentic_refine_batch.py` completed all 53 available cases in
+  `workspace/gpt_refine_fused_v4_20261030/`: 53/53 fused 100k carriers and
+  53/53 ordered Pixal-textured carriers, all active and accepted by the
+  original continuous decoder. The source carrier is never overwritten.
+  Offline GT evaluation of Redwood10/Custom12 is in
+  `redwood_custom_offline_gt.{json,csv}` under that output root. Fusion changes
+  Custom mean CD-L1 from 0.01992 to 0.01983 and Redwood from 0.01520 to
+  0.01510, with no GT in fusion. The gain is modest and does not repair the
+  underlying shape regressions. New GPT batch runs can request this separate
+  stage directly with `--fusion-output-root`, with explicit `--fusion-pilot`
+  mappings for any previously excluded cases.
+- [x] Diagnose no-GT part/structure failures from the existing trace, especially
+  Redwood 06830 and Custom Hydra, while keeping Fox/Pig/Seahawk as preservation
+  cases. Prototype a simple category-free coherent-region correction using
+  partial/visible residual evidence and the existing graph solver, not a new
+  semantic model or sample-specific part labels.
+  An isolated `scripts/probe_part_coherent_refine.py` experiment uses existing
+  Partial OT, coherent residual targets, and a geodesically linked
+  positive-component similarity projection (opt-in; default code path
+  unchanged). On Hydra, 222 sparse OT seeds formed two coherent moving
+  regions (66 and 70 supported samples) after geodesic connection, but the
+  protected output improved CD-L1 only 0.01392 -> 0.01383 and still lagged the
+  fixed-three baseline 0.01032. On Redwood 06830, the protected output was
+  0.02265 vs 0.02332 before and 0.01501 fixed-three; subsequent protected
+  rounds plateaued. The raw proposal improves visible fit more but is not
+  consistently safe. This hypothesis is therefore *not promoted*.
+- [ ] Run same-input before/after and post-fusion tests on representative
+  cases, then all Redwood/Custom. Evaluate CD-L1, CD-L2, EMD only after the
+  outputs are frozen; reject a proposed policy if it materially regresses
+  accepted carriers or damages unobserved completeness.
+- [x] Correct a feasible-action failure in the isolated GPT reviewer: the
+  final candidate can no longer request `TRY_NEXT_CANDIDATE` when no route
+  remains, and review now sees the prior candidates' hard-verifier results.
+  This changes only the experimental GPT branch, not the accepted mainline.
+  On Redwood 06830, a fresh no-GT run accepted three rounds, reduced the
+  visible partial-to-carrier p90 residual 0.02698 -> 0.01058 and increased
+  reference coverage 0.90735 -> 0.94022. Frozen offline CD-L1 improved from
+  0.02332 (old GPT v4) to 0.01842, but still trails the fixed-three 0.01501.
+  The separate continuous post-refine fusion produced CD-L1 0.01826 on the
+  same sample. See `workspace/gpt_refine_feasible_review_probe_20261030/`.
+  Hydra shows the same feasible-action correction: the last verified field
+  candidate is accepted in round three, and offline CD-L1 moves from
+  0.01392 to 0.01362, still behind fixed-three 0.01032. Both cases remain
+  diagnostic; the candidate policy is not promoted as a general part-aware
+  deformation method. The full repository suite passes 109 tests after these
+  opt-in changes.
+
+## GPT-driven refine-agent correction (2026-10-30)
+
+- [x] Replace the experimental rule-only decision path with an explicit GPT
+  decision backend that sees saved-camera diagnostic images and no-GT geometry
+  statistics. Preserve the frozen deterministic experiment as a separate mode;
+  never relabel its outputs as GPT results. The opt-in switch is
+  `--decision-backend gpt --gpt-model MODEL`.
+- [x] Restrict GPT to choosing a bounded action/profile/transport route and
+  reviewing solver proposals. Keep Partial OT, PosteriorAdapter, and hard
+  topology/coverage checks deterministic; save every GPT decision and image.
+- [x] Install the OpenAI Python SDK in `genpc`, pass mocked API tests, and
+  render the real Fox four-view observation board at
+  `workspace/gpt_refine_pilot_20261030/cartoon_fox/round_01_before_board.png`.
+- [x] Use the logged-in Codex CLI with `gpt-6-sol` as the real GPT vision
+  decision backend, without an API key. Keep the optional OpenAI API path
+  separate. The first live Fox/Pig pilot is saved under
+  `workspace/gpt_refine_pilot_20261030/{cartoon_fox,domestic_pig}/live_v1/`.
+  Its GPT decisions were genuine, but both cases regressed against the
+  deterministic controller and fixed-three controls in offline GT metrics;
+  do not promote the first policy or label it a successful result.
+- [x] Evaluate the general, non-sample-specific v2 evidence prompt on Pig.
+  The model correctly selected a structural update, but incorrectly used all
+  synthetic auxiliary cameras as global OT cameras. After three accepted
+  rounds, the visible p90 residual fell from 0.02446 to 0.00441 while offline
+  CD-L1 remained 0.03781, far worse than the deterministic Camera-1 result
+  (0.01513). The no-GT coverage verifier alone did not catch this regression.
+  Output: `workspace/gpt_refine_pilot_20261030/domestic_pig/live_v2/`.
+- [x] Test the v3 model prompt that distinguishes the physically calibrated
+  Camera-1 transport from synthetic orbit-view diagnosis/assimilation. Pig
+  completed with CD-L1/CD-L2/EMD 0.01541/0.000834/0.01992, versus deterministic
+  0.01513/0.000885/0.01951. Fox remained worse (0.02620/0.00372/0.03064
+  versus deterministic 0.02382/0.00332/0.02774). Both live outputs and
+  offline-only metric JSONs are under
+  `workspace/gpt_refine_pilot_20261030/{domestic_pig,cartoon_fox}/`.
+- [x] Evaluate v4 view-option evidence on Fox/Pig. The v3 Fox GPT plan
+  temporarily switched from adaptive orbit to saved four views during round
+  two without being shown that the latter see only 82.1% of partial points,
+  versus 87.3% for adaptive orbit. The v4 prompt provides these no-GT
+  visibility statistics before the discrete GPT decision. Fox completed three
+  GPT-selected/reviewed Camera-1 + adaptive-orbit rounds and produced an
+  identical carrier to the old deterministic result (CD-L1/CD-L2
+  0.02382/0.00332). Pig completed one structural and two observed-local rounds
+  (0.01516/0.000825), near the deterministic 0.01513/0.000885. Outputs and
+  offline metrics are in `workspace/gpt_refine_pilot_20261030/`.
+- [x] Test v4 on Seahawk and Redwood 01184. Seahawk's GPT-selected three-round
+  carrier is byte-identical to the prior deterministic result. Redwood 01184
+  completed after one transient SIGTERM/retry: CD-L1/CD-L2/EMD
+  0.01111/0.000504/0.01995 vs deterministic 0.01102/0.000522/0.02003.
+  The first interrupted Redwood directory has no final trace and must not be
+  interpreted as an output; the successful one is `live_v4_retry`.
+- [x] Run the remaining 49 complete input chains through the genuine GPT v4
+  backend in `workspace/gpt_refine_cross_dataset_v4_20261030/`. The four
+  pilot cases are excluded from repeat inference, and 12 older source
+  candidates missing a registered prior or saved manifest remain listed as
+  incomplete (not silently substituted). Batch index is resume-safe and
+  records backend, model, provider and prompt version. Then audit outputs and
+  evaluate Redwood/Custom offline against GT; do not use GT in the agent.
+  The batch was started with `gpt-6-sol` through Codex login; its progress
+  and any failures are in `batch_index.json` under the output root. An
+  interrupted sample may have intermediate PLYs without a final trace; only
+  `status=completed` or `completed_existing` is a verified batch result.
+  All 49 completed after one transient Codex exit-code-1 failure on ScanNet
+  `bed__scene0178_00_14` was retried with the same configuration. The 49
+  outputs passed the final 100k-carrier/trace audit with zero issues in
+  `no_gt_batch_audit.json`. The four v4 development cases were reused, giving
+  53 complete chains. Offline GT comparison covered all 22 Redwood/Custom
+  cases in `redwood_custom_offline_gt.{json,csv}`. Custom mean CD-L1/CD-L2/EMD
+  was 0.01992/0.00315/0.02628 versus fixed-three
+  0.02135/0.00405/0.02629; Redwood was 0.01520/0.00105/0.02523 versus
+  fixed-three 0.01473/0.00099/0.02412. Redwood 06830 (+55% CD-L1 versus
+  fixed-three), Custom Hydra (+35%), and Custom single-engine airplane
+  (+14%) are material regressions. Do not promote this GPT policy to mainline
+  on the basis of these results; the no-GT verifier can reject deformations
+  that improve complete-shape GT quality.
+
+## Cross-dataset isolated refine-agent evaluation (2026-10-30)
+
+- [x] Audit the frozen post-registration input chains. Available complete
+  chains: Redwood 10, Custom 12, ScanNet/ScanSalon 10, KITTI 11, Waymo 10.
+  The three previously tested objects are excluded from repeat inference.
+  KITTI prefers the newer style rerun when present, then the earlier pilot.
+  Missing older KITTI/Waymo candidates without a registered prior or saved
+  multiview manifest are listed in the batch index, not silently substituted.
+- [x] Run the no-GT refine agent on the remaining 50 samples under
+  `workspace/agentic_refine_cross_dataset_20261030/`, with one trace and
+  ordered 100k final carrier per case. This is post-registration refinement;
+  it does not rerun semantic generation or fusion. All 50 completed and passed
+  the carrier/trace audit (`no_gt_batch_audit.json`); the earlier three
+  development cases remain under `workspace/agentic_posterior_20261028/`.
+- [x] Run same-input fixed-three controls on Redwood and Custom, then evaluate
+  CD-L1, CD-L2 and EMD offline against GT. ScanNet, KITTI and Waymo are
+  reported with no-reference observations because matched complete GT was not
+  established. All 22 controls and offline GT evaluations completed; outputs
+  are `fixed_three_controls/` and `redwood_custom_offline_gt.{json,csv}`.
+- [x] Check all outputs, failures, view counts and regression cases before
+  deciding whether any agent policy should be promoted. Keep mainline intact.
+  The no-GT agent's Custom mean CD-L1/CD-L2 is 0.01995/0.00317 versus fixed
+  0.02135/0.00405, but Redwood is 0.01488/0.00101 versus fixed
+  0.01473/0.00099. Custom Hydra (+32% CD-L1), Custom single-engine airplane
+  (+14%), and Redwood 06830 (+20%) regress despite passing the no-GT partial
+  coverage verifier; the latter's visual projections show close partial
+  alignment, illustrating that observed-fit gain alone is insufficient to
+  guarantee complete-shape quality. No promotion to the released mainline.
+
 ## Isolated post-registration agentic refinement experiment (2026-10-28)
 
 - [x] Create independent `codex/agentic-posterior-loop` worktree from the

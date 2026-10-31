@@ -240,6 +240,7 @@ def _project_positive_components_to_similarity(
     *,
     core_hops: int = 0,
     gain: float = 1.0,
+    connectivity_hops: int = 0,
 ) -> tuple[np.ndarray, dict, np.ndarray]:
     """Make coherent positive-evidence structures move as proper Sim(3)s.
 
@@ -259,10 +260,26 @@ def _project_positive_components_to_similarity(
         raise ValueError("reference, candidate, and support shapes are inconsistent")
     if float(gain) <= 0.:
         raise ValueError("gain must be positive")
+    if int(connectivity_hops) < 0:
+        raise ValueError("connectivity_hops must be non-negative")
     ids = np.flatnonzero(support)
     if len(ids) < 16:
         return candidate.copy(), {"active": False, "reason": "insufficient_positive_support"}, support.copy()
-    induced = graph[ids][:, ids]
+    # Sparse OT surfels on the same physical structure are rarely immediate
+    # graph neighbours.  Geodesic dilation is used only to establish which
+    # positive seeds belong to one region; the similarity is still fitted
+    # exclusively on the original observed seeds.
+    connected_region = support.copy()
+    frontier = support.copy()
+    for _ in range(int(connectivity_hops)):
+        reached = np.asarray(graph @ frontier.astype(np.float64)).reshape(-1) > 0.
+        reached &= ~connected_region
+        if not np.any(reached):
+            break
+        connected_region |= reached
+        frontier = reached
+    connected_ids = np.flatnonzero(connected_region)
+    induced = graph[connected_ids][:, connected_ids]
     component_count, labels = csgraph.connected_components(induced, directed=False)
     spacing = _median_spacing(reference)
     minimum = max(16, int(math.ceil(.00025 * len(reference))))
@@ -271,7 +288,8 @@ def _project_positive_components_to_similarity(
     best_priority = np.full(len(reference), -np.inf, dtype=np.float64)
     records: list[dict] = []
     for component in range(component_count):
-        member = ids[labels == component]
+        member = connected_ids[labels == component]
+        member = member[support[member]]
         if len(member) < minimum:
             continue
         source = reference[member]
@@ -358,6 +376,7 @@ def _project_positive_components_to_similarity(
         "projected_points": int(np.isfinite(best_priority).sum()),
         "driver_support_points": int(driver_support.sum()),
         "core_hops": int(core_hops),
+        "connectivity_hops": int(connectivity_hops),
         "similarity_gain": float(gain),
     }, driver_support
 
@@ -476,6 +495,7 @@ def project_reference_carrier_protection(
     support_componentwise_similarity: bool = False,
     support_component_similarity_core_hops: int = 0,
     support_component_similarity_gain: float = 1.0,
+    support_component_connectivity_hops: int = 0,
 ) -> tuple[np.ndarray, dict]:
     """Keep an iterative update inside the complete-prior support envelope.
 
@@ -511,6 +531,8 @@ def project_reference_carrier_protection(
         raise ValueError("support_motion_smoothing_steps must be non-negative")
     if int(support_component_similarity_core_hops) < 0:
         raise ValueError("support_component_similarity_core_hops must be non-negative")
+    if int(support_component_connectivity_hops) < 0:
+        raise ValueError("support_component_connectivity_hops must be non-negative")
     if float(support_component_similarity_gain) <= 0.:
         raise ValueError("support_component_similarity_gain must be positive")
     if not len(reference):
@@ -603,6 +625,7 @@ def project_reference_carrier_protection(
                 source, candidate, graph, support,
                 core_hops=int(support_component_similarity_core_hops),
                 gain=float(support_component_similarity_gain),
+                connectivity_hops=int(support_component_connectivity_hops),
             ) if bool(support_componentwise_similarity) else (
                 candidate, {"active": False, "reason": "disabled"}, support
             )

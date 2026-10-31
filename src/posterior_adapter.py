@@ -87,6 +87,7 @@ class PosteriorAdapter:
         transports: list[TransportResult] = []
         displacements: list[np.ndarray] = []
         inherited_stable = np.zeros(len(prior), dtype=bool)
+        residual_support_union = np.zeros(len(prior), dtype=bool)
         stage_specs = (
             ("coarse", self.config.coarse_neighbours, self.config.coarse_edge_ratio,
              self.config.coarse_data_weight, self.config.coarse_screening,
@@ -105,6 +106,7 @@ class PosteriorAdapter:
                 view_projectors=transport_views,
             )
             transports.append(transport)
+            residual_support_union |= transport.residual_prior_mask
             stable = inherited_stable | transport.stable_prior_mask
             residual_pair = np.isin(transport.prior_ids, np.flatnonzero(transport.residual_prior_mask))
             target_ids = transport.prior_ids[residual_pair]
@@ -396,6 +398,7 @@ class PosteriorAdapter:
             "supported_stable": initial_stable,
             "supported_stable_final": inherited_stable,
             "supported_residual": final_transport.residual_prior_mask,
+            "supported_residual_any_stage": residual_support_union,
             "unsupported": final_transport.unsupported_prior_mask,
             "moved": np.linalg.norm(current - initial, axis=1) > 1e-8,
             "coarse_displacement": displacements[0],
