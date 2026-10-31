@@ -1,5 +1,11 @@
 # Active plan
 
+## Recomputed MoGe-to-partial bridges for the 21 inherited bundle gaps (2026-10-31)
+
+- [x] Recompute native Pixal-to-MoGe and MoGe-to-partial bridge for all 21 Custom12/Redwood9 gaps using only the frozen per-sample partial, Camera-1 mask/UV/camera, Pixal ordered 100k prior, Pixal-input FP16 MoGe cache and RMBG model. Outputs are under each case's `03_registration/recomputed_initial/{native,bridge}` in `workspace/gpt_refine_v7_paper_bundle_20261031/`. The frozen registered prior, GPT refine and fusion files were not changed.
+- [x] Fox pilot passed a saved-view visual check, 16,183 pixel matches and continuation relative RMSE 1.62e-16. All 21 now pass positive Camera-1 matches (8,191–96,226), proper Sim(3), three ordered 100k bridge/native carrier checks and bridge-to-frozen-prior continuity (maximum relative RMSE 8.34e-16). The recovered continuation matrix is a diagnostic net transform, not the missing historical optimizer trajectory. No GT was read by the bridge computation.
+- [x] Add resume-safe `scripts/rebuild_paper_bundle_bridges.py`, `bridge_rebuild_index.json`, per-case `rebuild_manifest.json`, code and RMBG weight hashes, saved commands, logs and paper-bundle `BRIDGE_REBUILD.md`. Verified all 462 new output-file checksums (524,349,279 bytes), 5,488 original sample-file checksums unchanged, no symlinks and 117 repository tests. Exact byte-identical replay of the 21 historical full initial registration chains remains impossible because their intermediate files were not archived; these results are explicitly labelled recomputed.
+
 ## GPT v7 paper artifact bundle (2026-10-31)
 
 - [x] Inventory and archive all 53 v7 sample chains at `workspace/gpt_refine_v7_paper_bundle_20261031/`: Custom 12, KITTI 11, Redwood 10, ScanNet 10, Waymo 10. The stage-ordered archive includes partial/depth/semantic/camera, Pixal3D/MoGe, exact historical native/bridge/initial registration for 32 cases, selected registered prior, four-view manifest, accepted GPT trajectory, and fusion. The other 21 inherited Custom/Redwood registration-info files declare historical paths in a removed September work directory; those bridges could not be recovered from agent-probe and are explicitly marked unavailable, not replaced with other experiments. All 53 are complete from registered prior onward.
