@@ -1,5 +1,11 @@
 # Active plan
 
+## GPT v7 paper artifact bundle (2026-10-31)
+
+- [x] Inventory and archive all 53 v7 sample chains at `workspace/gpt_refine_v7_paper_bundle_20261031/`: Custom 12, KITTI 11, Redwood 10, ScanNet 10, Waymo 10. The stage-ordered archive includes partial/depth/semantic/camera, Pixal3D/MoGe, exact historical native/bridge/initial registration for 32 cases, selected registered prior, four-view manifest, accepted GPT trajectory, and fusion. The other 21 inherited Custom/Redwood registration-info files declare historical paths in a removed September work directory; those bridges could not be recovered from agent-probe and are explicitly marked unavailable, not replaced with other experiments. All 53 are complete from registered prior onward.
+- [x] Add reusable, checksum-verified, resume-safe `scripts/package_refine_agent_paper.py`, per-sample SHA-256/provenance manifests and `replay_agent.sh`, source-code/config snapshot, root index/CSV, and paper-facing README. Keep GT separate: `offline_gt_evaluation/redwood_custom.{json,csv}` scores all 22 Custom/Redwood cases with deterministic 16,384-point FPS/seed 6145 after inference; GT/fixed-three source files are not copied into the no-GT bundle. Frozen mainline experiment directories were not modified.
+- [x] Verify 53 bundles, 5,586 archived files (including 98 code files), 5,044,504,425 sample bytes, every recorded checksum, all required 100k carrier headers, all replay input paths and shell syntax, absence of symlinks, and expected dataset counts. The bundled code entrypoints load successfully; repository suite passes 115 tests. Reproducibility limits: 21 historical initial bridges missing, external model weights/Codex GPT access required, and GPT decisions may vary on replay.
+
 ## GPT v7 batch throughput without changing geometry (2026-10-31)
 
 - [x] Profile the ongoing batch. The expensive optional structural route runs a six-round residual-proximal proposal plus graph projection; among the first 23 completed cases it was attempted 21 times but accepted only 3. A single KITTI case spent roughly 2m47s in that route. The batch also processed samples serially. Do not skip the route based on dataset/category: Fox, Hydra, and light helicopter benefited from it.
