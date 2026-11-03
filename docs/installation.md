@@ -14,14 +14,15 @@ python -m pip install --extra-index-url https://download.pytorch.org/whl/cu126 \
 python -m pip install -e '.[pixal,diagnostics]'
 ```
 
-Install the external Pixal3D runtime and checkpoints described in
-[models.md](models.md). Direct-GPT semantic completion is an external action:
-the repository writes its exact task and audits the returned foreground before
-3D generation. The `diffusers` and `transformers` pins remain for the optional
-local Qwen baseline.
+Install the Pixal3D runtime and checkpoints described in
+[models.md](models.md). The current semantic stage sends the saved depth
+image and the exact short prompt to interactive Codex Image Gen. The Prior
+Generation Agent reviews the returned full-canvas image, and RMBG-2.0 makes
+the accepted Pixal3D input transparent. A logged-in Codex CLI is needed for
+the `gpt-6-sol` prior and refinement decisions. The `diffusers` and
+`transformers` pins remain for the optional local Qwen/Nunchaku route.
 
-Offline CD/EMD in `scripts/evaluate_completions.py` requires the CUDA
-extensions but inference does not:
+Offline CD/EMD evaluation requires the CUDA extensions; inference does not:
 
 ```bash
 python -m pip install -e '.[metrics]'

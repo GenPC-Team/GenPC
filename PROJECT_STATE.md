@@ -1,5 +1,67 @@
 # Accepted project state
 
+## 2026-11-03 workspace handoff
+
+The only current local experiment directory is
+`/data/project/cr/CompAgent/workspace/redwood10_final/`. It is the user's
+accepted Redwood10 physical-copy package. The three other directories under
+`workspace/` were deleted at the user's request after the copy and checksum
+verification. All absolute paths into those removed directories in older
+entries are historical provenance and are no longer live output paths. For
+current results use `redwood10_final/<id>/` and its `copy_manifest.json`;
+copied JSON stage manifests retain the original inference-time absolute
+paths. Model weights and GT remain outside the package. The Git source push
+does not include this local 1.1 GB experiment package.
+
+## 2026-11-03 14:51 UTC — Redwood10 short-sentence Image Gen route promoted
+
+The user approved all ten new semantic images, asked for the complete ten-case
+CD/EMD report, and explicitly authorized replacing the previous results even
+where a sample regresses. All ten frozen RGB candidates, verbatim prompts,
+input hashes and unknown provider-side settings are recorded in the accepted
+image entries below. The retained chain for each sample is under
+`/data/project/cr/CompAgent/workspace/redwood10_final/<id>/`.
+The prior review compares the entire generated 1254×1254 canvas with the
+saved 512×512 depth raster by a no-crop, no-translation resize and requires
+the comparison depth, RGB and overlay to have identical dimensions. All ten
+passed positive-support and `gpt-6-sol` review for approximate visible
+geometry and natural completeness. RMBG-2.0 produced transparent RGBA Pixal
+inputs. All ten Pixal3D, registration, diagnostics, GPT refinement and fusion
+stages completed with 100,000-point final carriers. No GT entered inference.
+
+The frozen offline 16,384-FPS, seed-6145, ×100 results average CD-L1 `1.537036`
+and EMD `2.472180`; the same-run previous results average `1.918897` and
+`2.935511`. Exact sample scores and output paths are in
+`/data/project/cr/CompAgent/workspace/redwood10_final/redwood10_metrics.json`.
+The original and archive directories were removed during workspace cleanup.
+Their historical path mapping remains in the copied `promotion_manifest.json`.
+The new 05117 and 05452 regress individually,
+which the user explicitly accepted when authorizing direct replacement.
+For paper preparation, the user requested all new artifacts copied together.
+`/data/project/cr/CompAgent/workspace/redwood10_final/`
+contains ten physical sample-directory copies (1,705 files, 1,137,603,981
+bytes total), ten flat fused PLYs, `metrics.csv`, `README.md`,
+`copy_manifest.json`, and `SHA256SUMS`. Every copied sample file was verified
+against its source by SHA-256. The copy excludes external model weights and GT;
+the JSON stage manifests retain their inference-time absolute source paths.
+
+## 2026-11-03 17:20 CST — Redwood 01184 Image Gen four-stage pilot accepted by user
+
+**User approval and scope.** The user said “01184生成的不错 也可以保留” for this earlier pilot. This record preserves its provenance; its directory `workspace/agentic_redwood_01184_20261103/` was later removed at the user's request. The retained, separately approved Redwood10 version is `workspace/redwood10_final/01184/`. The paths below are historical and no longer resolve locally.
+
+**Exact sample, inputs, outputs.** Sample `01184`; partial `/data/project/cr/CompAgent/data/redwood/partial/01184.ply`; selected depth `/data/project/cr/CompAgent/workspace/agentic_redwood_01184_20261103/inputs/camera/01184/depth.png`; camera `/data/project/cr/CompAgent/workspace/agentic_redwood_01184_20261103/inputs/camera/01184/camera.pth`; point UV `/data/project/cr/CompAgent/workspace/agentic_redwood_01184_20261103/inputs/camera/01184/point_uv.npy`. The accepted Image Gen source is `/data/project/cr/CompAgent/workspace/agentic_redwood_01184_20261103/prior_agent/round_07/imagegen_candidate.png` (SHA-256 `e3c052d85f17dc6c9de2437246855c03956d3b769751f754611af09bb596b290`). Installed RGB semantic image `/data/project/cr/CompAgent/workspace/agentic_redwood_01184_20261103/inputs/camera/01184/img.png`; RMBG alpha image `/data/project/cr/CompAgent/workspace/agentic_redwood_01184_20261103/inputs/camera/01184/img_rmbg.png`; Pixal input `/data/project/cr/CompAgent/workspace/agentic_redwood_01184_20261103/inputs/pixal/01184/gpt_image.png`; Pixal preprocessed image `/data/project/cr/CompAgent/workspace/agentic_redwood_01184_20261103/inputs/pixal/01184/pixal3d_input.png`. Pixal 100k prior `/data/project/cr/CompAgent/workspace/agentic_redwood_01184_20261103/inputs/pixal/01184/pixal3d_sampled_100k.ply`; registered prior `/data/project/cr/CompAgent/workspace/agentic_redwood_01184_20261103/registration/01184/final/camera1_amplified_registered_100k.ply`; refined posterior `/data/project/cr/CompAgent/workspace/agentic_redwood_01184_20261103/refinement/01184/agent_selected_posterior_100k.ply`; final fused result `/data/project/cr/CompAgent/workspace/agentic_redwood_01184_20261103/fusion/01184/observation_anchored_fused_100k.ply`; textured final `/data/project/cr/CompAgent/workspace/agentic_redwood_01184_20261103/fusion/01184/observation_anchored_fused_100k_pixal_texture.ply`. Pipeline provenance `/data/project/cr/CompAgent/workspace/agentic_redwood_01184_20261103/four_stage_pipeline.json`; prior decision provenance `/data/project/cr/CompAgent/workspace/agentic_redwood_01184_20261103/prior_agent/prior_agent_manifest.json`. All listed PLY carriers have 100,000 vertices.
+
+**Full recorded positive prompt, copied verbatim from `prior_agent/round_06_prompt.txt`:**
+
+> Edit Image 1, the current blue bin. Image 2 is the selected 512px partial-depth projection. Image 3 is its user annotation; do not render the red circle. The observed body right wall at middle and lower heights is near x=315 in the 512px depth view, whereas Image 1 shows it slightly farther right. Move only that visible right wall left by approximately 10-15 pixels in 512px coordinates, tapering the correction smoothly under the lid. Keep the lid, left-wall lean, near wheel, far wheel, bottom slope, image center and background.
+>
+> Create one realistic blue wheeled rubbish bin on white from the selected depth view. Keep the camera, scale, lid, wheels, left wall leaning right as it descends, and lower edge sloping down toward the near wheel. Move the right body wall slightly left so it follows the observed, nearly vertical wall beneath the lid. Complete missing geometry naturally without straightening, recentering, or duplicating the bin.
+>
+> Reference image 1 is the selected partial-depth view and the sole authority for the object's camera and observed geometry. Preserve its camera viewpoint, yaw, pitch, roll, perspective, foreshortening, image-plane center, crop, approximate scale and silhouette of the observed support, observed part positions, and front-to-back depth ordering. Keep every observed foreground structure at the same image location; extend into unobserved regions wherever the complete object requires it. Do not rotate, mirror, tilt, straighten, recenter, rescale, or canonicalize the object to a catalog view.
+
+**Models, parameters, postprocessing.** Prior decision model `gpt-6-sol` via logged-in Codex CLI, saved prior prompt version `prior_mining_v1`; refinement model `gpt-6-sol` via Codex, five decisions ending `gpt_accept`. Image generation used the interactive Codex Image Gen tool; its provider-side base model and checkpoint are `UNKNOWN`, and negative prompt is `UNKNOWN` (none recorded). Source image size 1254×1254 RGB. Image Gen seed, steps, CFG/guidance scale, scheduler and backend are `UNKNOWN`; exact replay of generation is therefore not guaranteed. The source was resized to 512×512 RGB with Lanczos; RMBG-2.0 made the stored RGBA alpha/mask and positive-support audit, without global framing normalization. In this accepted historical pilot the Pixal `gpt_image.png` was **RGB**, and Pixal3D ran its own internal RMBG before cropping/compositing to a 404×404 RGB `pixal3d_input.png`. The later remaining-nine route explicitly feeds RMBG RGBA into Pixal; do not silently substitute that route into this accepted 01184 result. Pixal source `/data/project/cr/CompAgent/models/Pixal3D`; checkpoint `/data/project/cr/CompAgent/models/Pixal3D-weights`; DINO `/data/project/cr/CompAgent/models/dinov3-vitl16-pretrain-lvd1689m`; MoGe `/data/project/cr/CompAgent/models/moge-2-vitl/model.pt`; RMBG `/data/project/cr/CompAgent/models/RMBG-2.0`. Pixal seed 42, requested/actual resolution 1024, SDPA attention, sparse/shape/texture steps 12/12/12, guidance 7.5/7.5/1.0, guidance rescale 0.7/0.5/0.0, rescale-t 5/3/3, decimation target 120000, texture size 1024. Native Pixal–MoGe alignment, fixed two-camera bridge, joint proper Sim(3), GPT geometric refinement and continuous observation fusion followed; see the stage commands in `four_stage_pipeline.json`. No GT entered inference. Frozen offline Redwood GT evaluation with 16,384-point FPS and seed 6145 returned CD-L1×100 = 1.09018926 and EMD×100 = 1.84088424 in `/data/project/cr/CompAgent/workspace/agentic_redwood_01184_20261103/offline_gt_evaluation/fused_01184.json`.
+
+
 ## 2026-10-31 23:11 CST — Hydra GPT v7 refinement visually acknowledged
 
 **User approval and scope.** The user rechecked the current Custom Hydra output and said “确实好不少，是我看错了”. Preserve this as an accepted *experimental* Hydra refinement result; it is not authorization to replace the frozen mainline or to claim that Dragon's tail is solved. Do not overwrite the v7 carrier or its fusion output. The earlier concern that the Hydra tail had not moved was a version/inspection mistake: its distal registered-prior points moved (median approximately 0.0767 in the stored coordinate frame), and nearest observed-partial distance for that distal region fell from approximately 0.0727 to 0.00144. These are diagnostic numbers, not agent inputs.
@@ -2089,3 +2151,221 @@ You are the decision maker for a test-time 3D partial-to-complete refinement loo
 ```
 
 **Verification and preservation.** The fusion index reports 11/11 KITTI records completed; each geometry and textured output exists with exactly 100000 vertices. Preserve the original source roots, batch index, GPT traces, fusion index, semantic installation manifests, Pixal metadata, and all final PLYs. Do not silently substitute the later v5 feasible-review probe for these v4 accepted outputs. KITTI matched GT metrics were not established, so this acceptance is visual, not a measured CD/EMD claim.
+
+## 2026-11-03 19:02:47 CST — user-approved semantic references for Redwood 07136 and 05452
+
+**Approval scope.** The user identified exactly the two attached RGB images as correct examples of the visible object geometry: 07136 is a long, foreshortened sofa; 05452 is a thin curved chair with slender tubular legs. This approves these two semantic images as visual references. It does not approve copying their pixels into a new experiment, changing any historical baseline, or claiming the current Image Gen pipeline has improved. Keep future experiments in one isolated output root and improve the general prior-generation/review method. Do not replace either approved source image without asking.
+
+### 07136
+
+- Exact approved output: `/data/project/cr/CompAgent/workspace/compagent_pixal_reproduction_20260925/redwood/inputs/camera/07136/img.png` (SHA-256 `8f8de7b0373afb73db2772887af7fbe00f4a8342ce4b18420b218e21f238dcad`); attached user image has the same hash.
+
+- Inputs: partial `/data/project/cr/CompAgent/workspace/compagent_pixal_reproduction_20260925/redwood/inputs/partial/07136.ply`, fixed depth `/data/project/cr/CompAgent/workspace/compagent_pixal_reproduction_20260925/redwood/inputs/camera/07136/depth.png`, fixed camera `/data/project/cr/CompAgent/workspace/compagent_pixal_reproduction_20260925/redwood/inputs/camera/07136/camera.pth`, point UV `/data/project/cr/CompAgent/workspace/compagent_pixal_reproduction_20260925/redwood/inputs/camera/07136/point_uv.npy`. For 05452, the secondary thin-construction image mentioned by the final prompt is `UNKNOWN` from the surviving record.
+
+- Image generation model/checkpoint/transformer: `UNKNOWN`; generation seed, steps, CFG, scheduler and backend: `UNKNOWN`; negative prompt: `UNKNOWN`; source image resizing policy: `UNKNOWN`; installed semantic resolution: 512×512. This historical image is not exactly regenerable from the surviving record.
+
+- Pixal3D model: `/opt/data/private/cr/lab/GenPC/models/Pixal3D-weights`; DINO `/opt/data/private/cr/lab/GenPC/models/dinov3-vitl16-pretrain-lvd1689m`; MoGe `/opt/data/private/cr/lab/GenPC/models/moge-2-vitl/model.pt`; RMBG `/opt/data/private/cr/lab/GenPC/models/RMBG-2.0`. Pixal seed 42, requested/actual resolution 1024/1024, attention backend `xformers`, decimation target 300000, texture size 2048; sampler parameters `{"sparse_structure": {"steps": 12, "guidance_strength": 7.5, "guidance_rescale": 0.7, "rescale_t": 5.0}, "shape": {"steps": 12, "guidance_strength": 7.5, "guidance_rescale": 0.5, "rescale_t": 3.0}, "texture": {"steps": 12, "guidance_strength": 1.0, "guidance_rescale": 0.0, "rescale_t": 3.0}}`.
+
+- Postprocessing: depth-conditioned semantic install at 512×512 with no framing transform; RMBG-2.0 alpha/mask at `/data/project/cr/CompAgent/workspace/compagent_pixal_reproduction_20260925/redwood/inputs/camera/07136/img_rmbg.png`; Pixal preprocessing `/data/project/cr/CompAgent/workspace/compagent_pixal_reproduction_20260925/redwood/inputs/pixal/07136/pixal3d_input.png` and Pixal/MoGe cache `/data/project/cr/CompAgent/workspace/compagent_pixal_reproduction_20260925/redwood/inputs/pixal/07136/pixal_moge_fp16_observation.npz`. Later registration, posterior and fusion are separate from approval of this RGB image.
+
+- Full positive prompt (verbatim):
+
+```text
+Use case: sketch-to-render. Create one complete, realistic RGB product image of a long black leather sofa from the supplied incomplete depth map. Image 1 is the sole geometric, camera, and foreground-mask authority. Treat every non-black depth pixel and its silhouette as a hard ControlNet-like spatial constraint: preserve exactly the oblique end-on camera viewpoint, perspective, image-plane center, apparent width and height, crop, orientation, depth ordering, visible sofa end, seat plane, backrest line, and the strong foreshortening of the long sofa body. Complete only genuinely missing or occluded surfaces along the depth direction. Keep one coherent full-length sofa with a continuous seat, continuous backrest, two end armrests, and short attached feet, in dark leather on a pure white background. Do not turn it into a single chair or sectional sofa, do not shorten or widen the body, and do not rotate, mirror, recenter, rescale, tilt, redesign, or move observed surfaces. Sharp realistic boundaries and upholstery; no cushions detached from the sofa, text, logo, watermark, secondary object, clutter, or silhouette-changing shadow.
+```
+
+### 05452
+
+- Exact approved output: `/data/project/cr/CompAgent/workspace/compagent_pixal_reproduction_20260925/redwood/inputs/camera/05452/img.png` (SHA-256 `729a8ffe709f2661a0a3c16bcded306fc4e7392026091b2236308807b6e84a1b`); attached user image has the same hash.
+
+- Inputs: partial `/data/project/cr/CompAgent/workspace/compagent_pixal_reproduction_20260925/redwood/inputs/partial/05452.ply`, fixed depth `/data/project/cr/CompAgent/workspace/compagent_pixal_reproduction_20260925/redwood/inputs/camera/05452/depth.png`, fixed camera `/data/project/cr/CompAgent/workspace/compagent_pixal_reproduction_20260925/redwood/inputs/camera/05452/camera.pth`, point UV `/data/project/cr/CompAgent/workspace/compagent_pixal_reproduction_20260925/redwood/inputs/camera/05452/point_uv.npy`. For 05452, the secondary thin-construction image mentioned by the final prompt is `UNKNOWN` from the surviving record.
+
+- Image generation model/checkpoint/transformer: `UNKNOWN`; generation seed, steps, CFG, scheduler and backend: `UNKNOWN`; negative prompt: `UNKNOWN`; source image resizing policy: `UNKNOWN`; installed semantic resolution: 512×512. This historical image is not exactly regenerable from the surviving record.
+
+- Pixal3D model: `/opt/data/private/cr/lab/GenPC/models/Pixal3D-weights`; DINO `/opt/data/private/cr/lab/GenPC/models/dinov3-vitl16-pretrain-lvd1689m`; MoGe `/opt/data/private/cr/lab/GenPC/models/moge-2-vitl/model.pt`; RMBG `/opt/data/private/cr/lab/GenPC/models/RMBG-2.0`. Pixal seed 42, requested/actual resolution 1024/1024, attention backend `xformers`, decimation target 300000, texture size 2048; sampler parameters `{"sparse_structure": {"steps": 12, "guidance_strength": 7.5, "guidance_rescale": 0.7, "rescale_t": 5.0}, "shape": {"steps": 12, "guidance_strength": 7.5, "guidance_rescale": 0.5, "rescale_t": 3.0}, "texture": {"steps": 12, "guidance_strength": 1.0, "guidance_rescale": 0.0, "rescale_t": 3.0}}`.
+
+- Postprocessing: depth-conditioned semantic install at 512×512 with no framing transform; RMBG-2.0 alpha/mask at `/data/project/cr/CompAgent/workspace/compagent_pixal_reproduction_20260925/redwood/inputs/camera/05452/img_rmbg.png`; Pixal preprocessing `/data/project/cr/CompAgent/workspace/compagent_pixal_reproduction_20260925/redwood/inputs/pixal/05452/pixal3d_input.png` and Pixal/MoGe cache `/data/project/cr/CompAgent/workspace/compagent_pixal_reproduction_20260925/redwood/inputs/pixal/05452/pixal_moge_fp16_observation.npz`. Later registration, posterior and fusion are separate from approval of this RGB image.
+
+- Full positive prompt (verbatim):
+
+```text
+Use case: sketch-to-render. Image 1 is the authoritative incomplete depth map and hard foreground mask. Image 2 is only a reference for the chair's thin construction and gently curved brown material; do not copy Image 2's camera or framing. Generate one complete realistic RGB product image of the chair. Match Image 1 exactly in camera viewpoint, perspective, image-plane center, apparent width and height, crop, orientation, depth ordering, silhouette envelope, backward-curved backrest, seat length, arm curves, and observed leg locations. Every non-black observed region of Image 1 must remain covered by the corresponding chair structure. The seat and back must be a very thin continuous curved shell with minimal padding and a slim side profile, like Image 2; the arm and leg frame must be narrow tubular metal, not thick upholstered bars. Preserve the slightly tapered upper back contour seen in Image 1 without adding a new spike. Complete only occluded parts and keep four naturally attached slender legs. Pure white background. Do not thicken the seat, back, armrests, or legs; do not rotate, mirror, recenter, rescale, flatten curvature, redesign, add parts, move observed parts, add text, watermark, clutter, or silhouette-changing shadow.
+```
+
+## 2026-11-03 19:35:22 CST — Redwood 05452 metric-improved current result (not user-approved image)
+
+**Scope.** The complete four-stage revision under `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/05452` improved the current nine-sample run at 16,384-point FPS, seed 6145: CD-L1×100 2.689835 → 1.445329; EMD×100 4.143065 → 2.301014. The current sample path `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/05452` is a symlink to this unified revision root. The earlier user-approved 05452 semantic image under `workspace/compagent_pixal_reproduction_20260925` is untouched and remains a visual reference; the user has not approved the new image.
+
+**Inputs and outputs.** Partial `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/05452/inputs/partial/05452.ply`; fixed depth `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/05452/inputs/camera/05452/depth.png`; camera `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/05452/inputs/camera/05452/camera.pth`; generated source `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/05452/prior_agent/round_00/imagegen_candidate.png` (SHA-256 `46e7ca67447c06c5c9bc2ffb318a358cfc68b5bd2ef991a8a310da950be6c2c5`); installed semantic `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/05452/inputs/camera/05452/img.png`; transparent Pixal input `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/05452/inputs/pixal/05452/gpt_image.png` (SHA-256 `1aa3c06363874c8832512a39b22ed80f87db9989862621df9d678226717d62f6`); final fused carrier `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/05452/fusion/05452/observation_anchored_fused_100k.ply` (SHA-256 `1f769070821dece6243f7d0f84ab50462f2533c159b70c9db719c4b4c6e6922b`); offline evaluation `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/05452/offline_gt_evaluation/fused_05452.json`; full stage provenance `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/05452/four_stage_pipeline.json`.
+
+**Models and parameters.** Prompt author/reviewer: Codex `gpt-6-sol`, prior prompt schema `prior_mining_v4_visible_depth_and_category_review`. Raster generator: built-in Image Gen; exact checkpoint, transformer, generation seed, steps, CFG/guidance, scheduler and backend `UNKNOWN`. Generation image resolution 1254×1254; resize policy: installed to 512×512 by `install_depth_conditioned_semantic.py` with no change of framing; no separate negative prompt (`NONE`). Pixal source `models/Pixal3D`, weights `models/Pixal3D-weights`, DINOv3 `models/dinov3-vitl16-pretrain-lvd1689m`, MoGe-2 `models/moge-2-vitl/model.pt`, RMBG `models/RMBG-2.0`; exact source/checkpoint revision is in the four-stage manifest or `docs/models.md`. Pixal preprocessing uses RMBG transparent RGBA and saved fixed camera; registration composes Pixal--MoGe--partial, refinement uses `gpt-6-sol` and `configs/posterior_mainline.json`, fusion uses continuous observation anchoring. No Qwen. Offline GT was outside inference. The image is not exactly regenerable without the unknown Image Gen parameters.
+
+**Full Image Gen prompt (verbatim):**
+
+```text
+Generate one complete, realistic thin curved armchair on a pure white background, using the fixed saved camera and the supplied depth projection. Keep the observed chair at its current scale and image position. Its tall, thin back rises diagonally toward the upper left from the seat; the seat extends rightward. Preserve the dark, slender loop visible above the seat and the nearer, bright curved seat edge across the lower center. Keep the left visible leg slanting down-left and the right visible leg extending down-right. Complete the chair with a naturally connected thin molded seat and back, a slender tubular frame, and any missing supports at consistent thickness, with their feet on one plausible ground plane. Preserve the oblique view, part sizes, junctions, and near-to-far ordering. Use realistic materials and sharp boundaries; add no other objects, text, or logos.
+
+Reference image 1 is the selected partial-depth view and the sole authority for the object's camera and observed geometry. Preserve its camera viewpoint, yaw, pitch, roll, perspective, foreshortening, image-plane center, crop, approximate scale and silhouette of the observed support, observed part positions, visible surface side, opening direction, and front-to-back depth ordering. Render from the acquisition side of the partial scan, not the opposite side or from inside a hollow object. Keep every observed foreground structure at the same image location; extend into unobserved regions wherever the complete object requires it. Do not rotate, mirror, tilt, straighten, recenter, rescale, or canonicalize the object to a catalog view.
+```
+
+**Preservation.** Keep the historical user-approved semantic image at its original path. The new current result may be revised if later measurements and visual review support it; no user approval of its pixels is implied.
+
+## 2026-11-03 13:18:49 UTC — user-approved Redwood 07136 simple-sentence Image Gen semantic
+
+**Approval.** The user explicitly corrected the agent's assessment that the sofa was too short and said “没有偏短，效果挺好的.” Preserve this exact RGB semantic image as an approved visual result. This approval applies to the image only; it does not imply that Pixal3D, registration, refinement, fusion, or metrics have been run or accepted. Do not overwrite these pixels or change this prompt/conditioning for this accepted result without asking.
+
+**Output.** `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/imagegen_sentence_redwood10/07136/semantic.png` (SHA-256 `a9c040e7f7a445d91fce05728e3471cca06199d0383fb1c752ac21ee03c5fac6`), RGB 1254×1254. Exact prompt is next to it at `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/imagegen_sentence_redwood10/07136/prompt.txt`; generation/input hash record is in the same directory's `generation.json`.
+
+**Input.** Sole image input `/data/project/cr/CompAgent/workspace/compagent_pixal_reproduction_20260925/redwood/inputs/camera/07136/depth.png` (SHA-256 `f8845ac1da8c669d215a3dfb31a7b28a707885d64f74d9323a7db0103e89f3fd`), saved Camera-1 partial-depth raster, 512×512. No previous generated image or GT was supplied.
+
+**Model and parameters.** Codex built-in Image Gen; exact model checkpoint path, transformer path, seed, steps, CFG/guidance, scheduler, and backend: `UNKNOWN`. No separate negative prompt was supplied (`NONE`). The tool's output resolution was 1254×1254. No input resizing or crop was performed by the project before the tool call; any internal resizing is `UNKNOWN`. The image was copied byte-for-byte into the unified output directory. No RMBG, mask, MoGe, Pixal3D, FreeReg, ICP, coordinate flip, or downstream fusion was applied. This result is not exactly reproducible because the built-in generator's hidden parameters are unknown.
+
+**Full positive prompt (verbatim):**
+
+```text
+这是一个沙发扫描出来的深度图。用 Image Gen 将图1补全成一张完整的沙发图，遵循深度图可见部分的深度、轮廓约束，背景为纯白色。
+```
+
+## 2026-11-03 13:28:16 UTC — user-approved Redwood 01184 simple-sentence Image Gen semantic
+
+**Approval.** The user said all ten simple-sentence Redwood images look very good. Preserve this exact RGB semantic as an accepted image. Approval covers the semantic image, not any later Pixal3D, registration, refinement, fusion, or CD/EMD result. Do not overwrite these pixels or change this accepted result's conditioning without asking.
+
+**Output.** `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/imagegen_sentence_redwood10/01184/semantic.png` (SHA-256 `edb5bc54b0e1684797ff62c4e9921f5ee53659a21dd2ec405108977bbd121b11`). Exact prompt `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/imagegen_sentence_redwood10/01184/prompt.txt` and hash manifest `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/imagegen_sentence_redwood10/01184/generation.json`. The image resolution is 1254×1254 RGB.
+
+**Input.** Sole image input `/data/project/cr/CompAgent/workspace/compagent_pixal_reproduction_20260925/redwood/inputs/camera/01184/depth.png` (SHA-256 `dbf65d78e50076e094b2d28c3cd3a8198a0ee70e02dc7c3e184975dd8da5355d`), saved Camera-1 512×512 partial-depth raster. No prior generated image or GT was supplied.
+
+**Model and parameters.** Codex built-in Image Gen. Exact model checkpoint path, transformer path, seed, steps, CFG/guidance, scheduler, and backend: `UNKNOWN`. Separate negative prompt: `NONE` (none supplied). Project-side input resize/crop: `NONE`; any tool-internal resize is `UNKNOWN`. Output saved byte-for-byte with no postprocessing. RMBG, mask, MoGe, Pixal3D, FreeReg, ICP, coordinate flip, refinement, and fusion: `NOT RUN` for this accepted image. The result is not exactly reproducible because built-in generation settings are unknown.
+
+**Full positive prompt (verbatim):**
+
+```text
+这是一个带轮垃圾桶扫描出来的深度图。用 Image Gen 将图1补全成一张完整的带轮垃圾桶图，遵循深度图可见部分的深度、轮廓约束，背景为纯白色。
+```
+
+## 2026-11-03 13:28:16 UTC — user-approved Redwood 05117 simple-sentence Image Gen semantic
+
+**Approval.** The user said all ten simple-sentence Redwood images look very good. Preserve this exact RGB semantic as an accepted image. Approval covers the semantic image, not any later Pixal3D, registration, refinement, fusion, or CD/EMD result. Do not overwrite these pixels or change this accepted result's conditioning without asking.
+
+**Output.** `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/imagegen_sentence_redwood10/05117/semantic.png` (SHA-256 `beb77f65e86be3d2d2a109c42b80de514b08307add048d8995b6be6b66830910`). Exact prompt `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/imagegen_sentence_redwood10/05117/prompt.txt` and hash manifest `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/imagegen_sentence_redwood10/05117/generation.json`. The image resolution is 1254×1254 RGB.
+
+**Input.** Sole image input `/data/project/cr/CompAgent/workspace/compagent_pixal_reproduction_20260925/redwood/inputs/camera/05117/depth.png` (SHA-256 `5bfbb1908ec65d014e492813f38d2f84580416756e9314dbd1b8f458102f50df`), saved Camera-1 512×512 partial-depth raster. No prior generated image or GT was supplied.
+
+**Model and parameters.** Codex built-in Image Gen. Exact model checkpoint path, transformer path, seed, steps, CFG/guidance, scheduler, and backend: `UNKNOWN`. Separate negative prompt: `NONE` (none supplied). Project-side input resize/crop: `NONE`; any tool-internal resize is `UNKNOWN`. Output saved byte-for-byte with no postprocessing. RMBG, mask, MoGe, Pixal3D, FreeReg, ICP, coordinate flip, refinement, and fusion: `NOT RUN` for this accepted image. The result is not exactly reproducible because built-in generation settings are unknown.
+
+**Full positive prompt (verbatim):**
+
+```text
+这是一个椅子扫描出来的深度图。用 Image Gen 将图1补全成一张完整的椅子图，遵循深度图可见部分的深度、轮廓约束，背景为纯白色。
+```
+
+## 2026-11-03 13:28:16 UTC — user-approved Redwood 05452 simple-sentence Image Gen semantic
+
+**Approval.** The user said all ten simple-sentence Redwood images look very good. Preserve this exact RGB semantic as an accepted image. Approval covers the semantic image, not any later Pixal3D, registration, refinement, fusion, or CD/EMD result. Do not overwrite these pixels or change this accepted result's conditioning without asking.
+
+**Output.** `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/imagegen_sentence_redwood10/05452/semantic.png` (SHA-256 `9db5508afd496a88bb218688852c250a507af6285e40f5fa147affbf73f7c6ac`). Exact prompt `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/imagegen_sentence_redwood10/05452/prompt.txt` and hash manifest `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/imagegen_sentence_redwood10/05452/generation.json`. The image resolution is 1254×1254 RGB.
+
+**Input.** Sole image input `/data/project/cr/CompAgent/workspace/compagent_pixal_reproduction_20260925/redwood/inputs/camera/05452/depth.png` (SHA-256 `a06a31543330da2f2e4d8498933a1a85f3d1c5c28f8987c4b42e83a150887a53`), saved Camera-1 512×512 partial-depth raster. No prior generated image or GT was supplied.
+
+**Model and parameters.** Codex built-in Image Gen. Exact model checkpoint path, transformer path, seed, steps, CFG/guidance, scheduler, and backend: `UNKNOWN`. Separate negative prompt: `NONE` (none supplied). Project-side input resize/crop: `NONE`; any tool-internal resize is `UNKNOWN`. Output saved byte-for-byte with no postprocessing. RMBG, mask, MoGe, Pixal3D, FreeReg, ICP, coordinate flip, refinement, and fusion: `NOT RUN` for this accepted image. The result is not exactly reproducible because built-in generation settings are unknown.
+
+**Full positive prompt (verbatim):**
+
+```text
+这是一个带扶手的椅子扫描出来的深度图。用 Image Gen 将图1补全成一张完整的带扶手的椅子图，遵循深度图可见部分的深度、轮廓约束，背景为纯白色。
+```
+
+## 2026-11-03 13:28:16 UTC — user-approved Redwood 06127 simple-sentence Image Gen semantic
+
+**Approval.** The user said all ten simple-sentence Redwood images look very good. Preserve this exact RGB semantic as an accepted image. Approval covers the semantic image, not any later Pixal3D, registration, refinement, fusion, or CD/EMD result. Do not overwrite these pixels or change this accepted result's conditioning without asking.
+
+**Output.** `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/imagegen_sentence_redwood10/06127/semantic.png` (SHA-256 `7abb608fe4424bc9aec31215742a45d795ae71bef8b1c427af4c3c8fbd8b77cc`). Exact prompt `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/imagegen_sentence_redwood10/06127/prompt.txt` and hash manifest `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/imagegen_sentence_redwood10/06127/generation.json`. The image resolution is 1254×1254 RGB.
+
+**Input.** Sole image input `/data/project/cr/CompAgent/workspace/compagent_pixal_reproduction_20260925/redwood/inputs/camera/06127/depth.png` (SHA-256 `ce444cc4beda06f82afd63fc8d493a64c53dcd3d6b7ffe6eb7d07ec06a9d972a`), saved Camera-1 512×512 partial-depth raster. No prior generated image or GT was supplied.
+
+**Model and parameters.** Codex built-in Image Gen. Exact model checkpoint path, transformer path, seed, steps, CFG/guidance, scheduler, and backend: `UNKNOWN`. Separate negative prompt: `NONE` (none supplied). Project-side input resize/crop: `NONE`; any tool-internal resize is `UNKNOWN`. Output saved byte-for-byte with no postprocessing. RMBG, mask, MoGe, Pixal3D, FreeReg, ICP, coordinate flip, refinement, and fusion: `NOT RUN` for this accepted image. The result is not exactly reproducible because built-in generation settings are unknown.
+
+**Full positive prompt (verbatim):**
+
+```text
+这是一个带叶绿植的花盆扫描出来的深度图。用 Image Gen 将图1补全成一张完整的带叶绿植的花盆图，遵循深度图可见部分的深度、轮廓约束，背景为纯白色。
+```
+
+## 2026-11-03 13:28:16 UTC — user-approved Redwood 06145 simple-sentence Image Gen semantic
+
+**Approval.** The user said all ten simple-sentence Redwood images look very good. Preserve this exact RGB semantic as an accepted image. Approval covers the semantic image, not any later Pixal3D, registration, refinement, fusion, or CD/EMD result. Do not overwrite these pixels or change this accepted result's conditioning without asking.
+
+**Output.** `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/imagegen_sentence_redwood10/06145/semantic.png` (SHA-256 `2443af071b4781d8acfb4233595faa227fde8a97fd8d64e925c3d34e9b87ca74`). Exact prompt `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/imagegen_sentence_redwood10/06145/prompt.txt` and hash manifest `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/imagegen_sentence_redwood10/06145/generation.json`. The image resolution is 1254×1254 RGB.
+
+**Input.** Sole image input `/data/project/cr/CompAgent/workspace/compagent_pixal_reproduction_20260925/redwood/inputs/camera/06145/depth.png` (SHA-256 `aa18c37380f166b7c2401384de7ee510cc63a0f07a060ddf9ead006d860ab244`), saved Camera-1 512×512 partial-depth raster. No prior generated image or GT was supplied.
+
+**Model and parameters.** Codex built-in Image Gen. Exact model checkpoint path, transformer path, seed, steps, CFG/guidance, scheduler, and backend: `UNKNOWN`. Separate negative prompt: `NONE` (none supplied). Project-side input resize/crop: `NONE`; any tool-internal resize is `UNKNOWN`. Output saved byte-for-byte with no postprocessing. RMBG, mask, MoGe, Pixal3D, FreeReg, ICP, coordinate flip, refinement, and fusion: `NOT RUN` for this accepted image. The result is not exactly reproducible because built-in generation settings are unknown.
+
+**Full positive prompt (verbatim):**
+
+```text
+这是一个单柱圆底桌扫描出来的深度图。用 Image Gen 将图1补全成一张完整的单柱圆底桌图，遵循深度图可见部分的深度、轮廓约束，背景为纯白色。
+```
+
+## 2026-11-03 13:28:16 UTC — user-approved Redwood 06188 simple-sentence Image Gen semantic
+
+**Approval.** The user said all ten simple-sentence Redwood images look very good. Preserve this exact RGB semantic as an accepted image. Approval covers the semantic image, not any later Pixal3D, registration, refinement, fusion, or CD/EMD result. Do not overwrite these pixels or change this accepted result's conditioning without asking.
+
+**Output.** `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/imagegen_sentence_redwood10/06188/semantic.png` (SHA-256 `5ea02a4b94e1b2bcad32bbd07a90decaf659f5c723cd164c5089f6a89650665c`). Exact prompt `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/imagegen_sentence_redwood10/06188/prompt.txt` and hash manifest `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/imagegen_sentence_redwood10/06188/generation.json`. The image resolution is 1254×1254 RGB.
+
+**Input.** Sole image input `/data/project/cr/CompAgent/workspace/compagent_pixal_reproduction_20260925/redwood/inputs/camera/06188/depth.png` (SHA-256 `9abdca93bdbed88cc25e6d12b0db7819c98f1a2f7ecd025585a4c00de83d54d2`), saved Camera-1 512×512 partial-depth raster. No prior generated image or GT was supplied.
+
+**Model and parameters.** Codex built-in Image Gen. Exact model checkpoint path, transformer path, seed, steps, CFG/guidance, scheduler, and backend: `UNKNOWN`. Separate negative prompt: `NONE` (none supplied). Project-side input resize/crop: `NONE`; any tool-internal resize is `UNKNOWN`. Output saved byte-for-byte with no postprocessing. RMBG, mask, MoGe, Pixal3D, FreeReg, ICP, coordinate flip, refinement, and fusion: `NOT RUN` for this accepted image. The result is not exactly reproducible because built-in generation settings are unknown.
+
+**Full positive prompt (verbatim):**
+
+```text
+这是一个踏板摩托车扫描出来的深度图。用 Image Gen 将图1补全成一张完整的踏板摩托车图，遵循深度图可见部分的深度、轮廓约束，背景为纯白色。
+```
+
+## 2026-11-03 13:28:16 UTC — user-approved Redwood 06830 simple-sentence Image Gen semantic
+
+**Approval.** The user said all ten simple-sentence Redwood images look very good. Preserve this exact RGB semantic as an accepted image. Approval covers the semantic image, not any later Pixal3D, registration, refinement, fusion, or CD/EMD result. Do not overwrite these pixels or change this accepted result's conditioning without asking.
+
+**Output.** `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/imagegen_sentence_redwood10/06830/semantic.png` (SHA-256 `bab28f86331a0c2ffe528e37636ac1b1517f5ca773a483c2d499fc772b5c39eb`). Exact prompt `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/imagegen_sentence_redwood10/06830/prompt.txt` and hash manifest `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/imagegen_sentence_redwood10/06830/generation.json`. The image resolution is 1254×1254 RGB.
+
+**Input.** Sole image input `/data/project/cr/CompAgent/workspace/compagent_pixal_reproduction_20260925/redwood/inputs/camera/06830/depth.png` (SHA-256 `56be5d36c125f2b57f5efb29eefccabb8d1826fe79b7bab3219e99381933573e`), saved Camera-1 512×512 partial-depth raster. No prior generated image or GT was supplied.
+
+**Model and parameters.** Codex built-in Image Gen. Exact model checkpoint path, transformer path, seed, steps, CFG/guidance, scheduler, and backend: `UNKNOWN`. Separate negative prompt: `NONE` (none supplied). Project-side input resize/crop: `NONE`; any tool-internal resize is `UNKNOWN`. Output saved byte-for-byte with no postprocessing. RMBG, mask, MoGe, Pixal3D, FreeReg, ICP, coordinate flip, refinement, and fusion: `NOT RUN` for this accepted image. The result is not exactly reproducible because built-in generation settings are unknown.
+
+**Full positive prompt (verbatim):**
+
+```text
+这是一个三轮车扫描出来的深度图。用 Image Gen 将图1补全成一张完整的三轮车图，遵循深度图可见部分的深度、轮廓约束，背景为纯白色。
+```
+
+## 2026-11-03 13:28:16 UTC — user-approved Redwood 07306 simple-sentence Image Gen semantic
+
+**Approval.** The user said all ten simple-sentence Redwood images look very good. Preserve this exact RGB semantic as an accepted image. Approval covers the semantic image, not any later Pixal3D, registration, refinement, fusion, or CD/EMD result. Do not overwrite these pixels or change this accepted result's conditioning without asking.
+
+**Output.** `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/imagegen_sentence_redwood10/07306/semantic.png` (SHA-256 `7be3537131d4c16f213b644d185895e13308dfd24669c840d2ac7f0565994e64`). Exact prompt `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/imagegen_sentence_redwood10/07306/prompt.txt` and hash manifest `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/imagegen_sentence_redwood10/07306/generation.json`. The image resolution is 1254×1254 RGB.
+
+**Input.** Sole image input `/data/project/cr/CompAgent/workspace/compagent_pixal_reproduction_20260925/redwood/inputs/camera/07306/depth.png` (SHA-256 `25f17f06859eb02470f2607c94b18ed791202602c82a63ab6ea200a24300f1c8`), saved Camera-1 512×512 partial-depth raster. No prior generated image or GT was supplied.
+
+**Model and parameters.** Codex built-in Image Gen. Exact model checkpoint path, transformer path, seed, steps, CFG/guidance, scheduler, and backend: `UNKNOWN`. Separate negative prompt: `NONE` (none supplied). Project-side input resize/crop: `NONE`; any tool-internal resize is `UNKNOWN`. Output saved byte-for-byte with no postprocessing. RMBG, mask, MoGe, Pixal3D, FreeReg, ICP, coordinate flip, refinement, and fusion: `NOT RUN` for this accepted image. The result is not exactly reproducible because built-in generation settings are unknown.
+
+**Full positive prompt (verbatim):**
+
+```text
+这是一个敞口垃圾桶扫描出来的深度图。用 Image Gen 将图1补全成一张完整的敞口垃圾桶图，遵循深度图可见部分的深度、轮廓约束，背景为纯白色。
+```
+
+## 2026-11-03 13:28:16 UTC — user-approved Redwood 09639 simple-sentence Image Gen semantic
+
+**Approval.** The user said all ten simple-sentence Redwood images look very good. Preserve this exact RGB semantic as an accepted image. Approval covers the semantic image, not any later Pixal3D, registration, refinement, fusion, or CD/EMD result. Do not overwrite these pixels or change this accepted result's conditioning without asking.
+
+**Output.** `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/imagegen_sentence_redwood10/09639/semantic.png` (SHA-256 `972c332dff4380b68e86e62b9071d16de754e22e9b95ac89385b38f3a9c1442a`). Exact prompt `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/imagegen_sentence_redwood10/09639/prompt.txt` and hash manifest `/data/project/cr/CompAgent/workspace/agentic_redwood9_fixedcamera_20261103/revision_v2/imagegen_sentence_redwood10/09639/generation.json`. The image resolution is 1254×1254 RGB.
+
+**Input.** Sole image input `/data/project/cr/CompAgent/workspace/compagent_pixal_reproduction_20260925/redwood/inputs/camera/09639/depth.png` (SHA-256 `f75b47c9799b5badbcaca0f57d6ea1ec825c7d0e1526610a6813cae33d97c82e`), saved Camera-1 512×512 partial-depth raster. No prior generated image or GT was supplied.
+
+**Model and parameters.** Codex built-in Image Gen. Exact model checkpoint path, transformer path, seed, steps, CFG/guidance, scheduler, and backend: `UNKNOWN`. Separate negative prompt: `NONE` (none supplied). Project-side input resize/crop: `NONE`; any tool-internal resize is `UNKNOWN`. Output saved byte-for-byte with no postprocessing. RMBG, mask, MoGe, Pixal3D, FreeReg, ICP, coordinate flip, refinement, and fusion: `NOT RUN` for this accepted image. The result is not exactly reproducible because built-in generation settings are unknown.
+
+**Full positive prompt (verbatim):**
+
+```text
+这是一个办公椅扫描出来的深度图。用 Image Gen 将图1补全成一张完整的办公椅图，遵循深度图可见部分的深度、轮廓约束，背景为纯白色。
+```

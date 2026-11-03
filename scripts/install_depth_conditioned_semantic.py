@@ -28,6 +28,27 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def match_full_canvas(semantic: Image.Image, depth: Image.Image,
+                      resolution: int) -> tuple[Image.Image, Image.Image, dict]:
+    """Resize the entire generated canvas to the saved depth raster, without a crop."""
+    source_size, depth_size = semantic.size, depth.size
+    target_size = (int(resolution), int(resolution))
+    if depth_size != target_size:
+        raise ValueError(f"saved depth is {depth_size}, expected {target_size}; no camera remapping is defined")
+    if source_size[0] * depth_size[1] != source_size[1] * depth_size[0]:
+        raise ValueError("semantic and depth aspect ratios differ; an explicit camera crop is required")
+    semantic = semantic.convert("RGB").resize(depth_size, Image.Resampling.LANCZOS)
+    depth = depth.convert("L")
+    return semantic, depth, {
+        "source_semantic_size": list(source_size),
+        "source_depth_size": list(depth_size),
+        "comparison_size": list(depth_size),
+        "mapping": "full_canvas_resize_no_crop_no_translation",
+        "semantic_resampling": "PIL_LANCZOS",
+        "depth_resampling": "NONE",
+    }
+
+
 def _bbox(mask: np.ndarray) -> list[int]:
     y, x = np.where(mask)
     if not len(x):
@@ -123,6 +144,8 @@ def main() -> None:
         "--minimum-depth-coverage", type=float, default=.835,
         help="Shared foreground-coverage floor; tolerant to thin-part RMBG boundary noise.",
     )
+    parser.add_argument("--positive-support-only", action="store_true",
+                        help="Require coverage of observed depth; unknown pixels may be completed.")
     parser.add_argument(
         "--normalize-framing", action=argparse.BooleanOptionalAction, default=True,
         help="Apply one global 2D similarity when GPT drifts from the saved Camera-1 bbox.",
@@ -138,19 +161,19 @@ def main() -> None:
     output = args.camera_dir.resolve()
     output.mkdir(parents=True, exist_ok=True)
     semantic_path = output / "img.png"
-    semantic = Image.open(args.semantic).convert("RGB").resize(
-        (int(args.resolution), int(args.resolution)), Image.Resampling.LANCZOS,
+    semantic, depth_image, canvas_mapping = match_full_canvas(
+        Image.open(args.semantic), Image.open(args.depth), int(args.resolution),
     )
     semantic.save(semantic_path)
+    comparison_depth_path = output / "comparison_depth.png"
+    depth_image.save(comparison_depth_path)
     alpha = run_rmbg_mask(
         semantic_path, output / "img_rmbg.png", args.rmbg_model.resolve(),
     )
     object_mask_path = output / f"{args.sample}_moge_to_raw_partial_object_mask.png"
     save_mask_png(object_mask_path, alpha)
 
-    depth = np.asarray(
-        Image.open(args.depth).convert("L").resize(semantic.size, Image.Resampling.NEAREST),
-    )
+    depth = np.asarray(depth_image)
     depth_mask = depth > 8
     semantic_mask = np.asarray(Image.open(object_mask_path).convert("L")) > 127
     initial = _framing_measurements(depth_mask, semantic_mask)
@@ -159,7 +182,7 @@ def main() -> None:
     )
     bbox_error = float(np.max(np.abs(initial["bbox_scale"] - 1.)))
     framing_transform = None
-    if bool(args.normalize_framing) and (
+    if bool(args.normalize_framing) and not args.positive_support_only and (
         centre_offset_ratio > float(args.maximum_center_offset_ratio)
         or bbox_error > float(args.maximum_bbox_scale_error)
     ):
@@ -191,9 +214,12 @@ def main() -> None:
     bbox_scale = measured["bbox_scale"]
     depth_coverage = measured["depth_coverage"]
     passed = bool(
-        centre_offset_ratio <= float(args.maximum_center_offset_ratio)
-        and np.max(np.abs(bbox_scale - 1.)) <= float(args.maximum_bbox_scale_error)
-        and depth_coverage >= float(args.minimum_depth_coverage)
+        depth_coverage >= float(args.minimum_depth_coverage)
+        if args.positive_support_only else (
+            centre_offset_ratio <= float(args.maximum_center_offset_ratio)
+            and np.max(np.abs(bbox_scale - 1.)) <= float(args.maximum_bbox_scale_error)
+            and depth_coverage >= float(args.minimum_depth_coverage)
+        )
     )
     record = {
         "method": "depth_mask_conditioned_direct_gpt_semantic_install",
@@ -204,6 +230,8 @@ def main() -> None:
         "prompt_file": None if prompt_path is None else str(prompt_path.resolve()),
         "prompt": prompt,
         "depth": str(args.depth.resolve()),
+        "comparison_depth": str(comparison_depth_path),
+        "canvas_mapping": canvas_mapping,
         "installed_semantic": str(semantic_path),
         "object_mask": str(object_mask_path),
         "audit_overlay": str(audit_overlay_path),
@@ -236,6 +264,7 @@ def main() -> None:
             "minimum_depth_coverage": float(args.minimum_depth_coverage),
         },
         "passed": passed,
+        "verification_mode": "positive_observed_support" if args.positive_support_only else "strict_framing",
     }
     manifest = output / "semantic_install_manifest.json"
     manifest.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")

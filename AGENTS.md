@@ -10,27 +10,23 @@
 ## Default Python Environment
 - This project defaults to the conda environment `genpc`.
 - Do not assume `python` or `pip` from `PATH` points to that environment.
-- Prefer the explicit interpreter and pip paths below when installing deps or running code:
-  - `/opt/data/private/cr/miniconda3/envs/genpc/bin/python`
-  - `/opt/data/private/cr/miniconda3/envs/genpc/bin/pip`
+- On this machine, use
+  `/home/chenrui/miniconda3/envs/genpc/bin/python`; verify the path on other
+  machines before running. Use `python -m pip` through that interpreter.
 
 ## Command Convention
 - Install packages into `genpc`, not `base`.
-- Run project scripts with `/opt/data/private/cr/miniconda3/envs/genpc/bin/python ...`.
-- If a command needs `pip`, use `/opt/data/private/cr/miniconda3/envs/genpc/bin/python -m pip ...`.
-- For the default full pipeline, run Stage 1 + Stage 2 + metric on the visible GPU with:
-  `CUDA_VISIBLE_DEVICES=0 /opt/data/private/cr/miniconda3/envs/genpc/bin/python main.py`.
-- The default config already has `run_stage1`, `run_stage2`, and `run_metric` set to `true`.
-- Paths are configured through `paths` and `models` in `configs/config.yaml`.
-- Default output cleanup uses `outputs.keep_profile: lean`, which keeps only
-  useful pipeline artifacts: `depth.png`, `img.png`, `camera.pth`,
-  `point_uv.npy`, `qwen_edit_prompt.txt`, `img_sam.png`, final Hunyuan PLY,
-  MoGe object/index/transform metadata, masked FreeReg outputs, and final
-  fused PLYs.
-- Set `outputs.save_intermediates: true` or `outputs.keep_profile: debug` to
-  keep every depth image, mask, generated image, registered point cloud, and
-  debug output. Do this only for focused experiments, because it creates many
-  files.
+- Run project scripts with the explicit `genpc` interpreter above.
+- If a command needs `pip`, use that interpreter with `-m pip`.
+- Current object pipeline: `scripts/run_prior_generation_agent.py prepare`,
+  interactive Image Gen, `scripts/run_prior_generation_agent.py review`, then
+  `CUDA_VISIBLE_DEVICES=0 .../genpc/bin/python scripts/run_four_stage_pipeline.py`.
+  See `README.md` for exact arguments.
+- Keep the prompt, selected depth/camera, same-canvas audit, transparent Pixal
+  input, Pixal/MoGe assets, registration, diagnostics, refinement, fusion,
+  manifests and logs together for paper experiments. The accepted ten-case
+  archive is `workspace/redwood10_final/`; no other workspace directory is
+  currently retained.
 - Current Qwen ControlNet/Nunchaku test pins are `diffusers==0.36.0` and
   `transformers==4.57.6`.
 
@@ -73,15 +69,14 @@
   in code and add tests for prompt text when feasible.
 
 ## Model Download Notes
-- The public mainline is Qwen semantic completion → external GPT clarity edit
-  → Pixal3D → fixed Pixal--MoGe--partial registration → partial-anchored
-  Gaussian edit. Hunyuan, FreeReg, PCA/ICP routing, and historical agent
-  branches are not part of this route.
-- Qwen edit pipeline files must exist at `models/Qwen-Image-Edit-2511`; the
-  Nunchaku transformer must exist at
+- The current validated route is saved-camera depth → Codex Image Gen semantic
+  completion → GPT-6 Sol prior review → RMBG transparent Pixal3D input →
+  fixed Pixal--MoGe--partial registration → GPT-6 Sol geometric refinement →
+  continuous observation fusion. Ground truth is used only for offline metrics.
+- Qwen-Image-Edit-2511 and Nunchaku are an optional local backup, not a
+  dependency of the accepted Redwood10 route. If used, their paths are
+  `models/Qwen-Image-Edit-2511` and
   `models/nunchaku-qwen-image-edit/nunchaku_qwen_image_2511_balance_int4.safetensors`.
-  Stage 1 converts the depth input to RGB and uses the configurable object
-  label in its prompt.
 - Pixal3D source must be available at `models/Pixal3D` or via
   `PIXAL3D_SOURCE`; the tested source commit and its supplementary TRELLIS.2
   dependencies are recorded in `docs/models.md`. Its model files live under

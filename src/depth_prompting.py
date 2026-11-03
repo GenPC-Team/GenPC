@@ -7,6 +7,7 @@ depth-hole fill. Qwen remains callable only as a local comparison baseline.
 from __future__ import annotations
 
 import math
+from typing import TYPE_CHECKING
 
 import cv2
 import fpsample
@@ -17,9 +18,11 @@ from PIL import Image
 import torch
 from torchvision.utils import save_image
 
-from tools.qwen_image_edit import QwenImageEdit, resize_stage1_image_for_output
 from src.mainline_data import prompt_label
 from src.mainline_paths import model_path, sample_dir, sample_file
+
+if TYPE_CHECKING:
+    from tools.qwen_image_edit import QwenImageEdit
 
 
 class DepthPrompting:
@@ -36,6 +39,8 @@ class DepthPrompting:
 
     def _load_qwen(self) -> QwenImageEdit:
         if self.depth2image is None:
+            from tools.qwen_image_edit import QwenImageEdit
+
             self.depth2image = QwenImageEdit(
                 device=self.device,
                 transformer_path=str(model_path(
@@ -192,6 +197,7 @@ class DepthPrompting:
         flag: str,
         *,
         viewpoint_override: np.ndarray | None = None,
+        viewpoint_is_source_camera: bool = True,
     ):
         """Rasterise a partial scan from the saved or supplied Camera-1 view.
 
@@ -207,9 +213,14 @@ class DepthPrompting:
             viewpoint = np.asarray(viewpoint_override, dtype=np.float32).reshape(3)
             camera = self._camera_for_viewpoint(viewpoint)
             uv, depths = self._project_view(xyz, camera)
-            # These points were obtained from this camera. Keeping all observed
-            # points avoids a second visibility pass puncturing a sparse scan.
-            visible = torch.ones(xyz.shape[0], dtype=torch.bool, device=xyz.device)
+            # Original acquisition views retain every observed scan point.
+            # Synthetic prior-agent candidates use only points visible from
+            # their proposed camera, so back surfaces cannot overwrite front.
+            visible = (torch.ones(xyz.shape[0], dtype=torch.bool, device=xyz.device)
+                       if viewpoint_is_source_camera else self._visible_indices(
+                           xyz, np.asarray([viewpoint]),
+                           float(getattr(self.cfg, "removal_radius", 10000.0)),
+                       )[0])
         pixels = (uv * int(self.cfg.res)).long().clamp(0, int(self.cfg.res) - 1)
         pixels = torch.stack([pixels[:, 1], pixels[:, 0]], dim=1)
         sparse_depth, hole_mask = self._rasterise_depth(pixels[visible], depths[visible], rgb[visible])
@@ -246,6 +257,8 @@ class DepthPrompting:
         image = Image.open(raw_depth).convert("RGB").resize((input_size, input_size), Image.Resampling.LANCZOS)
         semantic = editor.generate(image, prompt_label(flag, self.cfg), size=int(self.cfg.generate_res))
         semantic.save(sample_file(self.cfg, flag, "img.png"))
+        from tools.qwen_image_edit import resize_stage1_image_for_output
+
         resize_stage1_image_for_output(editor.last_stage1_image, int(self.cfg.generate_res)).save(
             sample_file(self.cfg, flag, "qwen_edit_stage1.png")
         )
@@ -267,8 +280,10 @@ class DepthPrompting:
         rgb: torch.Tensor,
         *,
         viewpoint_override: np.ndarray | None = None,
+        viewpoint_is_source_camera: bool = True,
     ) -> None:
         """Save the camera/depth checkpoint without loading an image model."""
         self._save_depth(
             xyz, rgb, flag, viewpoint_override=viewpoint_override,
+            viewpoint_is_source_camera=viewpoint_is_source_camera,
         )

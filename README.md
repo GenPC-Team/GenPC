@@ -1,204 +1,101 @@
 # GenPC++
 
-GenPC++ is a zero-shot point-cloud completion system built around complete 3D
-generative priors. It keeps generation, geometric inference, and offline
-evaluation separate: neither ground truth nor CD/EMD is available to the
-inference path.
-
-The object pipeline is:
+GenPC++ completes a partial object point cloud with an image-conditioned 3D
+prior, camera-aware registration, GPT-6 Sol geometric refinement, and
+observation-anchored fusion. Ground truth and CD/EMD are used only after a
+prediction is frozen.
 
 ```text
-partial point cloud
-  -> saved-camera depth
-  -> mask-locked direct-GPT semantic completion
-  -> textured Pixal3D prior and native MoGe observation
-  -> camera-aware Pixal--MoGe--partial Sim(3) registration
-  -> four informative prior/partial residual views
-  -> exact Camera-1 structure-aware Partial OT
-  -> three rounds of prior-preserving posterior re-linearization
-  -> complete 100k-point prediction
+partial scan + saved camera
+  → depth image → Prior Generation Agent → Image Gen semantic image
+  → same-canvas review → RMBG transparent image → Pixal3D + MoGe-2 prior
+  → Pixal–MoGe–partial registration → four-view residual diagnosis
+  → GPT-6 Sol refinement → continuous observation fusion → 100k-point PLY
 ```
 
-The depth raster is the camera and foreground-layout authority for semantic
-completion. Direct GPT is instructed to preserve its mask, center, apparent
-size, crop, orientation, and visible part locations; an automatic mask audit
-rejects images that drift before any 3D generation is run.
-The shared audit allows small boundary uncertainty on thin structures but has
-no category- or sample-specific bypass.
+The Prior Generation Agent uses the saved acquisition camera when one exists.
+Otherwise it selects an exterior/front view from partial-derived depth views,
+avoiding the opposite or inside view of a hollow object. Its default Image Gen
+instruction is short:
 
-Prepare the external GPT task and install the returned image with:
+> 这是一个{物体}扫描出来的深度图。用 Image Gen 将图1补全成一张完整的{物体}图，遵循深度图可见部分的深度、轮廓约束，背景为纯白色。
+
+Supply **the depth image** as Image Gen's image input. The observed depth
+pixels constrain the visible contour, pose, part layout and near/far order;
+unobserved pixels are unknown and allow a complete, naturally built object.
+The agent resizes the entire generated image to the depth canvas without
+cropping or translation, checks equal comparison dimensions, measures
+approximate observed foreground coverage and reviews visible geometry,
+category identity and structural plausibility. A coverage score alone cannot
+accept an image. RMBG-2.0 makes the accepted image transparent **before** it
+is sent to Pixal3D. MoGe-2 observes Pixal3D's saved preprocessed input.
+
+## Run one object
+
+Use the `genpc` interpreter and installed model assets from
+[installation](docs/installation.md) and [models](docs/models.md):
 
 ```bash
-PY=/opt/data/private/cr/miniconda3/envs/genpc/bin/python
+PY=/home/chenrui/miniconda3/envs/genpc/bin/python
+RUN=workspace/my_01184_run
 
-$PY scripts/run_semantic_stage.py \
-  --output-root workspace/run/inputs/camera \
-  --samples 01184 --depth-only
-
-$PY scripts/prepare_depth_gpt_semantic_task.py \
-  --depth workspace/run/inputs/camera/01184/depth.png \
-  --object "a blue wheeled rubbish bin" \
-  --constraint "Keep exactly two wheels parallel and attached to the same axle." \
-  --output workspace/run/inputs/pixal/01184/gpt_depth_completion_prompt.txt
-
-# Run GPT image generation with the saved depth and exact prompt, then:
-$PY scripts/install_depth_conditioned_semantic.py \
+$PY scripts/run_prior_generation_agent.py prepare \
   --sample 01184 \
-  --semantic workspace/run/inputs/pixal/01184/gpt_image.png \
-  --depth workspace/run/inputs/camera/01184/depth.png \
-  --camera-dir workspace/run/inputs/camera/01184 \
-  --rmbg-model models/RMBG-2.0
-```
-
-The four-view observation exposes where the registered prior disagrees with
-positive partial evidence. Exact physical Camera-1 supplies the structural
-Partial-OT correspondence authority, while the four consistently reframed
-diagnostic views supply local observation assimilation. One category-
-independent `PosteriorAdapter` performs the physical update and preserves every prior
-carrier slot, anchors already aligned surface, propagates reliable residuals
-through a deformation graph, and protects unobserved structure. Missing
-partial pixels are unknown rather than deletion evidence.
-
-The final fusion is not point concatenation. The same four saved cameras first
-retain only correspondences supported by at least two views. Their residuals
-drive a finite-support embedded deformation whose boundary is fixed to the
-complete posterior; a no-GT line search protects coverage, connectivity, and
-local edge strain. Thus the observed surface is smoothly assimilated while
-unsupported prior geometry and the ordered 100k carrier are retained. The
-historical exact-slot measurement decoder remains available with `--mode
-exact` for reproducing earlier exports.
-
-## Quick start from a selected registered prior
-
-Use the project interpreter explicitly:
-
-```bash
-PY=/opt/data/private/cr/miniconda3/envs/genpc/bin/python
-
-CUDA_VISIBLE_DEVICES=0 $PY scripts/iterative_posterior_tto.py \
-  --prior workspace/run/registration_selected/01184/camera1_amplified_registered_100k.ply \
   --partial data/redwood/partial/01184.ply \
-  --camera workspace/run/inputs/camera/01184/camera.pth \
-  --semantic workspace/run/inputs/camera/01184/img.png \
-  --multiview-manifest workspace/run/residuals/01184/render/render_manifest.json \
-  --config-json configs/posterior_mainline.json \
-  --outer-rounds 3 \
-  --output-dir workspace/posterior_run/01184
+  --object "带轮垃圾桶" \
+  --camera-source workspace/redwood10_final/01184/inputs/camera/01184 \
+  --output-root "$RUN"
 ```
 
-For heterogeneous datasets, write a JSON case manifest:
-
-```json
-[
-  {
-    "sample_id": "01184",
-    "prior": "/absolute/path/to/registered_prior.ply",
-    "partial": "/absolute/path/to/partial.ply",
-    "camera": "/absolute/path/to/camera.pth",
-    "semantic": "/absolute/path/to/img.png",
-    "multiview_manifest": "/absolute/path/to/render_manifest.json"
-  }
-]
-```
-
-Then run the same frozen configuration over all cases:
+The camera source directory must contain `depth.png`, `camera.pth`, and
+`point_uv.npy`. Omit `--camera-source` only when those assets do not exist;
+`prepare` then renders depth candidates from the partial scan and asks the
+agent to choose a view. The command writes
+`$RUN/prior_agent/round_00_prompt.txt` and prints the selected depth path.
+Use **only that depth image and saved prompt** in Codex Image Gen, then save
+its full-resolution result and review it:
 
 ```bash
-CUDA_VISIBLE_DEVICES=0 $PY scripts/run_iterative_posterior_batch.py \
-  --source-root workspace/best_redwood_custom_camera1_transport_20260911 \
-  --output-root workspace/posterior_run \
-  --registration-stage selected \
-  --outer-rounds 3
+$PY scripts/run_prior_generation_agent.py review \
+  --candidate /absolute/path/to/imagegen_result.png \
+  --output-root "$RUN"
 ```
 
-Single-pass PosteriorAdapter runs use the `lean` output profile by default.
-It keeps only the final carrier, matched before/after partial overlays,
-Camera-1 image, multi-view board, and JSON audit. Use
-`--output-profile debug` only for a
-focused diagnosis that needs coarse carriers, support masks, OT pairs, or the
-dense deformation field. An existing full experiment can be exposed as a
-compact, zero-copy review tree with `scripts/make_posterior_review_bundle.py`.
-
-For a portable, cleanup-safe replay beginning at the retained Pixal3D stage,
-build a physical-copy package with `scripts/package_mainline_reproduction.py`.
-The accepted Redwood10 + Custom12 package is
-`workspace/compagent_pixal_reproduction_20260925/`. It contains Camera-1
-depth/semantic assets, camera/UV data, partials, Pixal3D GLBs and ordered 100k
-carriers, native MoGe caches, portable four-view camera manifests, selected
-registration checkpoints, final posterior reviews, metrics, and paper assets.
-Replay one sample with:
+If the review requests a revision, use its next saved prompt with the same
+depth view. An accepted review writes the RGB semantic image, same-canvas
+audits, exact prompt, and RMBG RGBA Pixal input under the run directory.
+Continue the geometric stages on the visible GPU:
 
 ```bash
-CUDA_VISIBLE_DEVICES=0 $PY scripts/reproduce_packaged_mainline.py \
-  --bundle-root workspace/compagent_pixal_reproduction_20260925 \
-  --dataset redwood --samples 01184 \
-  --output-root workspace/replay_01184
+CUDA_VISIBLE_DEVICES=0 $PY scripts/run_four_stage_pipeline.py \
+  --output-root "$RUN"
 ```
 
-The replay performs the initial Pixal--MoGe registration, the shared monotonic
-Camera-1 broad continuation, and the posterior solve. Its SHA-256 report must
-match the packaged registered carrier and posterior before legacy workspace
-artifacts are removed.
+The final geometry is
+`$RUN/fusion/01184/observation_anchored_fused_100k.ply`; the Pixal-coloured
+carrier is beside it. The run also retains its depth/camera, prompt,
+semantic image, alpha image, Pixal and MoGe assets, registration, view
+diagnostics, refinement decisions, stage logs and manifests. The two agent
+decisions use the logged-in Codex CLI model `gpt-6-sol`; Image Gen is an
+interactive Codex tool.
 
-The final prediction is
-`workspace/posterior_run/<sample>/round_03/posterior_prior_100k.ply`. Each
-sample also contains the registered start point, every intermediate carrier,
-OT pairs, support states, the deformation field, camera overlays, and no-GT
-residual and integrity diagnostics.
+## Redwood10 experiment
 
-## Optional four-view diagnosis
+The validated ten-case result package is the local directory
+`workspace/redwood10_final/`. Each numbered directory contains the full
+sample chain. The directory root also contains ten quick-access fused PLYs,
+`metrics.csv`, `copy_manifest.json`, and `SHA256SUMS`. Copied JSON manifests
+retain inference-time absolute paths from the original runs; use
+`copy_manifest.json` for paths inside this package. Model weights and ground
+truth are external. The result package is an experiment artifact and is not
+part of the Git source push.
 
-When a textured GLB and its ordered pre/post-registration carriers are
-available:
+Offline 16,384-point FPS evaluation with seed 6145 gives mean CD-L1 ×100
+**1.537036** and EMD ×100 **2.472180**. The same-run previous result means
+were 1.918897 and 2.935511, respectively. Two individual samples, 05117 and
+05452, regressed despite the aggregate improvement. Full per-sample scores
+are in the package's `metrics.csv`.
 
-```bash
-$PY scripts/run_multiview_diagnostics.py \
-  --glb workspace/run/inputs/pixal/01184/pixal3d.glb \
-  --source-carrier workspace/run/inputs/pixal/01184/pixal3d_sampled_100k.ply \
-  --registered-prior workspace/run/registration/01184/final/camera1_amplified_registered_100k.ply \
-  --partial data/redwood/partial/01184.ply \
-  --camera workspace/run/inputs/camera/01184/camera.pth \
-  --output-dir workspace/posterior_run/01184/multiview
-```
-
-Camera-1 is retained and three auxiliary views are selected by incremental
-visibility of physical partial points with a minimum yaw separation.
-
-## Offline evaluation
-
-Run metrics only after predictions are frozen:
-
-```bash
-CUDA_VISIBLE_DEVICES=0 $PY scripts/evaluate_completions.py \
-  --prediction-root workspace/posterior_run \
-  --ground-truth-root data/redwood/gt \
-  --output workspace/posterior_run/metrics/redwood
-```
-
-## Repository layout
-
-```text
-src/posterior_types.py                immutable posterior configuration/results
-src/partial_transport.py              visibility-aware structural Partial OT
-src/posterior_deformation.py          embedded-ARAP complete-carrier deformation
-src/carrier_protection.py             integrity and residual-motion projection
-src/posterior_adapter.py              posterior stage orchestration facade
-src/deformation_graph.py              reusable graph and strain primitives
-src/multiview_diagnostics.py          informative camera selection/rendering
-src/multiview_partial_evidence.py     prior-to-partial residual visualization
-scripts/iterative_posterior_tto.py    three-round one-sample re-linearization
-scripts/run_iterative_posterior_batch.py dataset-independent batch inference
-scripts/check_posterior_regression.py pointwise frozen-output regression gate
-scripts/run_multiview_diagnostics.py  optional four-view audit
-src/observation_anchored_fusion.py    four-view positive observation evidence
-scripts/run_scene_completion.py       independent scene-level extension
-```
-
-See [installation](docs/installation.md), [models](docs/models.md), the
-[canonical object method](docs/core_registration_pipeline.md), and the
-[scene-level route](docs/scene_completion.md).
-
-## License
-
-Project code is released under the [MIT License](LICENSE). External models,
-datasets, and CUDA extensions retain their own licenses.
+See the [method and artifact contract](docs/core_registration_pipeline.md).
+Project code is under the [MIT License](LICENSE); external models, datasets
+and CUDA extensions retain their own licenses.
