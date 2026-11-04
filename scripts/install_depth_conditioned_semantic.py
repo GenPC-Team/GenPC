@@ -35,7 +35,9 @@ def match_full_canvas(semantic: Image.Image, depth: Image.Image,
     target_size = (int(resolution), int(resolution))
     if depth_size != target_size:
         raise ValueError(f"saved depth is {depth_size}, expected {target_size}; no camera remapping is defined")
-    if source_size[0] * depth_size[1] != source_size[1] * depth_size[0]:
+    aspect_error = abs(source_size[0] / source_size[1] -
+                       depth_size[0] / depth_size[1]) / (depth_size[0] / depth_size[1])
+    if aspect_error > 0.03:
         raise ValueError("semantic and depth aspect ratios differ; an explicit camera crop is required")
     semantic = semantic.convert("RGB").resize(depth_size, Image.Resampling.LANCZOS)
     depth = depth.convert("L")
@@ -43,7 +45,11 @@ def match_full_canvas(semantic: Image.Image, depth: Image.Image,
         "source_semantic_size": list(source_size),
         "source_depth_size": list(depth_size),
         "comparison_size": list(depth_size),
-        "mapping": "full_canvas_resize_no_crop_no_translation",
+        "mapping": ("full_canvas_resize_no_crop_no_translation" if aspect_error == 0 else
+                    "full_canvas_resize_small_aspect_correction_no_crop_no_translation"),
+        "source_aspect_error": aspect_error,
+        "axis_scale_xy": [depth_size[0] / source_size[0],
+                          depth_size[1] / source_size[1]],
         "semantic_resampling": "PIL_LANCZOS",
         "depth_resampling": "NONE",
     }

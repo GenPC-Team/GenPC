@@ -2369,3 +2369,13 @@ Reference image 1 is the selected partial-depth view and the sole authority for 
 ```text
 这是一个办公椅扫描出来的深度图。用 Image Gen 将图1补全成一张完整的办公椅图，遵循深度图可见部分的深度、轮廓约束，背景为纯白色。
 ```
+
+## 2026-11-03 15:48 UTC — Custom mirrorless_camera semantic image visually approved
+
+**Approval.** User: “对对对 这个好很多”. This approves the regenerated visual layout: near rear/side camera body and far lens. Preserve the RGB image and exact prompt; pipeline acceptance and metrics remain pending.
+
+**Inputs and output.** Sample `mirrorless_camera`; partial `/data/project/cr/CompAgent/workspace/custom10_imagegen_20261103/mirrorless_camera/inputs/partial/mirrorless_camera.ply`; saved camera `/data/project/cr/CompAgent/workspace/custom10_imagegen_20261103/mirrorless_camera/inputs/camera/mirrorless_camera/camera.pth`; depth `/data/project/cr/CompAgent/workspace/custom10_imagegen_20261103/mirrorless_camera/inputs/camera/mirrorless_camera/depth.png` (SHA-256 `c4e8dbc9e441729346f8e0d97c396ab42af356e15821e4dbd0d83cd266efcfbf`); generated image `/data/project/cr/CompAgent/workspace/custom10_imagegen_20261103/mirrorless_camera/semantic.png` (SHA-256 `54449212573af1a37900c0769f0d91f9c7eb3719416a1433dcaca8c2f6369bb5`). Original provider file: `/home/chenrui/.codex/generated_images/01a1a01c-722e-7cc2-a45f-a50edfe37914/exec-78101d48-5ea8-483e-9f5d-0edcead0c6f0.png`. Exact generation metadata: `/data/project/cr/CompAgent/workspace/custom10_imagegen_20261103/mirrorless_camera/generation.json`.
+
+**Model and prompt.** Codex Image Gen tool; exact image model, model path, checkpoint and transformer: `UNKNOWN`. Depth interpretation: `gpt-6-sol` via Codex, saved at `/data/project/cr/CompAgent/workspace/custom10_imagegen_20261103/mirrorless_camera/prior_agent/prior_agent_manifest.json`. Full positive prompt verbatim: "这是一个mirrorless camera扫描出来的深度图。用 Image Gen 将图1补全成一张完整的mirrorless camera图，遵循深度图可见部分的深度、轮廓约束，背景为纯白色。 Complete a mirrorless camera with its broad rear/side body nearest the viewer and its lens naturally attached at the far end, pointing away from the viewer."; negative prompt: `NONE`.
+
+**Parameters and postprocessing.** Image resolution 1254×1254. Image Gen internal resize, seed, steps, CFG/guidance, scheduler and backend implementation: `UNKNOWN`; thus not exactly reproducible. No postprocessing at visual approval. Same-canvas 512×512 review, RMBG, Pixal3D, MoGe, registration, refinement and fusion are pending and are not part of this approval.

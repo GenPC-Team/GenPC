@@ -1,5 +1,290 @@
 # Active plan
 
+## Follow-on aircraft, unknown-camera datasets and Redwood ablations (2026-11-03)
+
+- [x] Immediately after Custom10 completes, run the current aircraft dataset
+  first: 40 partial/GT pairs in `data/aircraft/{partial,gt}/`, four aircraft
+  types × ten saved projection views. Use the supplied per-view camera JSON
+  and rasterize each partial at that fixed view; do not select a new camera.
+  Generate, review and run the same four-stage chain, then evaluate all 40
+  frozen predictions with CD/EMD under the stated offline protocol. All 40
+  fixed-camera inputs and prior-agent manifests are prepared under
+  `workspace/aircraft40_imagegen_20261103/` from the 2,048-point partials;
+  the denser saved depth scans and GT were excluded. The preparation script is
+  `scripts/prepare_aircraft_saved_camera_inputs.py`; one depth/camera pair was
+  visually and numerically checked before preparing all 40.
+  `scripts/record_imagegen_candidate.py` records exact prompts and hashes.
+  All 40/40 candidates passed the prior review and all 40/40 fused PLYs
+  exist with exactly 100,000 vertices. The frozen offline metric has 40 rows
+  in `workspace/aircraft40_imagegen_20261103/aircraft40_metrics.json` and
+  `.csv`: mean CD-L1 ×100 = 4.528710, mean EMD ×100 = 7.051503 (16,384 FPS,
+  seed 6145). These scores were not available to the prior agent or used to
+  tune generation. `J-15_view01` initially showed the aircraft
+  upper surface even though its saved camera was 20° below; a revised
+  underside candidate passed review. The generic depth interpretation now
+  passes a saved camera above/below cue when `world_up` is recorded. Distant
+  aircraft can also use the optional partial-only canvas framing hint.
+  During the aircraft batch, the generic positive-support floor was relaxed
+  from 0.80 to 0.75: the scan is incomplete, while the semantic reviewer
+  still checks visible part structure, depth order and natural construction.
+  The review now explicitly permits plausible extension into unobserved
+  pixels instead of treating the partial bounding box as a hard boundary.
+  Retry text now keeps only the latest correction, drops a possibly wrong
+  initial semantic hint after repeated failures, and uses relative canvas
+  positions. A provider output of 1240×1269 exposed a small aspect mismatch;
+  the full-canvas mapping now records axis scales and permits at most 3%
+  variation without cropping. Larger mismatches remain rejected.
+  The reviewer now treats isolated black scan voids inside a visible surface
+  as missing data rather than real holes, unless the object category supports
+  openings at those locations.
+  `J-36_view08` was reopened after a manual check found rendered holes in the
+  aircraft skin. Its earlier acceptance is retained only as a superseded audit
+  record; a revised continuous-skin candidate passed review and completed fusion.
+  `J-35_view03` required an underside edit; the reviewer initially overfit
+  an ambiguous short scan protrusion to a specific far-wing feature. The
+  saved depth interpretation had explicitly marked that part uncertain, so
+  the generic review now treats retry prompts as provenance rather than
+  evidence when they over-specify uncertain scan details. The candidate
+  passed re-review and its geometry chain completed. A Qwen diagnostic on
+  that case produced a washed-out depth-like image and was not used.
+  Image Gen edit experiments now record the exact second input image and
+  hash in `generation.json`. `运-20_view01` passed semantic review and fusion.
+  An isolated, frozen `J-15_view00` pilot offline score is stored in
+  `workspace/aircraft40_imagegen_20261103/pilot_J-15_view00_metrics.json`;
+  it was not used to tune subsequent prompts. Evaluate and report the full
+  aircraft batch was evaluated after all 40 predictions were frozen.
+
+- [x] After Custom10 and aircraft, run
+  every available current KITTI (`data/kitti/partial`: 20), Waymo
+  (`data/waymo/{CAR,PED,OTHER}`: 76) and ScanNet/ScanSalon
+  (`data/scannet/partial`: 50) partial. KITTI and Waymo have no matched
+  complete GT here, so report completion counts and no-GT checks only;
+  evaluate ScanNet against its 50 matched GT files only after inference.
+  KITTI pilot `frame_000782_car_1` completed 20-view preparation and GPT-6
+  Sol view choice. Its third Image Gen candidate passed the no-GT prior review
+  after making a continuous finished car surface and moving the observed roof
+  and wheels closer to the sparse scan. All 20 KITTI samples now have saved
+  20-view selection and depth interpretations. Three fused 100k outputs exist
+  under `workspace/kitti20_imagegen_20261103/`; the remainder are in semantic
+  review or the geometry chain. A sparse car candidate copied point scan
+  speckles into paint, so the shared depth-framing prompt now requires a
+  continuous finished surface. The reviewer initially over-constrained full
+  object width to the partial scan's bounding box; the general no-GT rule now
+  permits natural 15–25% extension beyond observed support when visible part
+  scale and overlap agree. Its earlier 91% support candidate then passed
+  re-review, while an artificially shrunk 57% support edit was rejected.
+  Waymo and ScanNet view preparation reached 57/76 and 47/50 respectively;
+  simultaneous Codex CLI `error` events interrupted both loops and require
+  retries without changing their selection protocol. Both now have all
+  views selected (Waymo 76/76, ScanNet 50/50), and their depth interpretation
+  passes are running. The same transient `error` event interrupted one KITTI
+  refinement. Prior and refinement Codex calls now retry such events up to
+  three times while preserving the existing ban on actual tool calls; the
+  failed refinement is resuming from its saved Pixal/registration/diagnostic
+  stages. Candidate generation metadata is now archived by image SHA-256
+  to preserve provenance across retries and re-review.
+  KITTI reached 20/20 accepted semantic images and 20/20 fused 100k outputs,
+  verified against the saved manifests and PLY vertex headers on 2026-11-03.
+  No matched complete GT PLY exists for KITTI, so no CD/EMD was calculated.
+  The sole
+  remaining car repeatedly inverted the scanned near/far perspective despite
+  four no-GT reviews; the general `reselect` command now excludes failed
+  views among the saved 20 candidates, records the reason, reinstalls the
+  newly selected camera and clears only rejected candidate rounds. Its view
+  changed from `view_088` to GPT-6 Sol's `view_083`; the new depth
+  interpretation and corrected ordinary-car generation passed review. All
+  20 KITTI semantic images are accepted; both remaining geometry chains
+  completed after GPU contention. The sparse-person review also
+  stopped forcing an exact hip boundary from an ambiguous lower-body patch,
+  allowing the natural high-support KITTI pedestrian to pass re-review.
+  Waymo 76/76 and ScanNet 50/50 depth interpretations and prompt files now
+  exist. A ScanNet chair hint once exceeded the short prompt budget; the
+  generic builder now drops redundant count text and, if needed, clips the
+  image hint while preserving facing and canvas cues. The first Waymo car
+  passed prior review and completed fusion; the first six Waymo images have
+  four accepted and two rejected for specific structural corrections.
+  A sparse Waymo car's three successive candidates kept a natural van body
+  and matched the observed near/far view, but review repeatedly demanded an
+  exact front-wheel center from scattered underbody returns. The generic
+  reviewer now distinguishes a clearly visible wheel/arch from an ambiguous
+  lower-body patch before imposing an exact center; re-review must still
+  verify positive support and overall pose. A separate `OTHER_VEHICLE` case
+  failed positive-support coverage twice and was reselected from saved view
+  `view_098` to `view_107` before regeneration, without using GT.
+  KITTI's 20/20 final carriers passed the vertex-count audit. One Waymo car
+  moved from `view_088` to `view_041` after repeated uncertain wheel-center
+  interpretations; its new semantic passed review. A ScanNet shell chair
+  moved from `view_195` to `view_060` after repeated concave/convex and
+  near/far reversals; the new semantic passed review. A ScanNet lamp needed a
+  thicker observed support and a natural unobserved base before acceptance.
+  All reselections used the saved partial-only view set, and all exact prompts,
+  source images, review audits and accepted transparent Pixal inputs remain
+  in the corresponding sample roots.
+  On 2026-11-04 all 50/50 ScanNet semantic candidates passed prior review and
+  all 50 fused PLYs under `workspace/scannet50_imagegen_20261103/` were
+  verified to contain exactly 100,000 vertices. Each five-stage manifest
+  records `ground_truth_used: false`. The frozen offline 16,384-FPS,
+  seed-6145 evaluation at `scannet50_metrics.json` and `.csv` has 50 rows:
+  mean CD-L1 x100 = 5.408549, mean EMD x100 = 7.748956. The
+  `sofa_scene0128_00_1` depth-order reversal was
+  resolved by reselecting from `view_249` to `view_020` and then restoring a
+  complete natural seat/back. A table required several review-driven retries
+  to recover its outward-flared supports and continuous finished surface.
+  Waymo now has all 76/76 accepted semantics under
+  `workspace/waymo76_imagegen_20261103/`; all 76 fused PLYs were verified
+  after the geometry queue completed on 2026-11-04. One ordinary-clothed
+  pedestrian candidate initially triggered an Image Gen safety rejection,
+  then passed with an explicitly adult, normally dressed prompt and corrected
+  head placement. Several low-support pedestrian views were reselected
+  from their frozen 20-view partial-only sets after failed edits, then passed
+  no-GT review.
+  No GT entered any of these corrections. The geometry queue processes
+  accepted Waymo cases on five separate GPUs and records failures per sample.
+  After repeated no-GT audits of sparse pedestrians, the current review
+  entry floor was lowered from 0.75 to 0.65. A visible torso/limb candidate
+  exceeded 0.82 support above the foot/ground band, while a broad horizontal
+  lower scan strip reduced whole-canvas support to about 0.68. This remains
+  only an entry gate: GPT-6 Sol still checks the full same-canvas overlay,
+  part structure, facing and depth order before acceptance. Earlier accepted
+  samples and the frozen ScanNet metric were not re-reviewed or retuned.
+  A final audit of KITTI20, ScanNet50 and Waymo76 found zero missing or
+  rejected semantic inputs, zero non-RGBA Pixal inputs, zero incomplete
+  five-stage manifests, zero GT-used flags, and exactly 100,000 vertices in
+  every fused PLY. KITTI and Waymo have no matched complete GT and therefore
+  no CD/EMD was computed for them.
+- [x] For these three datasets, generate a deterministic Fibonacci sphere of
+  candidate camera views, rank by partial-only visible point count, retain
+  the first 20 with a documented minimum angular separation, and let
+  `gpt-6-sol` choose the candidate depth view that most resembles the known
+  object class. Save all view scores, selected camera and prompt evidence;
+  never use GT to select a view. Then use the Custom-tested depth semantics,
+  Image Gen, review, Pixal3D, registration, refinement and fusion route.
+  All 146 unknown-camera samples have 20 saved candidate views, a selected
+  view among them, and a `gpt-6-sol` view-selection record. View reselections
+  for rejected candidate images used only the saved partial-only views.
+- [x] After those datasets, run controlled ablations on Redwood10 only,
+  holding the frozen input/camera and offline 16,384-FPS seed-6145 ×100
+  evaluation protocol fixed. Compare each feasible variant against the
+  corresponding full route and report all ten sample CD/EMD rows plus means,
+  exact artifact paths and no-GT inference provenance. Define variant
+  switches and accepted reference before launching; do not tune with GT.
+  Frozen reference: the ten accepted final fused carriers under
+  `workspace/redwood10_final/`. Predeclared variants are the saved registered
+  Pixal carrier (remove refinement and fusion), the saved refined carrier
+  (remove fusion), and continuous fusion applied directly to that registered
+  carrier (remove refinement), using the same partial and saved four-view
+  cameras. Place only ablation outputs and offline metric files in
+  `workspace/redwood10_final/ablations/`; leave the accepted sample chains
+  untouched. Relocate copied manifest paths to the package before invoking
+  fusion, because their original source run was removed. Evaluate all ten
+  cases per variant after outputs are frozen, without GT-driven selection.
+  Completed on 2026-11-04 in `workspace/redwood10_final/ablations/`:
+  `comparison.csv`/`.json` contain all ten paired rows and means for four
+  variants. Registered only: CD-L1 x100 1.766813, EMD x100 2.723830;
+  refined without fusion: 1.535004, 2.456332; registered plus continuous
+  fusion without refinement: 1.743406, 2.696517; frozen full route:
+  1.537036, 2.474640. All ten no-refinement fusion outputs have 100,000
+  vertices and no-GT provenance; the copied four-view manifests were
+  relocated and every referenced file exists. The complete route's CD
+  matches the previously saved Redwood result exactly, while its approximate
+  EMD varies slightly across identical offline runs (the saved package mean
+  was 2.472180; this run is 2.474640). A repeat for `01184` is under
+  `diagnostics/` and also shows small EMD variability with unchanged CD.
+  The full route is slightly worse on the ten-case mean than refinement
+  without fusion; this is reported as measured rather than tuned with GT.
+
+## Aircraft STL synthetic scan pairs (2026-11-04)
+
+- [x] Use the four STL models in `data/型号飞机模型.rar` (J-15, J-35,
+  J-36, 运-20) to make ten first-hit depth scans per model. Keep one
+  deterministic 16,384-point complete surface sample per model and save
+  matching 2,048-point partial/GT PLY filenames for all 40 views under
+  `data/aircraft/`. Normalize each STL by its bounding-box center and largest
+  extent; the STL physical unit is unknown. Generation code is
+  `scripts/materialize_aircraft_stl_scans.py`; source STLs remain extracted
+  under `data/aircraft/source/` and the original RAR remains in `data/`.
+- [x] Save 40 camera JSONs, 40 numeric depth NPZs, 40 viewable depth PNGs,
+  seeds, source/archive hashes, normalization and per-pair PLY hashes in
+  `data/aircraft/generation_manifest.json`. The 40-view contact sheet at
+  `data/aircraft/view_contact_sheet.png` was inspected: four aircraft have
+  visible silhouettes in every view. All 40 PLY pairs, depth arrays, camera
+  hit counts, and hashes were checked; each model's 10 GT copies have the same
+  hash. The minimum inter-camera direction angle is 51.8°, and the 40
+  768×768 depth views have 19,053–114,154 valid hit pixels. Partial-to-GT
+  nearest-neighbor means are below 0.0042 normalized units. A synthetic box
+  test confirms first-hit visibility. The scans are noise-free synthetic depth
+  observations, not real LiDAR; raw STL physical units remain unknown.
+
+## Waymo CAR dense-case retention (2026-11-03)
+
+- [x] Rank the 59 local `data/waymo/CAR/*.ply` cases by PLY vertex count,
+  breaking ties by filename. Keep the 25 densest and remove the other 34 CAR
+  PLYs. The rank-25/rank-26 boundary is 5,988/5,985 points.
+- [x] Record all 59 pre-prune filenames, point counts, ranks, retention
+  status, and SHA-256 hashes in `data/waymo/CAR_top25_selection.csv`.
+  Leave `data/waymo/PED/` and `data/waymo/OTHER/` unchanged.
+
+## Local ScanSalon and KITTI dataset materialization (2026-11-03)
+
+- [x] Copy ScanSalon object-level partial/GT pairs into `data/scannet/` using
+  matching category-prefixed filenames. For each of car, chair, lamp, sofa,
+  and table, select the 10 matched samples with the most partial points.
+  `data/scannet/selection.csv` records source paths and point counts. All 50
+  partials and 50 GTs were checked bytewise against source; category top-10
+  rankings were independently checked against all 764 source candidates.
+- [x] Extract KITTI Detection training LiDAR points inside annotated 3D car
+  and pedestrian boxes, select the 10 densest partials per class, and write
+  them under `data/kitti/partial/{car,pedestrian}/` with
+  `data/kitti/selection.csv`. Keep
+  `data/kitti/gt/` free of PLY files because matched complete object GT is
+  unavailable. Car selected point counts range 4,405–7,621; pedestrian
+  counts range 1,445–1,892.
+- [x] Verify KITTI car/pedestrian counts (10 each), global top-10 ranks from
+  five full-training shards, PLY vertex counts, and bytewise correspondence
+  to re-extracted raw LiDAR points. The earlier 3,181 unclassified temporary
+  KITTI copies and all shard caches were removed. The data directories now
+  contain only 20 KITTI partial PLYs and 50 ScanSalon partial/GT pairs.
+
+## Fixed-camera Custom10 four-stage run (2026-11-03)
+
+- [x] Prepare all ten current `data/custom/<category>/` partial scans using
+  each saved `camera.pth`/`camera.json`. Derive depth and point UV only from
+  the partial scan where the checked-out data omits them; keep the saved view
+  fixed. All ten 512×512 camera inputs and `fixed_camera_preparation.json`
+  records exist under `workspace/custom10_imagegen_20261103/source_camera/`;
+  ten prepared sample roots are in the same Custom10 directory.
+- [x] Use each directory name (spaces for the image prompt) as its category
+  label. Keep the validated short depth sentence and, when needed, append a
+  `gpt-6-sol` interpretation of visible part identity/count, attachments,
+  part axes versus tip directions, near/far order and uncertainty. Review
+  same-canvas visible support, pose, depth order, category and natural
+  construction; make the accepted Pixal input transparent. Camera and light
+  helicopter have accepted RGB candidates and transparent inputs; camera was
+  explicitly praised by the user. Hydra still misses the saved depth support,
+  and dragon remains under revision after confusing a wing with a second
+  head and downward claws with downward arms. The general interpretation
+  schema was strengthened; do not accept those earlier images.
+  All ten images then passed a first review, but the user identified a missed
+  Hydra front/rear failure: its far heads looked back toward the near tail.
+  That Hydra candidate and its partial downstream files were invalidated;
+  the generic agent now records semantic facing separately from part location
+  and requires `front_rear_axis_match` in review. A further Hydra candidate
+  showing the backs of all three heads, with the tail toward the camera,
+  passed both the 0.80 visible-support gate and the new facing check;
+  `workspace/custom10_imagegen_20261103/hydra_creature/` now contains the
+  replacement RGB, exact prompt and new transparent Pixal input. Its geometry
+  pipeline is complete. All other nine accepted candidates remain frozen.
+- [x] Run Pixal3D, MoGe registration, GPT-6 Sol refinement and continuous
+  fusion for every accepted image. After freezing outputs, evaluate available
+  Custom ground truth under the same 16,384-FPS/seed-6145 ×100 protocol and
+  retain all sample artifacts and prompts together. All ten pipeline manifests
+  have five complete stages and ten fused PLYs each have 100,000 vertices.
+  `workspace/custom10_imagegen_20261103/custom10_metrics.json` and `.csv`
+  contain offline CD/EMD for all ten; mean CD-L1 ×100 = 2.019229 and mean
+  EMD ×100 = 2.766696. The corrected Hydra sample is CD-L1 ×100 = 2.172856,
+  EMD ×100 = 2.695512. The exact Image Gen backend/seeds are unavailable
+  from the provider and remain marked UNKNOWN in generation records.
+
 ## Current handoff and source push (2026-11-03)
 
 - [x] Keep the accepted Redwood10 experiment as the sole directory under

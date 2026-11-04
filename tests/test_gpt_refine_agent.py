@@ -10,11 +10,35 @@ import numpy as np
 import pytest
 from PIL import Image
 
+import src.gpt_refine_agent as refine_module
+
 from src.gpt_refine_agent import (
     GPTRefineAgent, next_plateau_streak, render_diagnostic_board,
     visible_partial_fraction,
 )
 from src.posterior_agent import Observation
+
+
+def test_codex_refinement_retries_transient_error_event(monkeypatch):
+    calls = []
+
+    def fake_run(command, **kwargs):
+        calls.append(command)
+        answer = Path(command[command.index("--output-last-message") + 1])
+        answer.write_text('{"action": "STOP"}')
+        events = [{"type": "thread.started", "thread_id": "test"}]
+        if len(calls) == 1:
+            events.append({"type": "item.completed", "item": {"type": "error"}})
+        events.append({"type": "turn.completed"})
+        return SimpleNamespace(returncode=0, stderr="", stdout="\n".join(map(json.dumps, events)))
+
+    monkeypatch.setattr(refine_module.subprocess, "run", fake_run)
+    monkeypatch.setattr(refine_module.time, "sleep", lambda _: None)
+    agent = object.__new__(GPTRefineAgent)
+    agent.model = "test"
+    result = agent._request_codex({}, {}, [])
+    assert json.loads(result["text"]) == {"action": "STOP"}
+    assert len(calls) == 2
 
 
 class FakeProjector:

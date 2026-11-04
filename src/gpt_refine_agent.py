@@ -14,6 +14,7 @@ from pathlib import Path
 import shutil
 import subprocess
 from tempfile import TemporaryDirectory
+import time
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
@@ -247,24 +248,37 @@ class GPTRefineAgent:
                 "Return exactly one JSON object matching the supplied schema.\n"
                 + json.dumps(payload, sort_keys=True)
             )
-            result = subprocess.run(command, input=prompt, cwd=root, text=True,
-                                    capture_output=True, timeout=300, check=False)
-            if result.returncode != 0 or not answer_path.is_file():
-                raise RuntimeError(f"Codex GPT decision failed with exit code {result.returncode}: "
-                                   f"{result.stderr[-800:]}")
-            events = []
-            for line in result.stdout.splitlines():
-                try:
-                    events.append(json.loads(line))
-                except json.JSONDecodeError:
-                    continue
-            if not any(event.get("type") == "turn.completed" for event in events):
-                raise RuntimeError("Codex GPT turn did not complete")
-            forbidden = [event.get("item", {}).get("type") for event in events
-                         if event.get("type") in {"item.started", "item.completed"}
-                         and event.get("item", {}).get("type") not in {"agent_message", "reasoning"}]
-            if forbidden:
-                raise RuntimeError(f"Codex GPT attempted forbidden tool use: {forbidden}")
+            failure = ""
+            for attempt in range(3):
+                answer_path.unlink(missing_ok=True)
+                result = subprocess.run(command, input=prompt, cwd=root, text=True,
+                                        capture_output=True, timeout=300, check=False)
+                events = []
+                for line in result.stdout.splitlines():
+                    try:
+                        events.append(json.loads(line))
+                    except json.JSONDecodeError:
+                        continue
+                forbidden = [event.get("item", {}).get("type") for event in events
+                             if event.get("type") in {"item.started", "item.completed"}
+                             and event.get("item", {}).get("type") not in
+                             {"agent_message", "reasoning", "error"}]
+                if forbidden:
+                    raise RuntimeError(f"Codex GPT attempted forbidden tool use: {forbidden}")
+                transient_error = any(
+                    event.get("type") == "error" or event.get("item", {}).get("type") == "error"
+                    for event in events
+                )
+                if (result.returncode == 0 and answer_path.is_file()
+                        and any(event.get("type") == "turn.completed" for event in events)
+                        and not transient_error):
+                    break
+                failure = (f"Codex GPT decision incomplete ({result.returncode}); "
+                           f"error_event={transient_error}; {result.stderr[-400:]}")
+                if attempt < 2:
+                    time.sleep(2 * (attempt + 1))
+            else:
+                raise RuntimeError(failure)
             thread = next((e.get("thread_id") for e in events
                            if e.get("type") == "thread.started"), None)
             usage = next((e.get("usage") for e in events

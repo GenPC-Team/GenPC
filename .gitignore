@@ -11,6 +11,7 @@ loss_functions/**/*egg-info*/
 
 # 忽略所有rar压缩文件
 *.rar
+data/aircraft/source/*.stl
 *.zip
 *.tar.gz
 debug/

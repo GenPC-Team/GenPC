@@ -99,3 +99,38 @@ are in the package's `metrics.csv`.
 See the [method and artifact contract](docs/core_registration_pipeline.md).
 Project code is under the [MIT License](LICENSE); external models, datasets
 and CUDA extensions retain their own licenses.
+
+## Local point-cloud datasets
+
+`data/redwood/partial/<id>.ply` and `data/redwood/gt/<id>.ply` use matching
+names. The same convention now applies to the selected ScanSalon object pairs:
+`data/scannet/partial/<category>_<id>.ply` and
+`data/scannet/gt/<category>_<id>.ply`. Each of car, chair, lamp, sofa, and
+table contributes its 10 matched samples with the most points in the **partial**
+scan. `data/scannet/selection.csv` records the counts and original paths.
+These ScanSalon objects are the ScanNet/ScanSalon source used for object-level
+experiments, not the raw ScanNet room scans.
+
+KITTI is under `data/kitti/partial/<category>/frame_<frame>_<category>_<index>.ply`,
+with separate `car/` and `pedestrian/` directories.
+The 10 car and 10 pedestrian samples with the most LiDAR points inside their
+annotated 3D boxes are selected from the KITTI Detection training set. Points
+are stored in each box's local coordinate system, with the KITTI box bottom
+center as origin and annotation yaw removed. There is no matched object GT;
+`data/kitti/gt/` is deliberately empty. `data/kitti/selection.csv` records
+point counts and source LiDAR, label, and calibration files. To rebuild both
+datasets from the locally installed sources, run:
+
+```bash
+/home/chenrui/miniconda3/envs/genpc/bin/python scripts/materialize_scan_datasets.py
+```
+
+`data/waymo/CAR/` retains the 25 local car scans with the most PLY vertices.
+`data/waymo/CAR_top25_selection.csv` records the full 59-case ranking, including
+the 34 removed cases and their original SHA-256 hashes. The PED and OTHER
+directories were not changed by this selection.
+
+The four STL aircraft models in `data/型号飞机模型.rar` have 10 synthetic depth
+views each under [data/aircraft](data/aircraft/README.md): 40 matched
+2,048-point partial and 16,384-point GT pairs. Each view also has a viewable
+depth PNG, numeric depth NPZ, and camera metadata.

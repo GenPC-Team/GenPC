@@ -1,6 +1,35 @@
 from pathlib import Path
+from types import SimpleNamespace
+import json
+
+import src.prior_generation_agent as prior_module
 
 from src.prior_generation_agent import PriorGenerationAgent, compose_depth_edit_prompt
+
+
+def test_codex_prior_retries_transient_error_event(monkeypatch):
+    calls = []
+
+    def fake_run(command, **kwargs):
+        calls.append(command)
+        answer = Path(command[command.index("--output-last-message") + 1])
+        answer.write_text('{"choice": "ok"}')
+        events = [{"type": "thread.started", "thread_id": "test"}]
+        if len(calls) == 1:
+            events.append({"type": "item.completed", "item": {"type": "error"}})
+        events.append({"type": "turn.completed"})
+        return SimpleNamespace(returncode=0, stderr="", stdout="\n".join(map(json.dumps, events)))
+
+    monkeypatch.setattr(prior_module.subprocess, "run", fake_run)
+    monkeypatch.setattr(prior_module.time, "sleep", lambda _: None)
+    agent = object.__new__(PriorGenerationAgent)
+    agent.model = "test"
+    result = agent._decide(
+        {"required": ["choice"], "properties": {"choice": {"type": "string"}}},
+        {}, [],
+    )
+    assert result["decision"] == {"choice": "ok"}
+    assert len(calls) == 2
 
 
 def test_fixed_camera_prompt_uses_approved_short_depth_sentence():
@@ -15,11 +44,28 @@ def test_fixed_camera_prompt_uses_approved_short_depth_sentence():
     )
 
 
+def test_depth_relation_hint_adds_one_grounded_sentence_without_changing_base():
+    base = compose_depth_edit_prompt(object_description="mirrorless camera")
+    hint = "近端是机身背侧，镜头位于较远端；保持图1的斜视角。"
+    assert compose_depth_edit_prompt(
+        object_description="mirrorless camera", depth_relation_hint=hint,
+    ) == base + " " + hint
+
+
+def test_depth_relation_hint_removes_echoed_base_sentence():
+    base = compose_depth_edit_prompt(object_description="wolf")
+    hint = "保留俯视的头身朝向和自然连接的尾巴。"
+    assert compose_depth_edit_prompt(
+        object_description="wolf", depth_relation_hint=base + hint,
+    ) == base + " " + hint
+
+
 def test_review_rejects_incomplete_object_despite_scan_match(monkeypatch):
     agent = object.__new__(PriorGenerationAgent)
     candidate = {
         "action": "ACCEPT", "reason": "One end matches but the other is missing.",
         "next_prompt": "", "pose_and_orientation_match": True,
+        "front_rear_axis_match": True,
         "natural_construction": True, "visible_structure_match": True,
         "category_identity_match": True, "depth_order_match": True,
         "projected_envelope_match": True, "functional_form_match": True,
@@ -39,6 +85,30 @@ def test_review_rejects_incomplete_object_despite_scan_match(monkeypatch):
     assert "whole-object completeness" in result["decision"]["next_prompt"]
 
 
+def test_review_rejects_reversed_front_rear_axis(monkeypatch):
+    agent = object.__new__(PriorGenerationAgent)
+    candidate = {
+        "action": "ACCEPT", "reason": "Heads and tail have the right locations but face one another.",
+        "next_prompt": "", "pose_and_orientation_match": True,
+        "front_rear_axis_match": False,
+        "natural_construction": True, "visible_structure_match": True,
+        "category_identity_match": True, "depth_order_match": True,
+        "projected_envelope_match": True, "functional_form_match": True,
+        "complete_object": True,
+    }
+    monkeypatch.setattr(agent, "_decide", lambda *args, **kwargs: {"decision": candidate})
+    result = agent.review(
+        depth=Path("depth.png"), candidate=Path("candidate.png"),
+        audit_overlay=Path("overlay.png"),
+        audit={"passed": True, "centre_offset_ratio": 0.0,
+               "bbox_scale_xy": [1.0, 1.0], "depth_coverage": 1.0,
+               "mask_iou": 1.0, "semantic_leakage": 0.0},
+        prompt="Complete the object from partial depth.",
+        object_description="three-headed hydra",
+    )
+    assert result["decision"]["action"] == "REVISE"
+
+
 def test_review_requires_pose_and_natural_construction(monkeypatch):
     agent = object.__new__(PriorGenerationAgent)
     candidate = {
@@ -46,6 +116,7 @@ def test_review_requires_pose_and_natural_construction(monkeypatch):
         "reason": "Visible support matches, but the chair base is implausible.",
         "next_prompt": "",
         "pose_and_orientation_match": True,
+        "front_rear_axis_match": True,
         "natural_construction": False,
         "visible_structure_match": True,
         "category_identity_match": True,
@@ -73,6 +144,7 @@ def test_review_rejects_category_change_even_with_silhouette_coverage(monkeypatc
     candidate = {
         "action": "ACCEPT", "reason": "Mask coverage passes, but the sofa became a chair.",
         "next_prompt": "", "pose_and_orientation_match": True,
+        "front_rear_axis_match": True,
         "natural_construction": True, "visible_structure_match": True,
         "category_identity_match": False, "depth_order_match": True,
         "projected_envelope_match": True, "functional_form_match": True,
@@ -97,6 +169,7 @@ def test_review_rejects_catalog_view_expansion(monkeypatch):
     candidate = {
         "action": "ACCEPT", "reason": "A long sofa, but shown from a broad new view.",
         "next_prompt": "", "pose_and_orientation_match": True,
+        "front_rear_axis_match": True,
         "natural_construction": True, "visible_structure_match": True,
         "category_identity_match": True, "depth_order_match": True,
         "projected_envelope_match": False, "functional_form_match": True,
