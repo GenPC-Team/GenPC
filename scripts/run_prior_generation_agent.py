@@ -155,7 +155,7 @@ def select_diverse_view_indices(viewpoints: np.ndarray, visible_counts: np.ndarr
 
 def _view_boards(candidates: Path, ids: list[str], counts: dict[str, int],
                  output_dir: Path) -> list[Path]:
-    """Five full-resolution candidate panels per board for GPT-6 Sol."""
+    """Five full-resolution candidate panels per board for GPT-6 Astra."""
     output_dir.mkdir(parents=True, exist_ok=True)
     boards = []
     for start in range(0, len(ids), 5):
@@ -634,7 +634,7 @@ def main() -> None:
     prep.add_argument("--models-root", type=Path, default=ROOT / "models")
     prep.add_argument("--camera-source", type=Path,
                       help="Existing saved camera directory; skip view selection")
-    prep.add_argument("--model", default="gpt-6-sol")
+    prep.add_argument("--model", default="gpt-6-astra")
     prep.add_argument("--view-candidates", type=int, choices=(4, 20), default=4,
                       help="Use 20 diverse high-coverage Fibonacci views for unknown cameras")
     prep.add_argument("--minimum-view-angle", type=float, default=25.0)
@@ -643,7 +643,7 @@ def main() -> None:
     rev.add_argument("--output-root", type=Path, required=True)
     rev.add_argument("--rmbg-model", type=Path, default=ROOT / "models" / "RMBG-2.0")
     rev.add_argument("--moge-model", type=Path, default=ROOT / "models" / "moge-2-vitl" / "model.pt")
-    rev.add_argument("--model", default="gpt-6-sol")
+    rev.add_argument("--model", default="gpt-6-astra")
     rev.add_argument("--minimum-depth-coverage", type=float, default=0.65,
                      help="Tolerant partial-scan foreground support; semantic review remains required")
     rev.add_argument("--human-feedback", default="",
@@ -651,14 +651,14 @@ def main() -> None:
     insight = commands.add_parser("enrich")
     insight.add_argument("--output-root", type=Path, required=True)
     insight.add_argument("--feedback", default="")
-    insight.add_argument("--model", default="gpt-6-sol")
+    insight.add_argument("--model", default="gpt-6-astra")
     insight.add_argument("--include-depth-framing", action="store_true",
                          help="Append approximate observed canvas box from partial depth")
     retry_view = commands.add_parser("reselect")
     retry_view.add_argument("--output-root", type=Path, required=True)
     retry_view.add_argument("--reason", required=True)
     retry_view.add_argument("--exclude-view", action="append", default=[])
-    retry_view.add_argument("--model", default="gpt-6-sol")
+    retry_view.add_argument("--model", default="gpt-6-astra")
     args = parser.parse_args()
     {"prepare": prepare, "review": review, "enrich": enrich,
      "reselect": reselect}[args.command](args)

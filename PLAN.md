@@ -1,5 +1,297 @@
 # Active plan
 
+## Autonomous semantic refinement and Custom transfer (2026-11-05, active)
+
+- User approved the final fox local correction and red/blue overlay. Exact
+  copies, complete prompts and provenance are in
+  `workspace/semantic_refinement_astra/custom10/cartoon_fox/approved_local_round02/`.
+  Preserve this human-assisted reference; approval does not prove autonomy.
+- Consolidate the shared planning contract and add an autonomous entrypoint:
+  no user feedback, annotation, previous plan or approved intermediate carrier.
+  Start from each case's archived fixed-registration result. Use partial-only
+  residual inspection crops, a whole-object mismatch inventory, paired part
+  windows, fixed-slot support review and explicit evidence-based stopping.
+- User explicitly confirms that discovering and correcting residuals never
+  mentioned by a human is desirable. Judge them by observed support, semantic
+  correspondence and structural effects; do not restrict work to known hints.
+- Keep proper Sim(3) available only as an agent-selected remedy for a common
+  global pose offset; record its selection/acceptance instead of assuming
+  contribution. Fox's three recent branches selected it zero times.
+- Validate on fox from registration and three other Custom cases representing
+  different structures: wolf, handheld power drill, single-engine airplane.
+  Same policy, model (Astra medium), cameras and budget; no case-specific
+  feedback, GT or metric-driven selection. Store under one dataset directory.
+- Freeze decisions before offline CD/EMD evaluation. Report both gains and
+  regressions, action use and unresolved issues. Further transfer is pending;
+  do not claim the process is fully validated based on the accepted fox alone.
+- Initial v9 transfer found a generic hidden limitation: the drill's valid
+  housing selection contained 46,834/100,000 points, so the old 40% part and
+  45% affected-point quotas rejected it before solving. Removed both quotas;
+  retain nonempty supported part/external carrier, attachment transitions,
+  observed regression, connectivity and structural review. Added rigid/RBF
+  regression tests for a component occupying more than half the carrier.
+  Interrupted v9 before acceptance; diagnostics retained separately. All four
+  v10 runs restart from registration with no previous plans or human hints.
+- The first eight-round tranche still lists actionable residuals. Continue
+  eligible runs from their own automatic state to a shared 32-round ceiling (user explicitly authorized a larger budget),
+  with the same fixed initial reference and no human/GT feedback. A budget stop
+  is not convergence. Original commands plus continuation commands are retained.
+- Four concurrent model requests later exceeded the previous 300-second
+  subprocess timeout. Preserve pre-recovery code/checkpoints under each case's
+  `transport_interruptions/attempt_01/`, and record the interruption in
+  `transport_recovery.json`. Transport now retries timeouts (three attempts,
+  600 seconds each, configurable), discarding incomplete answers. Geometry,
+  prompts, model and reasoning policy remain unchanged. Eleven controller tests
+  pass, including bounded retry and stale-answer rejection. An interrupted
+  wolf review is explicitly unreviewed, not a rejected or accepted candidate.
+
+## Same-part correspondence (2026-11-05, local candidate verified)
+
+- User approved `joint_refinement_run/round_05/after_0.png` overall, except
+  the SAME remaining foot indicated in views 2 and 5. Exact point cloud,
+  images, full prompts, solver parameters and user annotations are frozen in
+  `workspace/semantic_refinement_astra/custom10/cartoon_fox/approved_joint_round05/`.
+  PROJECT_STATE.md records full approval provenance. No geometric freezing.
+- Add generic paired source/target part windows in two matching views. Lifted
+  controls must reproject into both the prior and observed windows, so a
+  landmark on an adjacent part cannot silently satisfy only the source check.
+- Accept optional user feedback images as experimental correspondence hints;
+  infer fresh coordinates from current paired grids. No sample coordinates,
+  foot rules or category branches enter the implementation.
+- New continuation: `.../cartoon_fox/local_correspondence_run/`, starts from
+  the user-approved round-05 checkpoint. Annotation-guided human-assisted
+  diagnostic, with GPT-6 Astra medium and the same generic six-view policy.
+  Semantic tests: 8 passed, including rejection of an inconsistent target part.
+- Round 2 accepted a local RBF correction after round 1 failed cross-view
+  correspondence validation. Added a fixed-slot same-part support audit and
+  two-view before/after crops (`part_specific_review_v8`) so a neighbouring
+  surface cannot substitute for the intended part. Evidence tests: 6 passed,
+  including a distractor surface coincident with the scan. Round-2 posthoc
+  audit is explicitly separate from its original v7 acceptance evidence.
+- Four-round continuation completed: round 1 failed correspondence validation;
+  round 2 accepted; both reviewed candidates in rounds 3 and 4 rejected.
+  `local_correspondence_run/selected_100k.ply` is exactly the accepted round-2
+  hash. Independent posthoc review with fixed-slot part evidence accepted it.
+  Same-part 3D mean: 0.027727 -> 0.007575; one view-local regression remains.
+- Frozen offline CD-L1 x100 / EMD x100: approved baseline 2.559833 / 3.189849;
+  candidate 2.311149 / 2.785310. No GT selection, final fusion or mainline
+  promotion. User subsequently approved this local round-02 result and its
+  colored overlay; it is frozen under `approved_local_round02/`. The earlier
+  approved round 05 is unchanged.
+  Summary and comparison paths are indexed in the sample's `artifacts.json`.
+  Combined semantic/evidence tests: 14 passed. This is annotation-assisted
+  local validation, not cross-dataset efficacy evidence.
+- Joint rounds 6/7 remain automatic diagnostic candidates, not user-approved
+  replacements for the chosen visual reference. Frozen offline scores never
+  choose the branch or its landmarks.
+
+## Remove unjustified hard stretch ratios (2026-11-05, active)
+
+- User correctly rejected a universal edge-length-ratio validity limit.
+  Removed p01 > 0.6 / p99 < 1.5 from both semantic experiment runners and
+  the cumulative audit. Per-step and fixed-rest strain remain review evidence;
+  no replacement hard strain ratio is introduced.
+- Propagate `enforce_edge_strain_limits=False` through experimental continuous
+  fusion and PosteriorAdapter, including embedded and node-level ARAP solvers.
+  Their connectivity check now uses candidate geometry rather than deleting
+  rest edges above a stretch ratio. Legacy defaults reproduce old baselines.
+  Backend/evidence/fusion/module tests: 11 passed, including a supported 1.7x
+  expansion passing both nested solvers despite legacy strain-limit values.
+- Finite ordered geometry, explicit constraints only when actually requested,
+  observed regional support, connectivity, available fold diagnostics, and
+  grounded multi-view structural review determine candidate acceptance.
+- `joint_refinement_run/` completed through round 7 with policy
+  `strain_diagnostic_v6_backend`; user chose round 5 visually as the next local
+  experiment's baseline. Old policy rejections do not exhaust a tool under
+  the corrected policy. Historical records remain unchanged.
+- Source snapshots and full prompts for the revision are stored beside the
+  same run. New tests check that both >1.5 expansion and <0.6 compression are
+  reported without automatic rejection. Whole-object naturalness still needs
+  semantic/structural evidence and cannot be inferred from passing this audit.
+
+## Approval clarification and joint refinement (2026-11-05, active)
+
+- User clarified that an approved region may still improve. Approval is an
+  archived comparison baseline, not an instruction to lock coordinates.
+  The earlier 8,762-slot tail freeze was an assistant interpretation, now revoked.
+- Stop the locked continuation; keep its three accepted observation-field steps
+  as a diagnostic branch. Start `joint_refinement_run/` from the same two-paw
+  semantic checkpoint with **no protected indices**; every region can improve.
+- Use common saved-camera regional support checks against both the current
+  carrier and the fixed loop-start carrier, alongside fixed-rest strain and
+  visual review. Reuse the registration method's regional trust limits.
+  These gates assess observed fit; they are not semantic part guarantees.
+- Restore optional `UPDATE_POSTERIOR` using the existing mainline configuration
+  and saved-camera transport. Keep semantic motion, proper Sim(3), and narrow
+  observation-field actions available to the same controller.
+- New run: `workspace/semantic_refinement_astra/custom10/cartoon_fox/joint_refinement_run/`.
+  Model GPT-6 Astra medium, four-round diagnostic ceiling, six fixed views.
+  New regional/evidence/view/registration tests: 13 passed. Full new-run
+  outputs and frozen offline evaluation are pending; no mainline promotion.
+
+## Evidence-complete refinement loop (2026-11-05, active)
+
+- [x] Diagnose repeated observation-field rejection: exact protected-slot
+  preservation was enforced but absent from review evidence; the deterministic
+  candidate was repeatedly regenerated at unchanged input geometry.
+- [x] Add frozen-reference coordinate/hash audits, fixed-rest cumulative strain,
+  deterministic candidate deduplication, and measured local before/after crops.
+  Crops include both largest observed gain and largest regression/smallest gain;
+  nearest-distance gains are explicitly not semantic correspondence evidence.
+- [x] Add common full/half/quarter observation-field candidates and remove that
+  action at unchanged geometry after its candidates are exhausted. No category
+  thresholds or GT-driven selection. Existing accepted checkpoints are frozen.
+- [x] Check fixed six-view policy on 60 existing manifests across three datasets:
+  all preserve the first four cameras and append the same +/-35-degree pair.
+  Record: `workspace/semantic_refinement_astra/view_policy_audit.json`.
+  This is a camera-policy audit, not a completion-performance benchmark.
+- [ ] Verify the new controller on fox in
+  `workspace/semantic_refinement_astra/custom10/cartoon_fox/evidence_v2_run/`;
+  record accepted decisions, protected-tail displacement and frozen offline metrics.
+- [ ] Cross-dataset autonomous efficacy and matched four/six-view ablation.
+
+Focused evidence/rendering tests: 16 passed. The separate semantic-helper suite
+also passed. All MLLM calls remain GPT-6 Astra, medium. This iteration starts
+from the accepted two-paw semantic continuation; it is a human-assisted pilot,
+not a replacement for the previously validated complete refinement/fusion route.
+
+## Active fox diagnostic and generic policy changes (2026-11-05)
+
+- User approved the tail shown in `flexible_run/round_01/after_0.png`.
+  Exact `smooth_1.0.ply`, image, prompt and parameters are frozen in
+  `workspace/semantic_refinement_astra/custom10/cartoon_fox/approved_tail/`;
+  full acceptance provenance is in PROJECT_STATE.md. Feet remain unresolved.
+- Six diagnostic views use one fixed rule: preserve four original views,
+  append +/-35-degree elevations in the reference-camera basis. No category,
+  part identity, GT or manually selected fox angle enters the view rule.
+  All three view-policy tests passed (2026-11-05): original-camera preservation,
+  world-similarity equivariance, and six-view board rendering. Cross-dataset
+  four-versus-six ablation remains pending; do not infer generalization from fox.
+- Semantic correspondence validation now reprojects lifted controls into both
+  selected windows and returns explicit failures/marked images to the agent.
+  This corrects the previous generic-feedback failure; do not relax the gate.
+- The six-view continuation is in the same case's `six_view_run/`. Round 4
+  accepted a smooth front-paw update; all 8,762 protected tail slots have
+  exactly zero displacement. Continue examining remaining limb residuals.
+- Generic geometry tools: proper global Sim(3), coherent part SE(3), and
+  regularized low-frequency RBF deformation, each with observation/structure
+  checks. Preserve accepted surfaces via a smooth intrinsic protection taper.
+- Frozen stage GT evaluation is offline-only under `offline_evaluation/`;
+  results never enter agent payloads, geometry acceptance, or stopping.
+  Distinguish the human-assisted pilot from future autonomous generalization
+  and the separate fine-registration ablation from the actual execution chain.
+
+## Region-balanced fine registration (2026-11-05, active)
+
+- [x] Implement an isolated proper Sim(3) continuation with visibility-valid
+  joint camera/3D reciprocal correspondences, robust equal-area weighting,
+  and fixed-region validation. No category routing, GT or per-case parameters.
+- [ ] Verify transform recovery, density imbalance, occlusion and identity
+  behavior; run matched correspondence/weight ablations on multiple datasets.
+- [ ] Save candidates and regional before/after evidence together by dataset;
+  preserve the accepted baseline and keep experimental until local alignment
+  and whole-object stability are verified. Semantic deformation remains a
+  separate outstanding stage below.
+
+**Current scope:** user requested a fox-only pilot starting from the existing
+registration, with the agent choosing alignment or semantic local deformation.
+Cross-dataset extension stopped after 44 complete comparison records under
+`workspace/registration_method_v1/`; this is not a completed benchmark or a
+mainline promotion. Five numerical registration tests passed.
+
+**Model change:** all new MLLM entrypoint defaults are `gpt-6-astra`, reasoning
+`medium`; preserve historic GPT-6 Sol records. Combined focused tests: 27 passed.
+
+**Fox pilot:** `workspace/semantic_refinement_astra/custom10/cartoon_fox/`.
+Sparse ARAP surface handles produced excessive strain and were rejected;
+`coherent_run/` tests whole-part SE(3) from the same semantic correspondences
+with an intrinsic attachment transition. Current accepted carrier and decision
+trace are saved in that run. No baseline replacements or new final metrics.
+
+**Pilot completed:** Astra accepted one coherent tail-part update, then chose
+KEEP_CURRENT because attachment and leg correspondences remain ambiguous.
+`coherent_run/comparison.png`, `selected_100k.ply`, `summary.json` and
+`report.json` contain the result and limitations. No global action was chosen;
+this therefore does not validate an alternating loop. Tail remains incompletely
+aligned, legs have no dedicated accepted correction, and no fusion/CD/EMD was
+run. Focused tests: 27 passed plus the added rigid-core preservation test passed.
+Next progress depends on stronger cross-view semantic correspondence and
+attachment support, not relaxing the shape guard or claiming this solved fox.
+
+## Semantic local correspondence refinement (2026-11-05, active)
+
+- [x] Clarify fox feedback: the tail was already misaligned in the original
+  result; this is an unresolved local deformation, not established regression
+  from packaging or the new local loop. Aggregate metric gains are insufficient.
+- [ ] Diagnose registration → standard refinement → local refinement → fusion
+  using matched views and visible partial evidence; preserve accepted originals.
+- [ ] Extend agent capability from choosing nearest-neighbour translations to
+  proposing explicit observed/prior part correspondences, with attachment and
+  endpoint evidence. Numeric transformations remain geometry-tool outputs.
+- [ ] Test supported part rotation/bending with attachment preservation and
+  matched local before/after review. Require local alignment and natural shape,
+  not merely better whole-object coverage or CD/EMD. Keep this experimental
+  until verified; avoid fox-specific rules and GT-driven correspondences.
+
+## Dataset-organized result package (2026-11-05)
+
+- [x] Copy all 60 validated sample chains into `workspace/refinement_final/`
+  with dataset → sample → stage directories, per-sample metrics and dataset
+  summaries. Preserve frozen originals; verify every copied file hash and
+  each final carrier against the paired metrics before publishing the package.
+  Published: 12,492 copied files (7,238,261,986 bytes), every source/destination
+  SHA-256 matched; all 60 final carriers matched paired candidate metrics and
+  finalization records. Physical copies, frozen originals unchanged. Dataset
+  summaries and sample-relative `artifacts.json` indexes provide current paths;
+  historical execution metadata retains original paths for provenance.
+
+## Structure-preserving local refinement (validated 2026-11-05)
+
+**Scope:** preserve prior generation agent → registration → refinement agent
+→ fusion; improve common-policy full-fusion CD/EMD on Aircraft40, Redwood10
+and Custom10 without sample-specific or GT-driven inference decisions.
+
+- [x] Freeze and verify original inputs and outputs (360 matching SHA-256s).
+- [x] Add bounded rigid-core translations with smooth graph transitions,
+  stable-observation and attachment/connectivity checks.
+- [x] Add GPT-6 Sol region planning, visible-only labels, matched square depth
+  crops, explicit correspondence review, up to three attempts, fixed local
+  rest graph and protection of previously accepted cores.
+- [x] Integrate `--planned-local-motion` into the four-stage runner and retain
+  the original and single-step modes for reproducible ablations. All 33
+  focused tests passed, including stage propagation and structural guards.
+- [x] Complete all 60 frozen-policy inference reports, unchanged final fusion
+  and three-repeat paired offline metrics. Two transport failures were
+  retried with the identical policy and recovered; batch records reconciled.
+- [x] Audit all 60 final carriers, exact metric/output hashes, shared config,
+  original baseline preservation and final structural changes.
+- [x] Verify both mean metrics improve on all three datasets. All three EMD
+  numerical-noise intervals exclude zero. Update the canonical method,
+  README and detailed report with the recommended explicit invocation.
+
+| Dataset | Cases | Original CD×100 | Planned CD×100 | Original EMD×100 | Planned EMD×100 |
+|---|---:|---:|---:|---:|---:|
+| aircraft | 40 | 4.52870972 | 4.51448453 | 7.04923825 | 7.03586992 |
+| redwood | 10 | 1.53703572 | 1.53187150 | 2.47234073 | 2.46418532 |
+| custom | 10 | 2.01922931 | 2.00722932 | 2.76870379 | 2.75527649 |
+
+**Outputs:** `workspace/structure_refinement_20261104/planned_v2/` and
+`planned_v2_fused/`; raw metrics, audited per-case CSVs, evidence and structure
+reports are in `metrics/`. The current reproducible method and limitations
+are in `docs/planned_local_refinement_results.md`. The prior single-step
+reference is preserved under `local_v2/` and `local_v2_fused/`.
+
+**Limits and decisions:** the numerical operator is local translation, not
+semantic part segmentation or arbitrary rotation. Final fusion is not exactly
+rigid: no significant graph split/merge was found, but affected-edge strain
+and individual metric regressions remain. Exact hosted GPT checkpoint/seed
+are UNKNOWN. Improvements are aggregate on these three tested datasets.
+The optional residual-registration experiment was audited separately and
+was not adopted; its incomplete combined run is not evidence for this result.
+No source push is part of this follow-on task. The requirement-by-requirement
+completion audit passed and is saved as `completion_audit.json` under the
+experiment root; no required work remains for this objective.
+
 ## Follow-on aircraft, unknown-camera datasets and Redwood ablations (2026-11-03)
 
 - [x] Immediately after Custom10 completes, run the current aircraft dataset

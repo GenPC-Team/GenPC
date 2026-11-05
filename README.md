@@ -1,7 +1,7 @@
 # GenPC++
 
 GenPC++ completes a partial object point cloud with an image-conditioned 3D
-prior, camera-aware registration, GPT-6 Sol geometric refinement, and
+prior, camera-aware registration, GPT-6 Astra geometric refinement, and
 observation-anchored fusion. Ground truth and CD/EMD are used only after a
 prediction is frozen.
 
@@ -10,7 +10,7 @@ partial scan + saved camera
   → depth image → Prior Generation Agent → Image Gen semantic image
   → same-canvas review → RMBG transparent image → Pixal3D + MoGe-2 prior
   → Pixal–MoGe–partial registration → four-view residual diagnosis
-  → GPT-6 Sol refinement → continuous observation fusion → 100k-point PLY
+  → GPT-6 Astra refinement → continuous observation fusion → 100k-point PLY
 ```
 
 The Prior Generation Agent uses the saved acquisition camera when one exists.
@@ -68,7 +68,7 @@ Continue the geometric stages on the visible GPU:
 
 ```bash
 CUDA_VISIBLE_DEVICES=0 $PY scripts/run_four_stage_pipeline.py \
-  --output-root "$RUN"
+  --output-root "$RUN" --planned-local-motion
 ```
 
 The final geometry is
@@ -76,8 +76,44 @@ The final geometry is
 carrier is beside it. The run also retains its depth/camera, prompt,
 semantic image, alpha image, Pixal and MoGe assets, registration, view
 diagnostics, refinement decisions, stage logs and manifests. The two agent
-decisions use the logged-in Codex CLI model `gpt-6-sol`; Image Gen is an
+decisions use the logged-in Codex CLI model `gpt-6-astra`; Image Gen is an
 interactive Codex tool.
+
+## Local refinement
+
+For experimental **autonomous semantic refinement** from an archived registered
+case (no annotations, previous plan or per-case feedback):
+
+```bash
+CUDA_VISIBLE_DEVICES=0 /home/chenrui/miniconda3/envs/genpc/bin/python \
+  scripts/run_semantic_refinement_continuation.py \
+  --case-dir workspace/refinement_final/custom10/wolf \
+  --output-dir workspace/autonomous_refinement/custom10/wolf \
+  --autonomous --views 6 --rounds 32
+```
+
+Use a fresh output directory; `--resume` continues the same run from its own
+saved state. `--rounds` is the total round ceiling, including completed rounds,
+not an additional number of rounds. The current pilot allows 32 rounds and
+can stop earlier after an evidence-based completion audit. A budget stop does
+not mean convergence. The agent discovers mismatched parts, validates
+cross-view correspondence, reviews local and global effects, and audits its
+stopping decision. Outputs include `selected_100k.ply`,
+`visualization/refined_red_partial_blue.ply`, before/after boards and the full
+decision trace. `scripts/run_autonomous_refinement_batch.py` applies the same
+policy to multiple archived cases. This experimental mode is being evaluated;
+the accepted fox reference was human assisted. See the
+[method and limitations](docs/core_registration_pipeline.md#autonomous-refinement-mode).
+
+The recommended `--planned-local-motion` mode adds GPT-6 Astra region planning,
+bounded local translations, matched depth crops and cumulative attachment/core
+checks inside refinement. It keeps the four-stage sequence and unchanged
+continuous fusion. The common policy improves mean CD/EMD on Aircraft40,
+Redwood10 and Custom10; see the [complete results and limitations](docs/planned_local_refinement_results.md).
+
+Use a new run directory when changing the mode. `--coherent-local-motion`
+is the mutually exclusive single-step ablation; omitting both options retains
+the original refinement for reproducibility. No GT is used for inference.
 
 ## Redwood10 experiment
 

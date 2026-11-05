@@ -5,7 +5,7 @@ Model weights and upstream source trees are not distributed with GenPC++.
 | Component | Purpose | Default path |
 | --- | --- | --- |
 | Codex Image Gen | complete semantic image conditioned on the selected partial depth view | interactive; save image and exact prompt as run artifacts |
-| Codex CLI `gpt-6-sol` | prior view/review decisions and geometric refinement decisions | logged-in external CLI |
+| Codex CLI `gpt-6-astra` | prior view/review decisions and geometric refinement decisions | logged-in external CLI |
 | Qwen-Image-Edit-2511 | optional local semantic-completion alternative | `models/Qwen-Image-Edit-2511` |
 | Nunchaku Qwen INT4 | optional Qwen execution on a 24 GB GPU | `models/nunchaku-qwen-image-edit/nunchaku_qwen_image_2511_balance_int4.safetensors` |
 | Pixal3D source | semantic image to complete textured prior | `models/Pixal3D` or `$PIXAL3D_SOURCE` |

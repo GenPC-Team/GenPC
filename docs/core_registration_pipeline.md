@@ -5,6 +5,12 @@ point cloud and its acquisition camera are inference inputs. Ground truth,
 CD, EMD, and sample-specific score thresholds never enter generation,
 registration, refinement, or fusion.
 
+## Current MLLM configuration
+
+New runs use `gpt-6-astra` with reasoning effort `medium` for prior generation
+interpretation/review and refinement planning/review, as requested on 2026-11-05.
+Existing validated experiments retain their recorded GPT-6 Sol provenance.
+
 ## 1. Prior Generation Agent and semantic completion
 
 The partial scan is projected into a depth raster with saved camera
@@ -186,6 +192,45 @@ strain. The final output still has exactly 100,000 ordered points; fusion is
 not point concatenation. An optional textured PLY carries the Pixal colours
 on those same slots.
 
+## Validated local planning within refinement
+
+The recommended runner invocation adds `--planned-local-motion`. After the
+standard refinement rounds, GPT-6 Sol chooses among numbered observed/prior
+region hypotheses or stops. Matching numbers are hypotheses, not asserted
+part identities. Labels use visible region points. Fixed square local crops
+include the prior core and observed target, preserve off-canvas padding and
+use identical before/after cameras and shared depth shading.
+
+Spatially connected, direction-consistent partial residuals propose bounded
+rigid core translations. Motion tapers along the surface graph, leaving
+nearby disconnected surfaces fixed. A common line search protects stable
+observed support, observation fit and attachment strain. GPT review checks
+correspondence, core shape, attachments and unaffected structures. Up to
+three plan/action/review attempts share one rest graph, with previously
+accepted core edges protected against subsequent distortion. The rest
+reference is the start of this local loop, after standard refinement.
+
+This is a geometric region method, not semantic part segmentation. The
+production local operator is translation; arbitrary part rotations are not
+inferred. Local rigidity does not extend exactly through the subsequent
+continuous fusion. Neither GT nor CD/EMD is available to the agent, proposal
+generator, acceptance checks or stopping rule. The common configuration and
+code hashes were verified across all 60 cases, without dataset routing.
+
+After unchanged continuous fusion, mean CD-L1×100 / EMD×100 improves on
+Aircraft40, Redwood10 and Custom10. Full values, raw repeated measurements,
+per-case regressions and final structural limits are recorded in
+[the validated experiment report](planned_local_refinement_results.md).
+All original baseline artifacts remain unchanged.
+
+`--coherent-local-motion` retains the single-step ablation; it is mutually
+exclusive with `--planned-local-motion`. Omit both for the original baseline.
+Changing policy requires a new run directory. The optional
+`--residual-registration` performs a bounded differentiable proper Sim(3)
+after the fixed Pixal–MoGe bridge, using saved-camera positive 2D/3D evidence.
+It is experimental and is not part of the validated local-planning route.
+Missing partial pixels remain unknown, rather than empty-space constraints.
+
 ## Execution and evidence
 
 `run_prior_generation_agent.py prepare` → optional `enrich` → interactive Codex Image Gen →
@@ -205,3 +250,136 @@ not checked into Git. Ground truth was used only for frozen offline
 16,384-point FPS, seed-6145 evaluation. Redwood10 mean CD-L1 ×100 is
 `1.537036` and mean EMD ×100 is `2.472180`; the ten individual rows are in
 `workspace/redwood10_final/metrics.csv`.
+
+## Experimental agent-controlled alignment and semantic handles
+
+`run_semantic_refinement_probe.py` starts at the existing fixed registration.
+GPT-6 Astra (medium) can choose `REFINE_ALIGNMENT`, `DEFORM_REGION`, or
+`KEEP_CURRENT`; actions are not forced to alternate. Alignment uses a proper
+Sim(3) with visible camera/3D correspondence and region-balanced validation.
+For deformation the agent proposes corresponding visible surface landmarks
+and two-view part windows. Numeric tools lift the landmarks and fit a proper
+part motion with a smooth intrinsic attachment transition. Whole-object
+observations, edge strain, connectivity and MLLM review gate adoption.
+The first sparse-handle ARAP experiment was rejected for excessive strain.
+
+Current semantic plans provide separate prior and observed-part windows in
+the same two views. Lifted source and target landmarks are reprojected into
+both sets of windows before solving. This detects inconsistent part assignments
+that a prior-only polygon check misses, though window inclusion alone is not
+proof of semantic identity. Optional `--feedback-images` supplies user-annotated
+diagnostic boards as hints; fresh control coordinates still come from the
+current paired grids. Such trials must be labelled human-assisted. Once a
+remaining mismatch is localized, planning prioritizes that part and its
+attachment rather than substituting distributed score gains elsewhere.
+The review also receives same-canvas crops of that part in both selected
+views. Its 3D support error uses the intersection of the observed windows
+and the fixed prior slots selected before deformation; unrelated nearby
+surfaces cannot supply the nearest-distance match. These are positive-support
+diagnostics, not a segmentation guarantee or a universal acceptance threshold.
+The separate whole-object gain/regression crops remain available to expose
+attachment changes and regressions elsewhere.
+
+The continuation runner supports a category-independent six-view diagnostic
+policy (`src/diagnostic_view_policy.py`): retain the four source cameras and
+append elevations of -35 and +35 degrees about the first camera's right axis,
+around the same object centre, with the same distance and field of view.
+These constants are shared across samples, not selected from semantic parts
+or offline metrics. The rule is equivariant to world rotation, translation,
+and positive uniform scale. Synthetic views reproject the existing partial;
+they supply no additional observed geometry, and missing pixels remain unknown.
+Paired partial/prior panels share camera, canvas, and projection settings.
+Tests verify preservation of the original cameras, similarity equivariance,
+and complete six-view board rendering. This validates the implementation,
+not a cross-dataset performance gain. Four versus six views must be compared
+with the same initial carrier, controller, and refinement budget before promotion.
+
+`scripts/audit_diagnostic_view_policy.py` measures the union of already scanned
+point slots exposed by these diagnostic projections (512-pixel, no splatting).
+On the 60 archived manifests, the added pair increases mean unique visibility
+by 0.0012 percentage points on Aircraft40, 1.8811 on Custom10, and 2.7370 on
+Redwood10. These are visibility diagnostics, not completion gains; extra
+perspectives may also clarify geometry without exposing additional point slots.
+The recorded audit is `workspace/semantic_refinement_astra/view_policy_audit.json`.
+
+The experimental continuation now audits every candidate against the loop's
+frozen initial carrier, with edge strain on a fixed rest graph. Previously
+approved outputs are comparison baselines, not immobile parts: approval does
+not automatically create protected slots. Only an explicit fixed-coordinate
+constraint supplies optional protected indices and exact-coordinate/hash checks.
+Saved-camera observation tiles check local fit against both the current and
+loop-start carrier, reusing the registration method's regional trust limits.
+This permits supported local and global motion while limiting regional
+regressions. Cumulative strain is descriptive evidence, not a fixed allowable
+stretch ratio. There is no universal p99 < 1.5 or p01 > 0.6 acceptance rule:
+a generated prior can require substantial proportional correction. Large
+strain calls for inspection of supported deformation and natural structure,
+not automatic rejection. In the new experimental route,
+`enforce_edge_strain_limits=False` propagates through both the continuous-field
+and PosteriorAdapter solvers, including their graph-node and full-carrier
+levels. Connectivity is checked on candidate geometry instead of declaring
+rest edges broken solely because of their length ratio. Historical default
+settings remain available for reproducing the old baseline. The audit does
+not certify earlier deformation branches. Numerical
+checks and the visual reviewer both receive these measurements. Local review
+crops use identical camera windows and include the greatest measured observed
+gain and greatest regression (or smallest gain). Observed-to-carrier nearest
+distance measures positive support, not semantic correctness or hidden shape.
+
+With `--allow-observation-field`, the existing narrow continuous observation
+field is an additional tool, using fixed full/half/quarter displacement steps.
+Candidate hashes prevent repeated review of identical ordered geometry. Once
+all field candidates are exhausted at an unchanged carrier, that deterministic
+action is removed until the carrier changes. The controller must use the
+concrete failure evidence to change route or stop. `--allow-posterior` also
+offers the existing coarse-to-fine PosteriorAdapter with mainline configuration
+and actual saved-camera transport. It uses the same candidate fractions and
+checks, including the adapter's own integrity gate. Both tools are optional
+actions; enabling the adapter does not prove it was selected. Complete-route
+performance claims still require a matched end-to-end experiment.
+
+### Autonomous refinement mode
+
+`run_semantic_refinement_continuation.py --autonomous` starts exclusively from
+the case's archived fixed-registration output. It rejects feedback text/images,
+cached plans, externally supplied initial carriers and protected-slot hints.
+The shared category-independent planning contract is in
+`src/semantic_refinement_policy.py`. It uses GPT-6 Astra at medium reasoning.
+
+Each round inspects all six views and lists a whole-object mismatch inventory.
+Automatically chosen positive-support residual crops provide attention cues;
+their selection discounts observed point slots already shown in another crop.
+They supply no semantic labels, and missing scan regions remain unknown.
+The agent identifies corresponding parts, their attachment boundaries, paired
+windows and visible surface landmarks itself. A common global offset can select
+proper Sim(3); local pose/shape differences select semantic deformation; broad
+surface residuals can select PosteriorAdapter or the narrow observation field.
+Tool availability is not evidence of utility: selection and acceptance are logged.
+
+Qualified local candidates retain weaker steps for review backtracking if the
+stronger proposals from both operators are rejected. A proposed stop with no
+actionable inventory entries is checked by a separate review call to the same
+model. It can request reassessment with concrete part/view evidence. Exhausting
+the iteration budget is recorded separately from adequate fit or uncertain
+residuals. The current four-case pilot has a shared 32-round ceiling, extended
+from eight rounds without adding human hints or GT feedback. Resuming retains
+the original fixed reference and its own decision history; `--rounds` counts
+total rounds across continuations. The process exports a red refinement / blue partial PLY overlay
+alongside full views, local crops, prompts, controls, candidates and reviews.
+Part size and affected-point fraction are reported rather than capped at a
+universal percentage: a natural component can occupy most of an object.
+The selection must contain supported surface points and leave an external
+carrier; attachment transitions, observation checks and structural review
+assess the resulting change. This removes the earlier 40%/45% point quotas.
+
+The accepted fox result under `workspace/semantic_refinement_astra/` remains a
+human-assisted reference. Autonomous transfer tests are under
+`workspace/autonomous_refinement/custom10/`; this mode concerns refinement
+from fixed registration, not autonomous upstream image-prior generation.
+Semantic window/landmark errors and cumulative deformation remain risks.
+Codex requests allow 600 seconds per attempt and at most three attempts;
+`COMPAGENT_CODEX_TIMEOUT_SECONDS` overrides the per-attempt timeout. Partial
+responses from timed-out attempts cannot accept an update. Successful decisions
+record attempt/timeout counts, separately from geometric iteration history.
+Cross-case results must be assessed before promoting this experiment to the
+validated mainline. No GT enters inference or candidate selection.

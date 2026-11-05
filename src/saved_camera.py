@@ -118,6 +118,31 @@ class SavedCameraProjector:
         height, width = self.image_shape
         return uv * np.array([width - 1, height - 1], dtype=np.float64), camera_points[:, 2]
 
+    def project_tensor(self, points: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+        """Differentiable counterpart of ``project`` with the identical canvas.
+
+        Camera parameters and partial-derived normalization stay fixed while
+        gradients pass only to the point coordinates.
+        """
+        if points.ndim != 2 or points.shape[1] != 3:
+            raise ValueError("points must have shape Nx3")
+        height, width = self.image_shape
+        if self.pinhole_intrinsic is not None:
+            transform = points.new_tensor(self.pinhole_world_to_camera)
+            intrinsic = points.new_tensor(self.pinhole_intrinsic)
+            camera_points = points @ transform[:3, :3].T + transform[:3, 3]
+            depth = camera_points[:, 2]
+            safe = torch.where(depth.abs() > 1e-12, depth, torch.full_like(depth, 1e-12))
+            native_height, native_width = self.pinhole_image_shape
+            x = (intrinsic[0, 0]*camera_points[:, 0]/safe + intrinsic[0, 2])
+            y = (intrinsic[1, 1]*camera_points[:, 1]/safe + intrinsic[1, 2])
+            return torch.stack((x*(width-1)/max(native_width-1, 1),
+                                y*(height-1)/max(native_height-1, 1)), dim=1), depth
+        camera_points = self.camera.transform(points)
+        uv = (camera_points[:, :2]-points.new_tensor(self.center_xy))/self.scale_xy
+        uv = uv*(1.-2.*self.padding)+.5
+        return torch.stack((uv[:, 0]*(width-1), (1.-uv[:, 1])*(height-1)), dim=1), camera_points[:, 2]
+
 
 def world_to_camera_axes(camera) -> np.ndarray:
     """Return the orthonormal Camera-1 row axes used by a saved Kaolin camera.

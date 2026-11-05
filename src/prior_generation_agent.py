@@ -1,4 +1,4 @@
-"""Bounded GPT-6 Sol decisions for image-conditioned prior generation.
+"""Bounded GPT-6 Astra decisions for image-conditioned prior generation.
 
 Image Gen is an interactive Codex tool. This module records its exact prompt
 and reviews saved candidates; geometry and framing gates stay deterministic.
@@ -228,7 +228,7 @@ INSTRUCTIONS = (
 )
 
 class PriorGenerationAgent:
-    def __init__(self, model: str = "gpt-6-sol") -> None:
+    def __init__(self, model: str = "gpt-6-astra") -> None:
         if shutil.which("codex") is None:
             raise RuntimeError("the logged-in Codex CLI is required")
         self.model = model
@@ -294,6 +294,7 @@ class PriorGenerationAgent:
             thread = next((e.get("thread_id") for e in events
                            if e.get("type") == "thread.started"), None)
             return {"decision": decision, "model": self.model,
+                    "reasoning_effort": "medium",
                     "provider": "codex", "thread_id": thread,
                     "prompt_version": PROMPT_VERSION}
 

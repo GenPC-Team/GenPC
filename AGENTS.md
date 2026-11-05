@@ -69,6 +69,9 @@
   in code and add tests for prompt text when feasible.
 
 ## Model Download Notes
+- New MLLM runs use `gpt-6-astra` with reasoning effort `medium` (user
+  preference, 2026-11-05). This applies to prior interpretation/review and
+  refinement planning/review. Preserve historical GPT-6 Sol run metadata.
 - The current validated route is saved-camera depth → Codex Image Gen semantic
   completion → GPT-6 Sol prior review → RMBG transparent Pixal3D input →
   fixed Pixal--MoGe--partial registration → GPT-6 Sol geometric refinement →

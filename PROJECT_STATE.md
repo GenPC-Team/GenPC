@@ -2379,3 +2379,9511 @@ Reference image 1 is the selected partial-depth view and the sole authority for 
 **Model and prompt.** Codex Image Gen tool; exact image model, model path, checkpoint and transformer: `UNKNOWN`. Depth interpretation: `gpt-6-sol` via Codex, saved at `/data/project/cr/CompAgent/workspace/custom10_imagegen_20261103/mirrorless_camera/prior_agent/prior_agent_manifest.json`. Full positive prompt verbatim: "这是一个mirrorless camera扫描出来的深度图。用 Image Gen 将图1补全成一张完整的mirrorless camera图，遵循深度图可见部分的深度、轮廓约束，背景为纯白色。 Complete a mirrorless camera with its broad rear/side body nearest the viewer and its lens naturally attached at the far end, pointing away from the viewer."; negative prompt: `NONE`.
 
 **Parameters and postprocessing.** Image resolution 1254×1254. Image Gen internal resize, seed, steps, CFG/guidance, scheduler and backend implementation: `UNKNOWN`; thus not exactly reproducible. No postprocessing at visual approval. Same-canvas 512×512 review, RMBG, Pixal3D, MoGe, registration, refinement and fusion are pending and are not part of this approval.
+
+## 2026-11-04 16:32:18 UTC — validated single-step local refinement, pending further agent benchmark
+
+**Status.** Experimental validation, not a new human approval. Original accepted
+priors, cameras, registration, refinement and fused baselines remain unchanged.
+Custom10's 60 input/output hashes were rechecked after the experiment.
+
+**Outputs.** `/data/project/cr/CompAgent/workspace/structure_refinement_20261104/local_v2_fused/`
+contains Aircraft40, Redwood10 and Custom10 final 100k carriers under
+`{dataset}/{sample}/final_100k.ply`, with local reviews, fusion diagnostics and
+source provenance in the same experiment root. Frozen source paths/hashes are
+`frozen_baselines.json` and `frozen_custom_baselines.json`; frozen local code is
+`code_local_v2/`. This is a fixed-input ablation: generation and registration
+are reused exactly, local refinement changes, and standard final fusion follows.
+
+**Validation.** `metrics/local_v2_validation_three_datasets.json` contains the
+paired raw measurements and pooled results. CD-L1×100 / EMD×100:
+- Aircraft40: 4.52870972 / 7.04844977 → 4.52401516 / 7.04642276.
+- Redwood10: 1.53703572 / 2.47399736 → 1.53494601 / 2.46866103.
+- Custom10: 2.01922931 / 2.76617322 → 2.01501732 / 2.76034483.
+
+Evaluation is offline 16,384-point FPS, seed 6145. EMD has three repeats per
+case, with twelve additional repeats on all 16 changed Aircraft cases;
+unchanged file pairs reuse identical measurements. Approximate numerical-noise
+intervals exclude zero for each dataset's mean EMD difference. These are small
+gains and do not demonstrate that semantic part placement is fully solved.
+
+**Inference and reproducibility.** GPT-6 Sol through the Codex CLI, reasoning
+medium; exact hosted checkpoint, sampling seed and provider internals: UNKNOWN.
+Full prompt builders are in the frozen `src/gpt_refine_agent.py`; per-case
+observations, local structure verdicts and response IDs are in `local_v2/`.
+No Image Gen prompt, generated RGB, RMBG, Pixal or MoGe input was changed.
+The common local rigid translation and graph-transition parameters are saved
+in each report, with connectivity checks before unchanged continuous fusion.
+GT never enters inference. Exact model-response reproduction is not guaranteed.
+
+**Next work.** The user requested further agent capability and expanded the
+stop condition to all three datasets. Preserve this validated fallback while
+`planned_v2/` tests numbered region planning, visible-only labels, square depth
+crops, bounded repeated actions and fixed-rest/core protection. Its 60-case
+full-fusion evaluation is pending; do not call it superior before verification.
+
+## 2026-11-05T08:33:42.242107+00:00 — validated planned local refinement on all three datasets
+
+**Status.** Verified experiment, not a new human visual approval. All 60
+original baseline chains remain unchanged (360 frozen hashes verified).
+The common policy is `planned_local_v2_visible_regions_fixed_rest`.
+
+**Exact locations.** Experiment root:
+`/data/project/cr/CompAgent/workspace/structure_refinement_20261104/`.
+For each dataset (`aircraft`, `redwood`, `custom`) and sample, inputs and
+SHA256s are in `planned_v2/{dataset}/{sample}/report.json`; the selected
+carrier is beside it as `selected_100k.ply`. Final outputs are
+`planned_v2_fused/{dataset}/{sample}/final_100k.ply` with fusion artifacts
+and provenance. All sixty IDs and original input/output paths are recorded
+in `frozen_baselines.json` and `frozen_custom_baselines.json`.
+
+**Models/prompts/parameters.** GPT-6 Sol via Codex CLI, reasoning medium;
+checkpoint, transformer path, temperature and sampling seed: UNKNOWN.
+Negative prompt: NONE. Full fixed planning/review instructions and dynamic
+payload builders are preserved verbatim in `planned_v2/code/src/`;
+`planned_v2/frozen_policy.json` hashes all five inference files. The local
+configuration is identical in every report. Up to three attempts; square
+matched crops preserve the saved camera and shared depth scale, with
+visible-only markers. Hosted model responses are not exactly reproducible.
+No Image Gen prompt, semantic image, RMBG, Pixal or MoGe model/input changed.
+
+**Postprocessing.** Standard registered/refined carriers are reused, followed
+by bounded local translations and graph transitions, cumulative rest/core
+checks and GPT review. Original registration and ordinary continuous fusion
+remain fixed; no extra coordinate flips. Final carriers remain 100k ordered
+points. GT enters offline evaluation only: FPS16384, seed6145, CD-L1×100,
+approximate EMD×100 (eps .005, iterations50), three repeated solves.
+
+**Verified means (original → planned; CD×100 / EMD×100).**
+- Aircraft40: 4.52870972 / 7.04923825 → 4.51448453 / 7.03586992.
+- Redwood10: 1.53703572 / 2.47234073 → 1.53187150 / 2.46418532.
+- Custom10: 2.01922931 / 2.76870379 → 2.00722932 / 2.75527649.
+
+All three EMD mean-difference numerical-noise intervals exclude zero.
+Per-case raw runs and CSVs are in `metrics/planned_v2_*`; exact evidence is
+`completion_audit.json`. Gains are aggregate, not every sample. Final fusion
+is not rigid; affected-edge strain remains despite no significant component
+split/merge in the 60-case graph audit. See
+`/data/project/cr/CompAgent/docs/planned_local_refinement_results.md`.
+
+**Preservation/use.** Preserve frozen originals and these validated outputs.
+The recommended explicit runner option is `--planned-local-motion`; the
+original and single-step modes remain available for ablation. Do not silently
+overwrite this experiment with a different policy. Optional residual
+registration is not part of this result; no source push was performed here.
+
+## Dataset-organized artifact package — 2026-11-05T08:47:49.940957+00:00
+
+Packaged the existing validated 60-case result at `/data/project/cr/CompAgent/workspace/refinement_final/`, with `aircraft40/`, `redwood10/`, and `custom10/` dataset directories. Each sample contains all stages, current metrics, logs and relative-path `artifacts.json`; latest final output is `fusion/final_100k.ply`. Dataset roots contain paired `metrics.json` and audited `metrics.csv`.
+
+This is a location/organization change only: no generation, prompts, model paths, parameters, registration, refinement, fusion or metrics were changed. Source inputs/model/prompt provenance remains the preceding validated-result entry and copied records. All 12,492 copied files (7,238,261,986 bytes) have matching source/destination SHA-256; all 60 final hashes match paired candidate metrics and finalization. All sample indexes resolve, with no symlinks. `copy_manifest.json` maps original paths to package-relative paths. Historical metadata retains original execution paths; original experiment directories remain untouched. This packaging does not assert new user acceptance of individual results.
+
+## 2026-11-05T09:21:49.429516+00:00 — Fox semantic refinement pilot (not user accepted)
+
+New MLLM preference: `gpt-6-astra`, reasoning `medium`, for all future prior/refinement decisions. Historical metadata remains unchanged.
+
+Exact output: `/data/project/cr/CompAgent/workspace/semantic_refinement_astra/custom10/cartoon_fox/coherent_run/selected_100k.ply`; same-directory `comparison.png`, `summary.json`, `report.json`, and `method/`. Inputs and prior generation assets copied locally. Initial registration hash and source recorded in report. Full prompts are in `round_*/plan_prompt.json` and method code. External model checkpoint/temperature/seed UNKNOWN; hosted decisions are not exactly reproducible. No Image Gen or checkpoint changes in this pilot.
+
+One coherent semantic tail-part SE(3) with graph attachment transition was accepted; source part windows and 4 correspondence pairs came from Astra. Sparse ARAP predecessor was rejected for excessive strain. Semantic plan reuse is recorded with identical initial hash. Remaining tail and leg mismatch led Astra to KEEP_CURRENT. No global step, fusion, or CD/EMD evaluated. 100k finite ordered points preserved; original accepted package untouched. This is a diagnostic pilot, not a claimed general solution or a newly approved result.
+
+## 2026-11-05T09:32:34.806235+00:00 — USER APPROVED cartoon_fox tail (feet unresolved)
+
+Exact preserved output and complete provenance:
+
+```json
+{
+  "timestamp": "2026-11-05T09:32:34.806235+00:00",
+  "sample": "cartoon_fox",
+  "user_approval": "尾巴做得不错；脚部还差。批准的是 round_01/after_0.png 对应的 smooth_1.0 候选尾巴。",
+  "scope": "tail appearance only; feet still require refinement",
+  "human_assisted": true,
+  "model": "gpt-6-astra",
+  "reasoning_effort": "medium",
+  "checkpoint": "UNKNOWN (hosted Codex model)",
+  "transformer": "UNKNOWN",
+  "seed": "UNKNOWN",
+  "temperature": "UNKNOWN",
+  "negative_prompt": "NONE",
+  "backend": "logged-in Codex CLI; no GT",
+  "inputs": "/data/project/cr/CompAgent/workspace/semantic_refinement_astra/custom10/cartoon_fox/coherent_run/selected_100k.ply",
+  "input_sha256": "6b53f53e461eeae22b7318a9a86d14f2939d217dcd73852a57b6e93aa8ba04d6",
+  "output": "/data/project/cr/CompAgent/workspace/semantic_refinement_astra/custom10/cartoon_fox/approved_tail/approved_100k.ply",
+  "output_sha256": "ba9db47744370dabff68c76d9cda07bf4a11e848ece937bd29af7c4165065f64",
+  "geometry_parameters": {
+    "operator": "semantic_smooth_rbf_with_intrinsic_transition",
+    "source_ids": [
+      33539,
+      77640,
+      68958,
+      48894
+    ],
+    "target_positions": [
+      [
+        -0.19100934267044067,
+        -0.23945239186286926,
+        -0.19569289684295654
+      ],
+      [
+        -0.31321799755096436,
+        -0.4081423282623291,
+        -0.33625054359436035
+      ],
+      [
+        -0.4765270948410034,
+        -0.1362360119819641,
+        -0.4120960235595703
+      ],
+      [
+        -0.33809560537338257,
+        -0.3992413878440857,
+        -0.34970998764038086
+      ]
+    ],
+    "part_points": 8762,
+    "affected_points": 50005,
+    "fraction": 1.0,
+    "strain": {
+      "edge_stretch_p01": 0.7552483247728193,
+      "edge_stretch_p50": 1.0269522672703857,
+      "edge_stretch_p99": 1.4592793723123754,
+      "edge_stretch_p999": 1.6209263839778212
+    },
+    "transition_width_ratio": 0.41058065514049985,
+    "handle_error_before": [
+      0.14549579899473666,
+      0.11070562967362857,
+      0.2079766187801459,
+      0.133733171402436
+    ],
+    "handle_error_after": [
+      0.005851022592022048,
+      0.007199851266766171,
+      0.004867967840485601,
+      0.005445075432176436
+    ],
+    "maximum_motion_ratio": 0.13686021838016663,
+    "minimum_full_rank_jacobian_determinant": 0.6659173696280217,
+    "full_rank_jacobians_checked": 512,
+    "observation_mean_before": 0.02132093232795893,
+    "observation_mean_after": 0.01932458584575794,
+    "connectivity": {
+      "passed": true,
+      "broken_components": 0,
+      "merged_components": 0,
+      "minimum_significant_size": 100,
+      "carrier_slots": 100000
+    },
+    "hard_passed": true
+  },
+  "prompt_verbatim": {
+    "instructions": "You control geometric refinement of a complete generated prior against an incomplete physical scan. Attached images are paired 512x512 panels: LEFT BLUE is observed partial, RIGHT RED is complete prior. Both use the same camera. Each image is one view numbered 0..3. Grid coordinates are percentages of each individual panel, not of the whole image. Unobserved prior surfaces must remain complete. First distinguish common global misalignment from a specific corresponding part with different pose/shape. Choose DEFORM_REGION only when the SAME physical part and its attachment are identifiable in both clouds. Choose REFINE_ALIGNMENT if several reliable parts share a common pose/scale offset; choose KEEP_CURRENT if ambiguous. For DEFORM_REGION, name the part, and outline its entire prior extent using a tight polygon in TWO different views; include its attachment boundary, exclude adjacent unrelated parts. Give 3 to 5 physically corresponding visible SURFACE landmarks along attachment, middle and extremity; never click empty space, a hidden centreline, or different sides of a part. Landmarks may use different views; select the clearest visible surface. Keep the first attachment landmark near its current location when attachment is already correct. Explain correspondence and intended deformation using multi-view depth and contour evidence. Do not use ground truth or invent numeric 3D coordinates or transforms. Do not force deformation just to improve overlap. Return uncertainty explicitly. Prioritize the largest coherent unresolved semantic mismatch, not tiny surface noise. Additional tools are available: coherent rigid part motion and smooth low-frequency RBF bending/length correction, both with graph attachment transitions. Missing scan connections alone do not make a visible distal part impossible to correct: use visible corresponding surfaces, preserve the unobserved attachment smoothly, and let geometry checks bound the proposal. When a clear local mismatch remains, uncertainty should trigger closer inspection of supplied zooms, new visible surface correspondences or trying another part/tool. KEEP_CURRENT is justified only when fit is adequate or concrete alternative routes have been exhausted. Explain which routes were tried. Extra images are magnified windows of the original views; their grid labels remain ORIGINAL panel percentages. Do not copy pixel positions from previous geometry blindly.",
+    "payload": {
+      "round": 1,
+      "remaining_rounds": 6,
+      "observation": {
+        "coverage": [
+          0.8934683544303798,
+          0.8308524418789628,
+          0.8166189111747851,
+          0.8496881496881497
+        ],
+        "depth": [
+          0.06400427825756394,
+          0.08464284062888973,
+          0.057148164715489023,
+          0.07561201443063559
+        ],
+        "partial_to_carrier_p90": 0.03091276455408357,
+        "partial_to_carrier_p99": 0.07142973779040569,
+        "partial_to_carrier_median": 0.00909220775843
+      },
+      "user_feedback": "The user asks to continue because tail and legs remain clearly misaligned. Do not equate uncertainty with task completion. Use close-up views, reconsider visible surface correspondences, and try low-frequency bending or length correction as well as rigid part motion. Keep attachments and other parts natural. A previous small coherent tail update helped but is insufficient.",
+      "history": []
+    }
+  },
+  "rendering": "four shared 512x512 projectors; diagnostic display panels 320 pixels; shared before/after depth reference; no crop/resize change to point geometry",
+  "postprocessing": "previous coherent part motion followed by linear-RBF semantic field with intrinsic graph transition; no new Image Gen/RMBG/Pixal/MoGe/registration/fusion in this candidate",
+  "preservation": "Do not overwrite approved files or alter approved tail in subsequent local trials without asking.",
+  "reproducibility": "Not exactly reproducible: hosted model checkpoint/seed unknown; frozen candidate and plan are reproducible assets."
+}
+```
+
+
+## 2026-11-05T18:31:14.054932+08:00 — Approval means baseline, not hard freezing
+
+User clarified: “不不 不代表我认可就可以不改善了 可以改善”.
+The approved cartoon_fox tail checkpoint remains an immutable historical
+comparison at `workspace/semantic_refinement_astra/custom10/cartoon_fox/approved_tail/`.
+New candidates may improve its coordinates and shape, including through global
+registration. Do not infer protected point indices from user approval. The earlier
+exact-coordinate lock was an assistant interpretation and is superseded.
+Use observed local fit and complete-shape integrity to assess regressions;
+no GT enters candidate selection. Other currently good regions are likewise
+references for comparison, not automatically immobile.
+
+
+## 2026-11-05T18:45:31.091831+08:00 — Remove universal hard strain ratio
+
+User rejected treating a fixed edge-length ratio as a hard validity criterion.
+The former p01 > 0.6 / p99 < 1.5 checks were experimental assistant-selected
+heuristics, not validated geometric limits. Remove them as acceptance gates in
+the semantic continuation. Record per-step and cumulative strain as diagnostic
+evidence for observation/semantic/structural review. Do not silently relax to
+a different numeric ratio or freeze approved regions. Existing run records
+retain their actual historical policy; new rounds explicitly record the change.
+
+
+## 2026-11-05T19:01:21.242846+08:00 — Approved joint fox result except one corresponding foot
+
+The user identified the same remaining foot in diagnostic views 2 and 5 and is satisfied with the other regions. This is a comparison baseline, not a geometric freeze. Full exact provenance follows.
+
+```json
+{
+  "timestamp": "2026-11-05T19:01:21.242846+08:00",
+  "sample": "cartoon_fox",
+  "user_approval": [
+    "效果还不错 只剩下我圈起来的这个脚还有些差距了",
+    "还有这个圈起来的 这两代表的是一个脚",
+    "除此之外都挺满意的"
+  ],
+  "scope": "Overall result satisfactory except the SAME foot indicated in diagnostic views 2 and 5. Preserve as comparison baseline, not a coordinate lock.",
+  "output": "/data/project/cr/CompAgent/workspace/semantic_refinement_astra/custom10/cartoon_fox/approved_joint_round05/approved_100k.ply",
+  "output_sha256": "4559c99c1f65ab5e2fce12deb3cc75b63f540c5e4d1938ecfc83b0e50a263861",
+  "source": "/data/project/cr/CompAgent/workspace/semantic_refinement_astra/custom10/cartoon_fox/joint_refinement_run/round_05/accepted_100k.ply",
+  "image": "/data/project/cr/CompAgent/workspace/semantic_refinement_astra/custom10/cartoon_fox/approved_joint_round05/approved.png",
+  "inputs": {
+    "carrier": "/data/project/cr/CompAgent/workspace/semantic_refinement_astra/custom10/cartoon_fox/joint_refinement_run/round_03/accepted_100k.ply",
+    "partial": "/data/project/cr/CompAgent/workspace/semantic_refinement_astra/custom10/cartoon_fox/joint_refinement_run/inputs/partial/cartoon_fox.ply",
+    "camera": "/data/project/cr/CompAgent/workspace/semantic_refinement_astra/custom10/cartoon_fox/joint_refinement_run/inputs/camera/cartoon_fox/camera.pth",
+    "diagnostic_views": "/data/project/cr/CompAgent/workspace/semantic_refinement_astra/custom10/cartoon_fox/joint_refinement_run/render_manifest.json"
+  },
+  "model": "gpt-6-astra",
+  "reasoning_effort": "medium",
+  "checkpoint": "UNKNOWN",
+  "transformer_path": "NOT APPLICABLE (hosted Codex model)",
+  "seed": "UNKNOWN",
+  "temperature": "UNKNOWN",
+  "negative_prompt": "NONE; structured geometric planning/review, no image generation in this stage",
+  "prompt_verbatim": {
+    "instructions": "You control geometric refinement of a complete generated prior against an incomplete physical scan. Attached images are paired 512x512 panels: LEFT BLUE is observed partial, RIGHT RED is complete prior. Both use the same camera. Each image is one view numbered consecutively from zero; the supplied payload gives the view count. Grid coordinates are percentages of each individual panel, not of the whole image. Unobserved prior surfaces must remain complete. First distinguish common global misalignment from a specific corresponding part with different pose/shape. Choose DEFORM_REGION only when the SAME physical part and its attachment are identifiable in both clouds. Choose REFINE_ALIGNMENT if several reliable parts share a common pose/scale offset; choose KEEP_CURRENT if ambiguous. For DEFORM_REGION, name the part, and outline its entire prior extent using a tight polygon in TWO different views; include its attachment boundary, exclude adjacent unrelated parts. Give 3 to 5 physically corresponding visible SURFACE landmarks along attachment, middle and extremity; never click empty space, a hidden centreline, or different sides of a part. Landmarks may use different views; select the clearest visible surface. Keep the first attachment landmark near its current location when attachment is already correct. Explain correspondence and intended deformation using multi-view depth and contour evidence. Do not use ground truth or invent numeric 3D coordinates or transforms. Do not force deformation just to improve overlap. Return uncertainty explicitly. Prioritize the largest coherent unresolved semantic mismatch, not tiny surface noise. Additional tools are available: coherent rigid part motion and smooth low-frequency RBF bending/length correction, both with graph attachment transitions. Missing scan connections alone do not make a visible distal part impossible to correct: use visible corresponding surfaces, preserve the unobserved attachment smoothly, and let geometry checks bound the proposal. When a clear local mismatch remains, uncertainty should trigger closer inspection of supplied zooms, new visible surface correspondences or trying another part/tool. KEEP_CURRENT is justified only when fit is adequate or concrete alternative routes have been exhausted. Explain which routes were tried. Extra images are magnified windows of the original views; their grid labels remain ORIGINAL panel percentages. Do not copy pixel positions from previous geometry blindly. Each candidate is audited against fixed loop-start rest edges and exact protected coordinates. Review receives explicit coordinate hashes and maximum protected displacement. Protection applies only to listed slots, not automatically to every previously edited part. Do not repeat a deterministic action at unchanged geometry after its candidate fractions are exhausted. Use the concrete rejection evidence to change correspondence/tool or justify stopping. A previously approved shape is a comparison baseline, not an immutable part. When protected_surface_slots is zero, every part may move or deform, including through global registration. Regional observed-support checks limit regressions against the current and frozen initial carrier without locking point coordinates. Judge both local improvement and natural complete structure. Edge-stretch percentiles, including cumulative strain, are DIAGNOSTICS ONLY. There is no universal 1.5 expansion or 0.6 compression rejection rule: a mismatched generated prior may need substantial changes of proportion. Earlier rejections based solely on those ratios are superseded. Judge supported alignment and natural structure; use large strain as a reason to inspect the changed region, not automatic rejection or automatic acceptance. REFINE_OBSERVED is also available: the existing baseline continuous observation field performs small distributed surface corrections using reliable cross-view matches, without requiring semantic part landmarks. Use it when part poses are reasonable but nontrivial distributed 3D residual remains. This tool was absent in earlier semantic-only pilots. It is a candidate requiring the same preservation and visual review, not an automatic acceptance. Consider this route before declaring remaining errors uncorrectable. Protected slots remain exactly fixed. UPDATE_POSTERIOR is available for broader distributed mismatch: the existing baseline coarse-to-fine partial optimal transport and PosteriorAdapter uses the actual saved acquisition camera for transport, with diagnostic views for positive surface support. This is an alternative to small observation-field steps or semantic part landmarks, not a mandatory action. Its full/half/quarter proposals undergo the SAME fixed-rest and exact-protection checks; the rest reference is not reset. Consider it if clear distributed mismatch remains and fine surface steps are inadequate. Do not use it to force hidden completion to fit missing scan data.",
+    "payload": {
+      "available_actions": [
+        "DEFORM_REGION",
+        "REFINE_ALIGNMENT",
+        "KEEP_CURRENT",
+        "REFINE_OBSERVED",
+        "UPDATE_POSTERIOR"
+      ],
+      "view_count": 6,
+      "protected_surface_slots": 0,
+      "round": 5,
+      "remaining_rounds": 3,
+      "observation": {
+        "coverage": [
+          0.9810835443037975,
+          0.9563893370906529,
+          0.9496631301788895,
+          0.9443718443718444,
+          0.9534707328555736,
+          0.9709295774647887
+        ],
+        "depth": [
+          0.04333255464367284,
+          0.06332007935523516,
+          0.03952766572668281,
+          0.05570028928400369,
+          0.049472641548239694,
+          0.04769554512886671
+        ],
+        "partial_to_carrier_p90": 0.015964193238446205,
+        "partial_to_carrier_p99": 0.04145350402155288,
+        "partial_to_carrier_median": 0.0027073669697769195
+      },
+      "user_feedback": "Continue from accepted geometry. No region is frozen by prior approval. Edge-stretch ratios are diagnostics only, now at both controller and nested solver levels; previous ratio-based rejections are superseded. Choose geometry tools according to visible residuals and accept supported improvements with natural complete structure. Do not replace the removed limits with invented numeric strain cutoffs. No GT or offline scores are available.",
+      "history": [
+        {
+          "action": "REFINE_OBSERVED",
+          "part": "Distributed visible surfaces of the head, legs, and tail",
+          "accepted": true,
+          "review": {
+            "action": "ACCEPT_UPDATE",
+            "reason": "Small distributed corrections improve measured 3D alignment while preserving plausible fox anatomy and visible attachments, with no demonstrated structural regression.",
+            "evidence": [
+              "Whole-scan mean residual decreases from 0.01505 to 0.01308; median decreases from 0.00617 to 0.00446. Depth residuals improve in all six views.",
+              "The corresponding ear crop improves from 0.02968 to 0.02552; the least-improved crop also improves slightly. No evaluated region regresses.",
+              "Across the boards, ears, head, legs, paws, and tail retain consistent semantic correspondence and natural structure; no visible collapse or detachment appears.",
+              "Connectivity reports zero broken or merged components. Fixed-rest cumulative strain has p01 0.761 and p99 1.255; hidden coverage remains 0.9899.",
+              "The integrity audit passes, but its protected-slot count is zero, so it establishes no protected anatomical region."
+            ]
+          },
+          "error": null,
+          "geometric_rejections": null,
+          "correspondence_validation": null,
+          "repeated_candidates": null
+        },
+        {
+          "action": "REFINE_OBSERVED",
+          "part": "Visible ear, leg, paw, and tail surfaces",
+          "accepted": true,
+          "review": {
+            "action": "ACCEPT_UPDATE",
+            "reason": "Small distributed corrections improve measured 3D alignment while preserving visible fox structure and plausible part correspondence, with no demonstrated structural regression.",
+            "evidence": [
+              "Whole-scan mean distance improves from 0.013085 to 0.012015; depth residuals improve in all six views and every evaluated region improves.",
+              "The corresponding ear crop improves from 0.02552 to 0.02283; even the least-improved crop improves slightly.",
+              "Before/after views retain natural ears, legs, paws, torso, and tail attachments without visible collapse or wrong-part association; connectivity reports zero broken or merged components.",
+              "Step strain p01/p99 is 0.855/1.140; cumulative fixed-rest strain p01/p99 is 0.705/1.361. Integrity passes, but protected-slot count is zero, so no coordinate protection is inferred."
+            ]
+          },
+          "error": null,
+          "geometric_rejections": [
+            {
+              "operator": "baseline_fine_observation_field",
+              "fraction": 1.0,
+              "strain": {
+                "edge_stretch_p01": 0.7450844010550294,
+                "edge_stretch_p50": 1.0,
+                "edge_stretch_p99": 1.3078903387916176,
+                "edge_stretch_p999": 1.7049796192491766
+              },
+              "solver_integrity_passed": true,
+              "integrity_audit": {
+                "carrier_slots": 100000,
+                "finite": true,
+                "protected_slots": {
+                  "count": 0,
+                  "reference": "frozen_loop_initial_carrier",
+                  "reference_coordinates_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                  "candidate_coordinates_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                  "exactly_preserved": true,
+                  "maximum_displacement": 0.0
+                },
+                "cumulative_strain": {
+                  "edge_stretch_p01": 0.6421328689492354,
+                  "edge_stretch_p50": 1.0,
+                  "edge_stretch_p99": 1.5177384408049355,
+                  "edge_stretch_p999": 2.1603524103006184
+                },
+                "cumulative_reference": "fixed edges and coordinates at start of this loop, not previous round",
+                "maximum_step_displacement": 0.014622244627665397,
+                "passed": false
+              },
+              "current_regional_support": {
+                "passed": true,
+                "normalization": "partial_bbox_diagonal",
+                "camera": "saved_acquisition",
+                "regressed_fraction": 0.0,
+                "maximum_regression": -0.00018428233233338563,
+                "regional_tolerance": 0.002,
+                "maximum_regressed_fraction": 0.2,
+                "maximum_allowed_regression": 0.006,
+                "no_immobile_part_assumption": true
+              },
+              "initial_regional_support": {
+                "passed": true,
+                "normalization": "partial_bbox_diagonal",
+                "camera": "saved_acquisition",
+                "regressed_fraction": 0.0,
+                "maximum_regression": -0.00026824286477138284,
+                "regional_tolerance": 0.002,
+                "maximum_regressed_fraction": 0.2,
+                "maximum_allowed_regression": 0.006,
+                "no_immobile_part_assumption": true
+              }
+            }
+          ],
+          "correspondence_validation": null,
+          "repeated_candidates": null
+        },
+        {
+          "action": "UPDATE_POSTERIOR",
+          "part": "Distributed observed ear, hind-leg, paw, and tail surfaces",
+          "accepted": true,
+          "review": {
+            "action": "ACCEPT_UPDATE",
+            "reason": "Supported local 3D alignment gains accompany stable fox anatomy and intact attachments, with no demonstrated structural regression.",
+            "evidence": [
+              "Whole-scan mean distance improves from 0.01201 to 0.00946; depth residuals decrease in all six views.",
+              "The leg/paw crops retain plausible correspondence: view 5 distance improves from 0.03016 to 0.02053, and the least-improved crop improves from 0.00292 to 0.00260.",
+              "Full-object views preserve recognizable ears, limbs, paws, and tail without visible collapse or detachment; connectivity reports zero broken or merged components.",
+              "Maximum regional regression is only 0.000036. Fixed-rest cumulative strain passes, with p01/p99 stretch 0.621/1.424.",
+              "There are zero protected slots; the protection audit does not establish any immobile anatomy."
+            ]
+          },
+          "error": null,
+          "geometric_rejections": null,
+          "correspondence_validation": null,
+          "repeated_candidates": null
+        },
+        {
+          "action": "UPDATE_POSTERIOR",
+          "part": "Distributed visible ear, hind-leg, paw, and tail surfaces",
+          "accepted": false,
+          "review": null,
+          "error": "Interrupted to propagate diagnostic-only strain policy through nested solvers; not a geometric rejection.",
+          "geometric_rejections": null,
+          "correspondence_validation": null,
+          "repeated_candidates": null
+        }
+      ]
+    }
+  },
+  "review_prompt_verbatim": {
+    "instructions": "Review a proposed geometric update. Image 1 is BEFORE and image 2 AFTER, identical cameras and depth scales. Each view has blue OBSERVED PARTIAL, red COMPLETE PRIOR, then overlay. Image 3, if present, contains identical local crops: observed / before overlay / after overlay, including the most improved and the most regressed (or least improved) observed regions. Purple is screen overlap only; use 3D residuals for depth agreement. Require semantic correspondence and local alignment improvement while keeping the full object natural and attachments intact. Missing scan geometry is unknown. The integrity_audit directly measures protected slot coordinates against the frozen loop start: exactly_preserved=true and zero maximum_displacement verify those slots. Do not infer that other slots are protected. Cumulative strain uses a fixed rest graph. For small distributed corrections, measured local 3D gains with stable visible structure can support acceptance even when the full-object board change is subtle. Nearest-distance gains alone do not prove a semantic correspondence; reject identifiable wrong associations, stretching, collapse, or detachment. ACCEPT_UPDATE with supported improvement and no demonstrated structural regression; otherwise TRY_NEXT_CANDIDATE or STOP_KEEP_CURRENT with concrete evidence. Never use GT. Stretch percentiles are descriptive only; do not use 1.5 expansion, 0.6 compression, or another invented universal ratio as an acceptance boundary. Substantial proportional correction can be appropriate for a generated prior. Distinguish supported shape correction from visible unnatural distortion, folding, wrong correspondence or collapse. Cite concrete local evidence when rejecting shape changes.",
+    "payload": {
+      "proposal_action": "UPDATE_POSTERIOR",
+      "semantic_plan": {
+        "action": "UPDATE_POSTERIOR",
+        "part": "Distributed visible ear, leg, paw, and tail surfaces",
+        "evidence": [
+          "Residuals vary by part and view rather than sharing one clear global translation or scale offset; global registration is not supported.",
+          "Views 1–3 show remaining ear and hind-leg contour differences, while view 5 shows residual paw and tail differences.",
+          "The supplied leg zooms show remaining differences in limb width and paw contours. Missing scan connections do not justify removing complete prior attachments.",
+          "Earlier observation-field steps improved alignment, and the accepted posterior update produced further supported improvement while preserving natural structure.",
+          "The subsequent posterior attempt was interrupted for policy propagation, not geometrically rejected or exhausted. Resume that route from the accepted geometry using visible surface support."
+        ],
+        "uncertainty": "Moderate: incomplete sampling and overlapping limbs make isolated semantic handles unreliable. Evaluate posterior proposals for cross-view surface improvement and natural complete anatomy; preserve unobserved connections and do not fit hidden surfaces to scan gaps. Treat cumulative strain as diagnostic.",
+        "windows": [],
+        "handles": []
+      },
+      "geometry": {
+        "operator": "baseline_partial_ot_posterior",
+        "fraction": 1.0,
+        "field": {
+          "active": true,
+          "method": "structure_aware_partial_ot_complete_gaussian_posterior",
+          "strict_zero_shot": true,
+          "ground_truth_cd_emd_used": false,
+          "category_or_part_rules_used": false,
+          "carrier_slots_before": 100000,
+          "carrier_slots_after": 100000,
+          "carrier_slots_preserved": true,
+          "config": {
+            "partial_samples": 3072,
+            "prior_samples": 6144,
+            "normal_neighbours": 24,
+            "transport_iterations": 60,
+            "transport_relaxation": 0.72,
+            "transport_temperature_floor": 0.012,
+            "maximum_3d_ratio": 0.34,
+            "maximum_screen_ratio": 0.28,
+            "maximum_depth_ratio": 0.34,
+            "structural_rescue_candidates": 48,
+            "structural_rescue_screen_fraction": 0.55,
+            "structural_rescue_depth_fraction": 0.7,
+            "intrinsic_landmarks": 8,
+            "intrinsic_graph_neighbours": 12,
+            "minimum_transport_pairs": 96,
+            "stable_spacing_multiplier": 3.0,
+            "stable_residual_quantile": 0.22,
+            "residual_quantile": 0.42,
+            "require_localized_residual_evidence": true,
+            "coarse_node_fraction": 0.02,
+            "fine_node_fraction": 0.055,
+            "minimum_graph_nodes": 192,
+            "maximum_graph_nodes": 6144,
+            "skinning_neighbours": 4,
+            "low_frequency_modes": 24,
+            "low_frequency_regularization": 0.035,
+            "low_frequency_stable_weight": 6.0,
+            "coarse_neighbours": 18,
+            "coarse_edge_ratio": 2.45,
+            "coarse_data_weight": 2.5,
+            "coarse_screening": 0.0008,
+            "coarse_iterations": 5,
+            "coarse_displacement_ratio": 0.28,
+            "fine_neighbours": 10,
+            "fine_edge_ratio": 1.85,
+            "fine_data_weight": 4.0,
+            "fine_screening": 0.003,
+            "fine_iterations": 5,
+            "fine_displacement_ratio": 0.12,
+            "bending_regularization": 0.0,
+            "attachment_edge_ratio": 3.2,
+            "minimum_observed_improvement": 0.025,
+            "minimum_edge_compression": 0.55,
+            "maximum_edge_stretch": 2.8,
+            "enforce_edge_strain_limits": false,
+            "minimum_hidden_coverage": 0.95,
+            "coverage_resolution": 160,
+            "integrated_observation_fusion": true,
+            "assimilation_samples": 6144,
+            "assimilation_pixel_radius": 1.0,
+            "assimilation_cross_view_pixel_radius": 2.0,
+            "assimilation_minimum_view_support": 1,
+            "assimilation_separate_stable_anchors": false,
+            "assimilation_stable_quantile": 0.25,
+            "assimilation_hard_residual_targets": false,
+            "assimilation_coherent_residual_targets": false,
+            "assimilation_data_weight": 2.0,
+            "assimilation_screening": 0.004,
+            "assimilation_iterations": 3,
+            "assimilation_displacement_ratio": 0.05,
+            "assimilation_anchor_residual_ratio": 0.03,
+            "slender_rigidity_projection": false,
+            "slender_neighbours": 128,
+            "slender_linearity_quantile": 0.95,
+            "slender_minimum_fraction": 0.003,
+            "slender_minimum_aspect_ratio": 6.0,
+            "slender_dilation_steps": 2
+          },
+          "stages": [
+            {
+              "stage": "coarse",
+              "active": false,
+              "reason": "insufficient_residual_transport_pairs",
+              "transport": {
+                "active": false,
+                "method": "multiview_camera_structure_unbalanced_partial_transport",
+                "device": "cuda",
+                "view_count": 1,
+                "view_evidence": [
+                  {
+                    "view": 0,
+                    "partial_visible": 2842,
+                    "prior_visible": 6144,
+                    "supported_pairs": 17461248
+                  }
+                ],
+                "partial_diagonal": 1.5934643873839316,
+                "partial_spacing": 0.0033872161310978133,
+                "visible_prior": 29184,
+                "partial_samples": 3072,
+                "prior_samples": 6144,
+                "valid_transport_rows": 2842,
+                "retained_capacity_pairs": 0,
+                "stable_pairs": 626,
+                "coherent_residual_rows": 0,
+                "raw_coherent_residual_rows": 1604,
+                "coherent_residual_fraction": 0.5643912737508796,
+                "coherent_prior_support_fraction": 0.16536458333333334,
+                "localization_bound": 0.19999999999999998,
+                "localized_residual_evidence": false,
+                "residual_pairs": 0,
+                "stable_prior": 2692,
+                "residual_prior": 0,
+                "unsupported_prior": 97308,
+                "unmatched_partial_fraction": 0.7962239583333334,
+                "temperature": 0.012,
+                "stable_limit": 0.024174688869072827,
+                "residual_limit": 0.0423140842071864,
+                "residual_median": null,
+                "residual_p90": null
+              }
+            }
+          ],
+          "supported_stable": 2692,
+          "supported_stable_final": 0,
+          "supported_residual": 0,
+          "unsupported": 97308,
+          "moved": 100000,
+          "hidden_coverage_ratio": 0.9544161345387874,
+          "hidden_coverage_per_view": [
+            0.9770438481266028,
+            0.9544161345387874,
+            1.0012124151309407
+          ],
+          "integrity": {
+            "input_connected_components": 2,
+            "output_connected_components": 2,
+            "new_connected_components": 0,
+            "component_significance_size": 100,
+            "input_significant_components": 1,
+            "output_significant_components": 1,
+            "input_component_sizes": [
+              99999,
+              1
+            ],
+            "output_component_sizes": [
+              99999,
+              1
+            ],
+            "tracked_original_edges": 499487,
+            "tracked_edge_replacement_fraction": 7.207394787051515e-05,
+            "stable_motion_p50": 0.0022677101302881154,
+            "stable_motion_p95": 0.008953360159487282,
+            "stable_motion_max": 0.014569198954531968,
+            "passed": true
+          },
+          "topology_projection": {
+            "active": false,
+            "corrected_points": 0,
+            "passes": [
+              {
+                "pass": 0,
+                "components_before": 2,
+                "new_small_fragment_points": 0
+              }
+            ]
+          },
+          "observation_assimilation": {
+            "active": true,
+            "method": "integrated_four_view_observation_assimilation",
+            "positive_evidence": {
+              "views": [
+                {
+                  "view_index": 0,
+                  "partial_visible_pixels": 14306,
+                  "prior_visible_pixels": 60111,
+                  "nearby_pixel_pairs": 14172,
+                  "mutual_pixel_pairs": 10767,
+                  "max_pixel_distance": 1.0,
+                  "radius_relaxed": false,
+                  "pair_subsample_limit": 100000
+                },
+                {
+                  "view_index": 1,
+                  "partial_visible_pixels": 13240,
+                  "prior_visible_pixels": 66545,
+                  "nearby_pixel_pairs": 12907,
+                  "mutual_pixel_pairs": 9367,
+                  "max_pixel_distance": 1.0,
+                  "radius_relaxed": false,
+                  "pair_subsample_limit": 100000
+                },
+                {
+                  "view_index": 2,
+                  "partial_visible_pixels": 11369,
+                  "prior_visible_pixels": 66806,
+                  "nearby_pixel_pairs": 10954,
+                  "mutual_pixel_pairs": 7765,
+                  "max_pixel_distance": 1.0,
+                  "radius_relaxed": false,
+                  "pair_subsample_limit": 100000
+                },
+                {
+                  "view_index": 3,
+                  "partial_visible_pixels": 10906,
+                  "prior_visible_pixels": 63304,
+                  "nearby_pixel_pairs": 10496,
+                  "mutual_pixel_pairs": 7303,
+                  "max_pixel_distance": 1.0,
+                  "radius_relaxed": false,
+                  "pair_subsample_limit": 100000
+                },
+                {
+                  "view_index": 4,
+                  "partial_visible_pixels": 12340,
+                  "prior_visible_pixels": 55556,
+                  "nearby_pixel_pairs": 12009,
+                  "mutual_pixel_pairs": 8503,
+                  "max_pixel_distance": 1.0,
+                  "radius_relaxed": false,
+                  "pair_subsample_limit": 100000
+                },
+                {
+                  "view_index": 5,
+                  "partial_visible_pixels": 11895,
+                  "prior_visible_pixels": 53965,
+                  "nearby_pixel_pairs": 11722,
+                  "mutual_pixel_pairs": 8286,
+                  "max_pixel_distance": 1.0,
+                  "radius_relaxed": false,
+                  "pair_subsample_limit": 100000
+                }
+              ],
+              "raw_visible_pairs": 51991,
+              "unique_physical_pairs": 50314,
+              "support_histogram": {
+                "0": 23207,
+                "1": 10713,
+                "2": 4838,
+                "3": 2166,
+                "4": 1071,
+                "5": 1369,
+                "6": 6950
+              },
+              "cross_view_pixel_radius": 2.0,
+              "cross_view_depth_limit": 0.04780393162151795
+            },
+            "assignment": {
+              "pixel_pairs": 27107,
+              "within_metric_limit": 26883,
+              "collision_free_pairs": 12021,
+              "max_residual": 0.04780393162151795,
+              "residual_median": 0.009816916090353263,
+              "residual_p90": 0.03559549207810468,
+              "selected_support_mean": 3.7238166541885036
+            },
+            "retained_anchors": 6144,
+            "residual_anchors": 6144,
+            "stable_gaussians": 0,
+            "stable_limit": null,
+            "solver": {
+              "active": true,
+              "field": "hierarchical_embedded_arap_posterior",
+              "graph_nodes": 11257,
+              "node_graph_edges": 56202,
+              "attachment_edges": 0,
+              "carrier_graph_edges": 499487,
+              "carrier_attachment_edges": 2,
+              "target_gaussians": 6144,
+              "stable_gaussians": 0,
+              "moved_gaussians": 100000,
+              "moved_fraction": 1.0,
+              "maximum_displacement": 0.02602978790138807,
+              "mean_displacement": 0.006428859727310346,
+              "coherent_targets": {
+                "components": 0,
+                "regularized_targets": 0
+              },
+              "node_solver": {
+                "active": true,
+                "field": "soft_full_surface_arap_posterior",
+                "surface_graph_edges": 56202,
+                "attachment_edges": 0,
+                "coherent_targets": {
+                  "components": 0,
+                  "regularized_targets": 0
+                },
+                "hard_target_constraints": false,
+                "line_search": [
+                  {
+                    "alpha": 1.0,
+                    "observed_residual_before": 0.005676197041016438,
+                    "observed_residual_after": 0.0012242836626745,
+                    "observed_improvement": 0.7843126914327013,
+                    "hidden_coverage_ratio": 0.9516083119840593,
+                    "hidden_coverage_per_view": [
+                      0.9846196868008948,
+                      0.9516083119840593,
+                      0.9869782971619365
+                    ],
+                    "original_graph_components": 1,
+                    "candidate_graph_components": 1,
+                    "edge_stretch_p01": 0.4575776307023475,
+                    "edge_stretch_p50": 1.0109583361816759,
+                    "edge_stretch_p99": 2.2805425125099967,
+                    "edge_stretch_p999": 4.510390107115008,
+                    "significant_component_size": 32,
+                    "original_significant_components": 1,
+                    "candidate_significant_components": 1,
+                    "candidate_small_component_mass": 0,
+                    "edge_strain_limits_enforced": false
+                  }
+                ],
+                "target_gaussians": 6144,
+                "stable_gaussians": 0,
+                "moved_gaussians": 11257,
+                "moved_fraction": 1.0,
+                "maximum_displacement": 0.04507219497538258,
+                "mean_displacement": 0.011499366969218982,
+                "cg_status": [
+                  0,
+                  0,
+                  0
+                ],
+                "alpha": 1.0,
+                "observed_residual_before": 0.005676197041016438,
+                "observed_residual_after": 0.0012242836626745,
+                "observed_improvement": 0.7843126914327013,
+                "hidden_coverage_ratio": 0.9516083119840593,
+                "hidden_coverage_per_view": [
+                  0.9846196868008948,
+                  0.9516083119840593,
+                  0.9869782971619365
+                ],
+                "original_graph_components": 1,
+                "candidate_graph_components": 1,
+                "edge_stretch_p01": 0.4575776307023475,
+                "edge_stretch_p50": 1.0109583361816759,
+                "edge_stretch_p99": 2.2805425125099967,
+                "edge_stretch_p999": 4.510390107115008,
+                "significant_component_size": 32,
+                "original_significant_components": 1,
+                "candidate_significant_components": 1,
+                "candidate_small_component_mass": 0,
+                "edge_strain_limits_enforced": false
+              },
+              "preserve_target_amplitude": false,
+              "hard_target_constraints": false,
+              "node_minimum_edge_compression": null,
+              "line_search": [
+                {
+                  "alpha": 1.0,
+                  "observed_residual_before": 0.005676197041016438,
+                  "observed_residual_after": 0.002869616280712229,
+                  "observed_improvement": 0.49444738088261186,
+                  "hidden_coverage_ratio": 0.9289795918367347,
+                  "hidden_coverage_per_view": [
+                    0.9753593429158111,
+                    0.9289795918367347,
+                    1.0017750524447313
+                  ],
+                  "original_graph_components": 1,
+                  "candidate_graph_components": 1,
+                  "significant_component_size": 100,
+                  "original_significant_components": 1,
+                  "candidate_significant_components": 1,
+                  "candidate_small_component_mass": 0,
+                  "robust_edge_quantile": 0.99,
+                  "edge_strain_limits_enforced": false,
+                  "edge_stretch_p01": 0.5771380700912804,
+                  "edge_stretch_p50": 1.0016656658589624,
+                  "edge_stretch_p99": 1.740147437636218,
+                  "edge_stretch_p999": 2.64584588077214
+                },
+                {
+                  "alpha": 0.85,
+                  "observed_residual_before": 0.005676197041016438,
+                  "observed_residual_after": 0.003047050705638789,
+                  "observed_improvement": 0.4631879965369995,
+                  "hidden_coverage_ratio": 0.9354169286882154,
+                  "hidden_coverage_per_view": [
+                    0.9730419623957166,
+                    0.9354169286882154,
+                    0.9999193418293273
+                  ],
+                  "original_graph_components": 1,
+                  "candidate_graph_components": 1,
+                  "significant_component_size": 100,
+                  "original_significant_components": 1,
+                  "candidate_significant_components": 1,
+                  "candidate_small_component_mass": 0,
+                  "robust_edge_quantile": 0.99,
+                  "edge_strain_limits_enforced": false,
+                  "edge_stretch_p01": 0.6019668912863425,
+                  "edge_stretch_p50": 1.0003689976729906,
+                  "edge_stretch_p99": 1.5981269095413864,
+                  "edge_stretch_p999": 2.3446332509655865
+                },
+                {
+                  "alpha": 0.7,
+                  "observed_residual_before": 0.005676197041016438,
+                  "observed_residual_after": 0.003342820460247291,
+                  "observed_improvement": 0.4110809691608782,
+                  "hidden_coverage_ratio": 0.9460907944514502,
+                  "hidden_coverage_per_view": [
+                    0.9739846528167696,
+                    0.9460907944514502,
+                    0.9986296953087216
+                  ],
+                  "original_graph_components": 1,
+                  "candidate_graph_components": 1,
+                  "significant_component_size": 100,
+                  "original_significant_components": 1,
+                  "candidate_significant_components": 1,
+                  "candidate_small_component_mass": 0,
+                  "robust_edge_quantile": 0.99,
+                  "edge_strain_limits_enforced": false,
+                  "edge_stretch_p01": 0.6361968758039267,
+                  "edge_stretch_p50": 0.9996290321409975,
+                  "edge_stretch_p99": 1.4654132839596465,
+                  "edge_stretch_p999": 2.0567878336672707
+                },
+                {
+                  "alpha": 0.55,
+                  "observed_residual_before": 0.005676197041016438,
+                  "observed_residual_after": 0.0037005752825901503,
+                  "observed_improvement": 0.3480537663069766,
+                  "hidden_coverage_ratio": 0.9544161345387874,
+                  "hidden_coverage_per_view": [
+                    0.9770438481266028,
+                    0.9544161345387874,
+                    1.0012124151309407
+                  ],
+                  "original_graph_components": 1,
+                  "candidate_graph_components": 1,
+                  "significant_component_size": 100,
+                  "original_significant_components": 1,
+                  "candidate_significant_components": 1,
+                  "candidate_small_component_mass": 0,
+                  "robust_edge_quantile": 0.99,
+                  "edge_strain_limits_enforced": false,
+                  "edge_stretch_p01": 0.6847972129982891,
+                  "edge_stretch_p50": 0.9990986590805843,
+                  "edge_stretch_p99": 1.3457694763528651,
+                  "edge_stretch_p999": 1.7869800881666589
+                }
+              ],
+              "alpha": 0.55,
+              "observed_residual_before": 0.005676197041016438,
+              "observed_residual_after": 0.0037005752825901503,
+              "observed_improvement": 0.3480537663069766,
+              "hidden_coverage_ratio": 0.9544161345387874,
+              "hidden_coverage_per_view": [
+                0.9770438481266028,
+                0.9544161345387874,
+                1.0012124151309407
+              ],
+              "original_graph_components": 1,
+              "candidate_graph_components": 1,
+              "significant_component_size": 100,
+              "original_significant_components": 1,
+              "candidate_significant_components": 1,
+              "candidate_small_component_mass": 0,
+              "robust_edge_quantile": 0.99,
+              "edge_strain_limits_enforced": false,
+              "edge_stretch_p01": 0.6847972129982891,
+              "edge_stretch_p50": 0.9990986590805843,
+              "edge_stretch_p99": 1.3457694763528651,
+              "edge_stretch_p999": 1.7869800881666589
+            },
+            "topology_projection": {
+              "active": true,
+              "corrected_points": 1,
+              "passes": [
+                {
+                  "pass": 0,
+                  "components_before": 2,
+                  "new_small_fragment_points": 1
+                },
+                {
+                  "pass": 1,
+                  "components_before": 2,
+                  "new_small_fragment_points": 1
+                },
+                {
+                  "pass": 2,
+                  "components_before": 2,
+                  "new_small_fragment_points": 1
+                }
+              ]
+            }
+          },
+          "slender_rigidity_projection": {
+            "active": false,
+            "reason": "disabled",
+            "method": "covariance_detected_slender_region_se3_projection"
+          },
+          "posterior_diagnostics": {
+            "selection_gate_used": false,
+            "initial": {
+              "objective": 0.1171829629172057,
+              "visible_3d": 0.039412939578610036,
+              "visible_pair_count": 11097,
+              "silhouette_iou": 0.7705516265912306,
+              "coverage": 0.9818686468171004,
+              "leakage": 0.2183258243177318,
+              "depth_error_normalized": 0.04798863656257944
+            },
+            "candidate": {
+              "objective": 0.10362842497175673,
+              "visible_3d": 0.02365922183123386,
+              "visible_pair_count": 11093,
+              "silhouette_iou": 0.7763953935287335,
+              "coverage": 0.983004109292769,
+              "leakage": 0.21304071797535568,
+              "depth_error_normalized": 0.04161657663382018
+            },
+            "objective_delta": -0.013554537945448975,
+            "ground_truth_cd_emd_used": false
+          },
+          "edge_stretch_p01": 0.6847969239270834,
+          "edge_stretch_p50": 0.9990986590805843,
+          "edge_stretch_p99": 1.3457710478482108,
+          "edge_stretch_p999": 1.786980193121679
+        },
+        "strain": {
+          "edge_stretch_p01": 0.6866508170146716,
+          "edge_stretch_p50": 0.999147032205649,
+          "edge_stretch_p99": 1.3332360834630295,
+          "edge_stretch_p999": 1.752523137545696
+        },
+        "mean_before": 0.009461311622285626,
+        "mean_after": 0.0061469263163699845,
+        "connectivity": {
+          "passed": true,
+          "broken_components": 0,
+          "merged_components": 0,
+          "minimum_significant_size": 100,
+          "carrier_slots": 100000
+        },
+        "solver_integrity_passed": true,
+        "hard_passed": true,
+        "integrity_audit": {
+          "carrier_slots": 100000,
+          "finite": true,
+          "protected_slots": {
+            "count": 0,
+            "reference": "frozen_loop_initial_carrier",
+            "reference_coordinates_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "candidate_coordinates_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "exactly_preserved": true,
+            "maximum_displacement": 0.0
+          },
+          "cumulative_strain": {
+            "edge_stretch_p01": 0.5335886528930781,
+            "edge_stretch_p50": 0.9992646955157299,
+            "edge_stretch_p99": 1.6189952706348083,
+            "edge_stretch_p999": 2.3565733262338573
+          },
+          "strain_policy": "diagnostic_only_no_absolute_stretch_threshold",
+          "cumulative_reference": "fixed edges and coordinates at start of this loop, not previous round",
+          "maximum_step_displacement": 0.02602978790138807,
+          "passed": true
+        },
+        "current_regional_support": {
+          "passed": true,
+          "normalization": "partial_bbox_diagonal",
+          "camera": "saved_acquisition",
+          "regions": [
+            {
+              "tile": 2,
+              "observations": 34,
+              "mean_before": 0.03247577837120155,
+              "mean_after": 0.02441775760457783,
+              "regression": -0.008058020766623724
+            },
+            {
+              "tile": 3,
+              "observations": 57,
+              "mean_before": 0.012631424417826293,
+              "mean_after": 0.008517582385894304,
+              "regression": -0.00411384203193199
+            },
+            {
+              "tile": 5,
+              "observations": 99,
+              "mean_before": 0.002955801922245753,
+              "mean_after": 0.002166892501976032,
+              "regression": -0.0007889094202697207
+            },
+            {
+              "tile": 6,
+              "observations": 393,
+              "mean_before": 0.006052475993901103,
+              "mean_after": 0.0041421593114018985,
+              "regression": -0.0019103166824992032
+            },
+            {
+              "tile": 7,
+              "observations": 61,
+              "mean_before": 0.002072126127273009,
+              "mean_after": 0.0015472886447581947,
+              "regression": -0.0005248374825148148
+            },
+            {
+              "tile": 10,
+              "observations": 156,
+              "mean_before": 0.01080220877017723,
+              "mean_after": 0.007394056765282791,
+              "regression": -0.003408152004894438
+            },
+            {
+              "tile": 11,
+              "observations": 468,
+              "mean_before": 0.003869864741491747,
+              "mean_after": 0.002456741513245217,
+              "regression": -0.0014131232282465305
+            },
+            {
+              "tile": 12,
+              "observations": 442,
+              "mean_before": 0.005437633677921095,
+              "mean_after": 0.003811046695014482,
+              "regression": -0.0016265869829066126
+            },
+            {
+              "tile": 13,
+              "observations": 464,
+              "mean_before": 0.00420793444410705,
+              "mean_after": 0.002825803336432234,
+              "regression": -0.0013821311076748159
+            },
+            {
+              "tile": 14,
+              "observations": 475,
+              "mean_before": 0.0031594540683072873,
+              "mean_after": 0.0020558841571078445,
+              "regression": -0.0011035699111994425
+            },
+            {
+              "tile": 15,
+              "observations": 225,
+              "mean_before": 0.004259272638885066,
+              "mean_after": 0.0023666511636989667,
+              "regression": -0.001892621475186099
+            },
+            {
+              "tile": 18,
+              "observations": 69,
+              "mean_before": 0.0024083294709034662,
+              "mean_after": 0.0017252813784532253,
+              "regression": -0.0006830480924502408
+            },
+            {
+              "tile": 19,
+              "observations": 459,
+              "mean_before": 0.003088029561456756,
+              "mean_after": 0.0018730024355083034,
+              "regression": -0.0012150271259484529
+            },
+            {
+              "tile": 20,
+              "observations": 487,
+              "mean_before": 0.003104979998423231,
+              "mean_after": 0.0019225178928317925,
+              "regression": -0.0011824621055914386
+            },
+            {
+              "tile": 21,
+              "observations": 489,
+              "mean_before": 0.0044651154810918785,
+              "mean_after": 0.002462142958503893,
+              "regression": -0.002002972522587986
+            },
+            {
+              "tile": 22,
+              "observations": 454,
+              "mean_before": 0.0031465513605138545,
+              "mean_after": 0.0018785100529631097,
+              "regression": -0.0012680413075507446
+            },
+            {
+              "tile": 23,
+              "observations": 275,
+              "mean_before": 0.0023621860844779546,
+              "mean_after": 0.0016810333521954425,
+              "regression": -0.0006811527322825119
+            },
+            {
+              "tile": 27,
+              "observations": 111,
+              "mean_before": 0.003512513958657621,
+              "mean_after": 0.00207940761413891,
+              "regression": -0.0014331063445187113
+            },
+            {
+              "tile": 28,
+              "observations": 444,
+              "mean_before": 0.002245795220863153,
+              "mean_after": 0.0016880195072721239,
+              "regression": -0.0005577757135910287
+            },
+            {
+              "tile": 29,
+              "observations": 464,
+              "mean_before": 0.0037933145528813686,
+              "mean_after": 0.0022537081949557873,
+              "regression": -0.0015396063579255802
+            },
+            {
+              "tile": 30,
+              "observations": 427,
+              "mean_before": 0.0024995707342857936,
+              "mean_after": 0.001827285268319241,
+              "regression": -0.0006722854659665527
+            },
+            {
+              "tile": 31,
+              "observations": 20,
+              "mean_before": 0.0016184113723661663,
+              "mean_after": 0.0014948655013851913,
+              "regression": -0.0001235458709809745
+            },
+            {
+              "tile": 34,
+              "observations": 63,
+              "mean_before": 0.0070453907255360985,
+              "mean_after": 0.0058023709866371585,
+              "regression": -0.0012430197388989402
+            },
+            {
+              "tile": 35,
+              "observations": 269,
+              "mean_before": 0.0020715601635743486,
+              "mean_after": 0.0017779253756970397,
+              "regression": -0.0002936347878773091
+            },
+            {
+              "tile": 36,
+              "observations": 442,
+              "mean_before": 0.0015702090348940973,
+              "mean_after": 0.0014030195142694817,
+              "regression": -0.0001671895206246153
+            },
+            {
+              "tile": 37,
+              "observations": 468,
+              "mean_before": 0.0018777991913928713,
+              "mean_after": 0.0016882133239661406,
+              "regression": -0.00018958586742673063
+            },
+            {
+              "tile": 38,
+              "observations": 473,
+              "mean_before": 0.0027809906906277994,
+              "mean_after": 0.0019919272588812364,
+              "regression": -0.0007890634317465627
+            },
+            {
+              "tile": 39,
+              "observations": 21,
+              "mean_before": 0.0030157983898308873,
+              "mean_after": 0.00191164152244704,
+              "regression": -0.0011041568673838477
+            },
+            {
+              "tile": 41,
+              "observations": 27,
+              "mean_before": 0.013382148213511058,
+              "mean_after": 0.007551864470433095,
+              "regression": -0.00583028374307796
+            },
+            {
+              "tile": 42,
+              "observations": 393,
+              "mean_before": 0.010147359927444479,
+              "mean_after": 0.005871858615436843,
+              "regression": -0.004275501312007637
+            },
+            {
+              "tile": 43,
+              "observations": 449,
+              "mean_before": 0.01767152277508179,
+              "mean_after": 0.01276174014196345,
+              "regression": -0.004909782633118336
+            },
+            {
+              "tile": 44,
+              "observations": 474,
+              "mean_before": 0.0021751452610696336,
+              "mean_after": 0.0017074402388902862,
+              "regression": -0.00046770502217934756
+            },
+            {
+              "tile": 45,
+              "observations": 377,
+              "mean_before": 0.0023062852850751435,
+              "mean_after": 0.001813183373478653,
+              "regression": -0.0004931019115964905
+            },
+            {
+              "tile": 46,
+              "observations": 397,
+              "mean_before": 0.0024327129646820977,
+              "mean_after": 0.0018452983246989925,
+              "regression": -0.0005874146399831049
+            },
+            {
+              "tile": 48,
+              "observations": 179,
+              "mean_before": 0.009235232535009094,
+              "mean_after": 0.005232940195111098,
+              "regression": -0.004002292339897996
+            },
+            {
+              "tile": 49,
+              "observations": 389,
+              "mean_before": 0.006169281085705522,
+              "mean_after": 0.0034864744572241533,
+              "regression": -0.0026828066284813675
+            },
+            {
+              "tile": 50,
+              "observations": 473,
+              "mean_before": 0.017657615245513222,
+              "mean_after": 0.011514888272762303,
+              "regression": -0.006142726972750917
+            },
+            {
+              "tile": 51,
+              "observations": 239,
+              "mean_before": 0.02658946559038365,
+              "mean_after": 0.018479535622303925,
+              "regression": -0.008109929968079726
+            },
+            {
+              "tile": 52,
+              "observations": 479,
+              "mean_before": 0.0062936326577979216,
+              "mean_after": 0.0033548092619828094,
+              "regression": -0.002938823395815112
+            },
+            {
+              "tile": 53,
+              "observations": 249,
+              "mean_before": 0.0028454550899912473,
+              "mean_after": 0.0023193768406389276,
+              "regression": -0.0005260782493523193
+            },
+            {
+              "tile": 54,
+              "observations": 390,
+              "mean_before": 0.0017266594248253942,
+              "mean_after": 0.0014594032702889442,
+              "regression": -0.00026725615453644983
+            },
+            {
+              "tile": 55,
+              "observations": 44,
+              "mean_before": 0.001614237154083533,
+              "mean_after": 0.0016395629031474757,
+              "regression": 2.5325749063942752e-05
+            },
+            {
+              "tile": 56,
+              "observations": 332,
+              "mean_before": 0.009975384499720349,
+              "mean_after": 0.00533924897762782,
+              "regression": -0.0046361355220925285
+            },
+            {
+              "tile": 57,
+              "observations": 469,
+              "mean_before": 0.01746362726503005,
+              "mean_after": 0.009118309770611469,
+              "regression": -0.008345317494418582
+            },
+            {
+              "tile": 58,
+              "observations": 395,
+              "mean_before": 0.011252680243556634,
+              "mean_after": 0.007063116224671128,
+              "regression": -0.004189564018885506
+            },
+            {
+              "tile": 59,
+              "observations": 28,
+              "mean_before": 0.012367864165750092,
+              "mean_after": 0.00875188418479149,
+              "regression": -0.003615979980958605
+            },
+            {
+              "tile": 60,
+              "observations": 382,
+              "mean_before": 0.004598862946495512,
+              "mean_after": 0.003341398531849971,
+              "regression": -0.0012574644146455412
+            },
+            {
+              "tile": 61,
+              "observations": 88,
+              "mean_before": 0.008147728173957001,
+              "mean_after": 0.005510200310365156,
+              "regression": -0.0026375278635918462
+            },
+            {
+              "tile": 62,
+              "observations": 145,
+              "mean_before": 0.0018624237001950339,
+              "mean_after": 0.0015713139975919712,
+              "regression": -0.00029110970260306227
+            },
+            {
+              "tile": 63,
+              "observations": 89,
+              "mean_before": 0.001460335104165076,
+              "mean_after": 0.0013686766325542196,
+              "regression": -9.165847161085608e-05
+            }
+          ],
+          "regressed_fraction": 0.0,
+          "maximum_regression": 2.5325749063942752e-05,
+          "regional_tolerance": 0.002,
+          "maximum_regressed_fraction": 0.2,
+          "maximum_allowed_regression": 0.006,
+          "no_immobile_part_assumption": true
+        },
+        "initial_regional_support": {
+          "passed": true,
+          "normalization": "partial_bbox_diagonal",
+          "camera": "saved_acquisition",
+          "regions": [
+            {
+              "tile": 2,
+              "observations": 34,
+              "mean_before": 0.03765737458425234,
+              "mean_after": 0.02441775760457783,
+              "regression": -0.013239616979674514
+            },
+            {
+              "tile": 3,
+              "observations": 57,
+              "mean_before": 0.017215534149439805,
+              "mean_after": 0.008517582385894304,
+              "regression": -0.008697951763545504
+            },
+            {
+              "tile": 5,
+              "observations": 99,
+              "mean_before": 0.004443347622912872,
+              "mean_after": 0.002166892501976032,
+              "regression": -0.002276455120936839
+            },
+            {
+              "tile": 6,
+              "observations": 393,
+              "mean_before": 0.0100657562107657,
+              "mean_after": 0.0041421593114018985,
+              "regression": -0.005923596899363803
+            },
+            {
+              "tile": 7,
+              "observations": 61,
+              "mean_before": 0.004763765290432025,
+              "mean_after": 0.0015472886447581947,
+              "regression": -0.003216476645673831
+            },
+            {
+              "tile": 10,
+              "observations": 156,
+              "mean_before": 0.015441190438618703,
+              "mean_after": 0.007394056765282791,
+              "regression": -0.008047133673335911
+            },
+            {
+              "tile": 11,
+              "observations": 468,
+              "mean_before": 0.006738573627520826,
+              "mean_after": 0.002456741513245217,
+              "regression": -0.004281832114275611
+            },
+            {
+              "tile": 12,
+              "observations": 442,
+              "mean_before": 0.008929138893156397,
+              "mean_after": 0.003811046695014482,
+              "regression": -0.005118092198141916
+            },
+            {
+              "tile": 13,
+              "observations": 464,
+              "mean_before": 0.00749779011364203,
+              "mean_after": 0.002825803336432234,
+              "regression": -0.004671986777209796
+            },
+            {
+              "tile": 14,
+              "observations": 475,
+              "mean_before": 0.006418126681146042,
+              "mean_after": 0.0020558841571078445,
+              "regression": -0.004362242524038198
+            },
+            {
+              "tile": 15,
+              "observations": 225,
+              "mean_before": 0.008874325797369104,
+              "mean_after": 0.0023666511636989667,
+              "regression": -0.006507674633670136
+            },
+            {
+              "tile": 18,
+              "observations": 69,
+              "mean_before": 0.0036884412839411304,
+              "mean_after": 0.0017252813784532253,
+              "regression": -0.0019631599054879046
+            },
+            {
+              "tile": 19,
+              "observations": 459,
+              "mean_before": 0.007510399865566317,
+              "mean_after": 0.0018730024355083034,
+              "regression": -0.005637397430058014
+            },
+            {
+              "tile": 20,
+              "observations": 487,
+              "mean_before": 0.008498195323888276,
+              "mean_after": 0.0019225178928317925,
+              "regression": -0.006575677431056484
+            },
+            {
+              "tile": 21,
+              "observations": 489,
+              "mean_before": 0.008804045878169613,
+              "mean_after": 0.002462142958503893,
+              "regression": -0.006341902919665721
+            },
+            {
+              "tile": 22,
+              "observations": 454,
+              "mean_before": 0.009294804271995418,
+              "mean_after": 0.0018785100529631097,
+              "regression": -0.007416294219032308
+            },
+            {
+              "tile": 23,
+              "observations": 275,
+              "mean_before": 0.005833453361100883,
+              "mean_after": 0.0016810333521954425,
+              "regression": -0.004152420008905441
+            },
+            {
+              "tile": 27,
+              "observations": 111,
+              "mean_before": 0.005075588877516018,
+              "mean_after": 0.00207940761413891,
+              "regression": -0.0029961812633771093
+            },
+            {
+              "tile": 28,
+              "observations": 444,
+              "mean_before": 0.004129701721545212,
+              "mean_after": 0.0016880195072721239,
+              "regression": -0.0024416822142730877
+            },
+            {
+              "tile": 29,
+              "observations": 464,
+              "mean_before": 0.007583027955480054,
+              "mean_after": 0.0022537081949557873,
+              "regression": -0.005329319760524265
+            },
+            {
+              "tile": 30,
+              "observations": 427,
+              "mean_before": 0.005130221325890858,
+              "mean_after": 0.001827285268319241,
+              "regression": -0.003302936057571618
+            },
+            {
+              "tile": 31,
+              "observations": 20,
+              "mean_before": 0.003371819464247936,
+              "mean_after": 0.0014948655013851913,
+              "regression": -0.0018769539628627444
+            },
+            {
+              "tile": 34,
+              "observations": 63,
+              "mean_before": 0.008918701230164123,
+              "mean_after": 0.0058023709866371585,
+              "regression": -0.0031163302435269625
+            },
+            {
+              "tile": 35,
+              "observations": 269,
+              "mean_before": 0.0036392455115519906,
+              "mean_after": 0.0017779253756970397,
+              "regression": -0.0018613201358549508
+            },
+            {
+              "tile": 36,
+              "observations": 442,
+              "mean_before": 0.0022855430978951847,
+              "mean_after": 0.0014030195142694817,
+              "regression": -0.0008825235836257033
+            },
+            {
+              "tile": 37,
+              "observations": 468,
+              "mean_before": 0.0035454169220713525,
+              "mean_after": 0.0016882133239661406,
+              "regression": -0.001857203598105212
+            },
+            {
+              "tile": 38,
+              "observations": 473,
+              "mean_before": 0.004160768990004953,
+              "mean_after": 0.0019919272588812364,
+              "regression": -0.002168841731123716
+            },
+            {
+              "tile": 39,
+              "observations": 21,
+              "mean_before": 0.005764501442225645,
+              "mean_after": 0.00191164152244704,
+              "regression": -0.003852859919778606
+            },
+            {
+              "tile": 41,
+              "observations": 27,
+              "mean_before": 0.018610565320046298,
+              "mean_after": 0.007551864470433095,
+              "regression": -0.011058700849613197
+            },
+            {
+              "tile": 42,
+              "observations": 393,
+              "mean_before": 0.014948603302777584,
+              "mean_after": 0.005871858615436843,
+              "regression": -0.00907674468734074
+            },
+            {
+              "tile": 43,
+              "observations": 449,
+              "mean_before": 0.023006147938244435,
+              "mean_after": 0.01276174014196345,
+              "regression": -0.010244407796280981
+            },
+            {
+              "tile": 44,
+              "observations": 474,
+              "mean_before": 0.0033044558939427236,
+              "mean_after": 0.0017074402388902862,
+              "regression": -0.0015970156550524374
+            },
+            {
+              "tile": 45,
+              "observations": 377,
+              "mean_before": 0.00448260128787058,
+              "mean_after": 0.001813183373478653,
+              "regression": -0.002669417914391928
+            },
+            {
+              "tile": 46,
+              "observations": 397,
+              "mean_before": 0.005298041416120443,
+              "mean_after": 0.0018452983246989925,
+              "regression": -0.0034527430914214497
+            },
+            {
+              "tile": 48,
+              "observations": 179,
+              "mean_before": 0.013220773432134127,
+              "mean_after": 0.005232940195111098,
+              "regression": -0.00798783323702303
+            },
+            {
+              "tile": 49,
+              "observations": 389,
+              "mean_before": 0.01147946859721285,
+              "mean_after": 0.0034864744572241533,
+              "regression": -0.007992994139988698
+            },
+            {
+              "tile": 50,
+              "observations": 473,
+              "mean_before": 0.023298617337116984,
+              "mean_after": 0.011514888272762303,
+              "regression": -0.011783729064354681
+            },
+            {
+              "tile": 51,
+              "observations": 239,
+              "mean_before": 0.03266809110867958,
+              "mean_after": 0.018479535622303925,
+              "regression": -0.014188555486375664
+            },
+            {
+              "tile": 52,
+              "observations": 479,
+              "mean_before": 0.010817858934755528,
+              "mean_after": 0.0033548092619828094,
+              "regression": -0.007463049672772718
+            },
+            {
+              "tile": 53,
+              "observations": 249,
+              "mean_before": 0.005565197243384599,
+              "mean_after": 0.0023193768406389276,
+              "regression": -0.0032458204027456714
+            },
+            {
+              "tile": 54,
+              "observations": 390,
+              "mean_before": 0.003464499378221291,
+              "mean_after": 0.0014594032702889442,
+              "regression": -0.0020050961079323467
+            },
+            {
+              "tile": 55,
+              "observations": 44,
+              "mean_before": 0.002104062879369741,
+              "mean_after": 0.0016395629031474757,
+              "regression": -0.00046449997622226546
+            },
+            {
+              "tile": 56,
+              "observations": 332,
+              "mean_before": 0.014253065825635541,
+              "mean_after": 0.00533924897762782,
+              "regression": -0.008913816848007721
+            },
+            {
+              "tile": 57,
+              "observations": 469,
+              "mean_before": 0.023633759034804754,
+              "mean_after": 0.009118309770611469,
+              "regression": -0.014515449264193287
+            },
+            {
+              "tile": 58,
+              "observations": 395,
+              "mean_before": 0.014636860538667699,
+              "mean_after": 0.007063116224671128,
+              "regression": -0.007573744313996569
+            },
+            {
+              "tile": 59,
+              "observations": 28,
+              "mean_before": 0.017853135499633944,
+              "mean_after": 0.00875188418479149,
+              "regression": -0.009101251314842459
+            },
+            {
+              "tile": 60,
+              "observations": 382,
+              "mean_before": 0.007168328743424698,
+              "mean_after": 0.003341398531849971,
+              "regression": -0.0038269302115747266
+            },
+            {
+              "tile": 61,
+              "observations": 88,
+              "mean_before": 0.012836966837361468,
+              "mean_after": 0.005510200310365156,
+              "regression": -0.00732676652699631
+            },
+            {
+              "tile": 62,
+              "observations": 145,
+              "mean_before": 0.004031893235507612,
+              "mean_after": 0.0015713139975919712,
+              "regression": -0.0024605792379156404
+            },
+            {
+              "tile": 63,
+              "observations": 89,
+              "mean_before": 0.002186349888940481,
+              "mean_after": 0.0013686766325542196,
+              "regression": -0.0008176732563862615
+            }
+          ],
+          "regressed_fraction": 0.0,
+          "maximum_regression": -0.00046449997622226546,
+          "regional_tolerance": 0.002,
+          "maximum_regressed_fraction": 0.2,
+          "maximum_allowed_regression": 0.006,
+          "no_immobile_part_assumption": true
+        }
+      },
+      "before": {
+        "coverage": [
+          0.9810835443037975,
+          0.9563893370906529,
+          0.9496631301788895,
+          0.9443718443718444,
+          0.9534707328555736,
+          0.9709295774647887
+        ],
+        "depth": [
+          0.04333255464367284,
+          0.06332007935523516,
+          0.03952766572668281,
+          0.05570028928400369,
+          0.049472641548239694,
+          0.04769554512886671
+        ],
+        "partial_to_carrier_p90": 0.015964193238446205,
+        "partial_to_carrier_p99": 0.04145350402155288,
+        "partial_to_carrier_median": 0.0027073669697769195
+      },
+      "after": {
+        "coverage": [
+          0.9825620253164556,
+          0.9628661682158035,
+          0.9598595730400888,
+          0.9554796554796555,
+          0.9619971752890097,
+          0.9723943661971831
+        ],
+        "depth": [
+          0.038619652427165585,
+          0.05912194278562614,
+          0.03461249719559176,
+          0.05104798082929353,
+          0.04223233788533792,
+          0.04049019462136707
+        ],
+        "partial_to_carrier_p90": 0.008516912101499205,
+        "partial_to_carrier_p99": 0.03167536517796426,
+        "partial_to_carrier_median": 0.001985786615593758
+      },
+      "local_evidence": {
+        "metric": "observed-to-carrier nearest distance; not semantic correctness",
+        "synthetic_views_are_not_independent_observations": true,
+        "whole_scan_mean_before": 0.009461311622285626,
+        "whole_scan_mean_after": 0.0061469263163699845,
+        "review_regions": [
+          {
+            "view": 3,
+            "tile": [
+              5,
+              6
+            ],
+            "observed_points": 474,
+            "mean_before": 0.03193019439491025,
+            "mean_after": 0.018127274380093907,
+            "mean_gain": 0.013802920014816351,
+            "box": [
+              288,
+              352,
+              416,
+              480
+            ],
+            "role": "largest_measured_gain"
+          },
+          {
+            "view": 4,
+            "tile": [
+              4,
+              1
+            ],
+            "observed_points": 11,
+            "mean_before": 0.007772139657592079,
+            "mean_after": 0.00782843181382555,
+            "mean_gain": -5.629215623346882e-05,
+            "box": [
+              224,
+              32,
+              352,
+              160
+            ],
+            "role": "largest_regression_or_smallest_gain"
+          }
+        ]
+      }
+    },
+    "images": [
+      "workspace/semantic_refinement_astra/custom10/cartoon_fox/joint_refinement_run/round_05/before.png",
+      "workspace/semantic_refinement_astra/custom10/cartoon_fox/joint_refinement_run/round_05/after_0.png",
+      "workspace/semantic_refinement_astra/custom10/cartoon_fox/joint_refinement_run/round_05/local_comparison_0.png"
+    ]
+  },
+  "parameters": {
+    "point_count": 100000,
+    "diagnostic_resolution": [
+      512,
+      512
+    ],
+    "view_count": 6,
+    "view_policy": "preserve_four_plus_fixed_elevation_pair_v1",
+    "resize_policy": "shared cameras and canvases; no point-cloud crop or recentering",
+    "solver": {
+      "operator": "baseline_partial_ot_posterior",
+      "fraction": 1.0,
+      "field": {
+        "active": true,
+        "method": "structure_aware_partial_ot_complete_gaussian_posterior",
+        "strict_zero_shot": true,
+        "ground_truth_cd_emd_used": false,
+        "category_or_part_rules_used": false,
+        "carrier_slots_before": 100000,
+        "carrier_slots_after": 100000,
+        "carrier_slots_preserved": true,
+        "config": {
+          "partial_samples": 3072,
+          "prior_samples": 6144,
+          "normal_neighbours": 24,
+          "transport_iterations": 60,
+          "transport_relaxation": 0.72,
+          "transport_temperature_floor": 0.012,
+          "maximum_3d_ratio": 0.34,
+          "maximum_screen_ratio": 0.28,
+          "maximum_depth_ratio": 0.34,
+          "structural_rescue_candidates": 48,
+          "structural_rescue_screen_fraction": 0.55,
+          "structural_rescue_depth_fraction": 0.7,
+          "intrinsic_landmarks": 8,
+          "intrinsic_graph_neighbours": 12,
+          "minimum_transport_pairs": 96,
+          "stable_spacing_multiplier": 3.0,
+          "stable_residual_quantile": 0.22,
+          "residual_quantile": 0.42,
+          "require_localized_residual_evidence": true,
+          "coarse_node_fraction": 0.02,
+          "fine_node_fraction": 0.055,
+          "minimum_graph_nodes": 192,
+          "maximum_graph_nodes": 6144,
+          "skinning_neighbours": 4,
+          "low_frequency_modes": 24,
+          "low_frequency_regularization": 0.035,
+          "low_frequency_stable_weight": 6.0,
+          "coarse_neighbours": 18,
+          "coarse_edge_ratio": 2.45,
+          "coarse_data_weight": 2.5,
+          "coarse_screening": 0.0008,
+          "coarse_iterations": 5,
+          "coarse_displacement_ratio": 0.28,
+          "fine_neighbours": 10,
+          "fine_edge_ratio": 1.85,
+          "fine_data_weight": 4.0,
+          "fine_screening": 0.003,
+          "fine_iterations": 5,
+          "fine_displacement_ratio": 0.12,
+          "bending_regularization": 0.0,
+          "attachment_edge_ratio": 3.2,
+          "minimum_observed_improvement": 0.025,
+          "minimum_edge_compression": 0.55,
+          "maximum_edge_stretch": 2.8,
+          "enforce_edge_strain_limits": false,
+          "minimum_hidden_coverage": 0.95,
+          "coverage_resolution": 160,
+          "integrated_observation_fusion": true,
+          "assimilation_samples": 6144,
+          "assimilation_pixel_radius": 1.0,
+          "assimilation_cross_view_pixel_radius": 2.0,
+          "assimilation_minimum_view_support": 1,
+          "assimilation_separate_stable_anchors": false,
+          "assimilation_stable_quantile": 0.25,
+          "assimilation_hard_residual_targets": false,
+          "assimilation_coherent_residual_targets": false,
+          "assimilation_data_weight": 2.0,
+          "assimilation_screening": 0.004,
+          "assimilation_iterations": 3,
+          "assimilation_displacement_ratio": 0.05,
+          "assimilation_anchor_residual_ratio": 0.03,
+          "slender_rigidity_projection": false,
+          "slender_neighbours": 128,
+          "slender_linearity_quantile": 0.95,
+          "slender_minimum_fraction": 0.003,
+          "slender_minimum_aspect_ratio": 6.0,
+          "slender_dilation_steps": 2
+        },
+        "stages": [
+          {
+            "stage": "coarse",
+            "active": false,
+            "reason": "insufficient_residual_transport_pairs",
+            "transport": {
+              "active": false,
+              "method": "multiview_camera_structure_unbalanced_partial_transport",
+              "device": "cuda",
+              "view_count": 1,
+              "view_evidence": [
+                {
+                  "view": 0,
+                  "partial_visible": 2842,
+                  "prior_visible": 6144,
+                  "supported_pairs": 17461248
+                }
+              ],
+              "partial_diagonal": 1.5934643873839316,
+              "partial_spacing": 0.0033872161310978133,
+              "visible_prior": 29184,
+              "partial_samples": 3072,
+              "prior_samples": 6144,
+              "valid_transport_rows": 2842,
+              "retained_capacity_pairs": 0,
+              "stable_pairs": 626,
+              "coherent_residual_rows": 0,
+              "raw_coherent_residual_rows": 1604,
+              "coherent_residual_fraction": 0.5643912737508796,
+              "coherent_prior_support_fraction": 0.16536458333333334,
+              "localization_bound": 0.19999999999999998,
+              "localized_residual_evidence": false,
+              "residual_pairs": 0,
+              "stable_prior": 2692,
+              "residual_prior": 0,
+              "unsupported_prior": 97308,
+              "unmatched_partial_fraction": 0.7962239583333334,
+              "temperature": 0.012,
+              "stable_limit": 0.024174688869072827,
+              "residual_limit": 0.0423140842071864,
+              "residual_median": null,
+              "residual_p90": null
+            }
+          }
+        ],
+        "supported_stable": 2692,
+        "supported_stable_final": 0,
+        "supported_residual": 0,
+        "unsupported": 97308,
+        "moved": 100000,
+        "hidden_coverage_ratio": 0.9544161345387874,
+        "hidden_coverage_per_view": [
+          0.9770438481266028,
+          0.9544161345387874,
+          1.0012124151309407
+        ],
+        "integrity": {
+          "input_connected_components": 2,
+          "output_connected_components": 2,
+          "new_connected_components": 0,
+          "component_significance_size": 100,
+          "input_significant_components": 1,
+          "output_significant_components": 1,
+          "input_component_sizes": [
+            99999,
+            1
+          ],
+          "output_component_sizes": [
+            99999,
+            1
+          ],
+          "tracked_original_edges": 499487,
+          "tracked_edge_replacement_fraction": 7.207394787051515e-05,
+          "stable_motion_p50": 0.0022677101302881154,
+          "stable_motion_p95": 0.008953360159487282,
+          "stable_motion_max": 0.014569198954531968,
+          "passed": true
+        },
+        "topology_projection": {
+          "active": false,
+          "corrected_points": 0,
+          "passes": [
+            {
+              "pass": 0,
+              "components_before": 2,
+              "new_small_fragment_points": 0
+            }
+          ]
+        },
+        "observation_assimilation": {
+          "active": true,
+          "method": "integrated_four_view_observation_assimilation",
+          "positive_evidence": {
+            "views": [
+              {
+                "view_index": 0,
+                "partial_visible_pixels": 14306,
+                "prior_visible_pixels": 60111,
+                "nearby_pixel_pairs": 14172,
+                "mutual_pixel_pairs": 10767,
+                "max_pixel_distance": 1.0,
+                "radius_relaxed": false,
+                "pair_subsample_limit": 100000
+              },
+              {
+                "view_index": 1,
+                "partial_visible_pixels": 13240,
+                "prior_visible_pixels": 66545,
+                "nearby_pixel_pairs": 12907,
+                "mutual_pixel_pairs": 9367,
+                "max_pixel_distance": 1.0,
+                "radius_relaxed": false,
+                "pair_subsample_limit": 100000
+              },
+              {
+                "view_index": 2,
+                "partial_visible_pixels": 11369,
+                "prior_visible_pixels": 66806,
+                "nearby_pixel_pairs": 10954,
+                "mutual_pixel_pairs": 7765,
+                "max_pixel_distance": 1.0,
+                "radius_relaxed": false,
+                "pair_subsample_limit": 100000
+              },
+              {
+                "view_index": 3,
+                "partial_visible_pixels": 10906,
+                "prior_visible_pixels": 63304,
+                "nearby_pixel_pairs": 10496,
+                "mutual_pixel_pairs": 7303,
+                "max_pixel_distance": 1.0,
+                "radius_relaxed": false,
+                "pair_subsample_limit": 100000
+              },
+              {
+                "view_index": 4,
+                "partial_visible_pixels": 12340,
+                "prior_visible_pixels": 55556,
+                "nearby_pixel_pairs": 12009,
+                "mutual_pixel_pairs": 8503,
+                "max_pixel_distance": 1.0,
+                "radius_relaxed": false,
+                "pair_subsample_limit": 100000
+              },
+              {
+                "view_index": 5,
+                "partial_visible_pixels": 11895,
+                "prior_visible_pixels": 53965,
+                "nearby_pixel_pairs": 11722,
+                "mutual_pixel_pairs": 8286,
+                "max_pixel_distance": 1.0,
+                "radius_relaxed": false,
+                "pair_subsample_limit": 100000
+              }
+            ],
+            "raw_visible_pairs": 51991,
+            "unique_physical_pairs": 50314,
+            "support_histogram": {
+              "0": 23207,
+              "1": 10713,
+              "2": 4838,
+              "3": 2166,
+              "4": 1071,
+              "5": 1369,
+              "6": 6950
+            },
+            "cross_view_pixel_radius": 2.0,
+            "cross_view_depth_limit": 0.04780393162151795
+          },
+          "assignment": {
+            "pixel_pairs": 27107,
+            "within_metric_limit": 26883,
+            "collision_free_pairs": 12021,
+            "max_residual": 0.04780393162151795,
+            "residual_median": 0.009816916090353263,
+            "residual_p90": 0.03559549207810468,
+            "selected_support_mean": 3.7238166541885036
+          },
+          "retained_anchors": 6144,
+          "residual_anchors": 6144,
+          "stable_gaussians": 0,
+          "stable_limit": null,
+          "solver": {
+            "active": true,
+            "field": "hierarchical_embedded_arap_posterior",
+            "graph_nodes": 11257,
+            "node_graph_edges": 56202,
+            "attachment_edges": 0,
+            "carrier_graph_edges": 499487,
+            "carrier_attachment_edges": 2,
+            "target_gaussians": 6144,
+            "stable_gaussians": 0,
+            "moved_gaussians": 100000,
+            "moved_fraction": 1.0,
+            "maximum_displacement": 0.02602978790138807,
+            "mean_displacement": 0.006428859727310346,
+            "coherent_targets": {
+              "components": 0,
+              "regularized_targets": 0
+            },
+            "node_solver": {
+              "active": true,
+              "field": "soft_full_surface_arap_posterior",
+              "surface_graph_edges": 56202,
+              "attachment_edges": 0,
+              "coherent_targets": {
+                "components": 0,
+                "regularized_targets": 0
+              },
+              "hard_target_constraints": false,
+              "line_search": [
+                {
+                  "alpha": 1.0,
+                  "observed_residual_before": 0.005676197041016438,
+                  "observed_residual_after": 0.0012242836626745,
+                  "observed_improvement": 0.7843126914327013,
+                  "hidden_coverage_ratio": 0.9516083119840593,
+                  "hidden_coverage_per_view": [
+                    0.9846196868008948,
+                    0.9516083119840593,
+                    0.9869782971619365
+                  ],
+                  "original_graph_components": 1,
+                  "candidate_graph_components": 1,
+                  "edge_stretch_p01": 0.4575776307023475,
+                  "edge_stretch_p50": 1.0109583361816759,
+                  "edge_stretch_p99": 2.2805425125099967,
+                  "edge_stretch_p999": 4.510390107115008,
+                  "significant_component_size": 32,
+                  "original_significant_components": 1,
+                  "candidate_significant_components": 1,
+                  "candidate_small_component_mass": 0,
+                  "edge_strain_limits_enforced": false
+                }
+              ],
+              "target_gaussians": 6144,
+              "stable_gaussians": 0,
+              "moved_gaussians": 11257,
+              "moved_fraction": 1.0,
+              "maximum_displacement": 0.04507219497538258,
+              "mean_displacement": 0.011499366969218982,
+              "cg_status": [
+                0,
+                0,
+                0
+              ],
+              "alpha": 1.0,
+              "observed_residual_before": 0.005676197041016438,
+              "observed_residual_after": 0.0012242836626745,
+              "observed_improvement": 0.7843126914327013,
+              "hidden_coverage_ratio": 0.9516083119840593,
+              "hidden_coverage_per_view": [
+                0.9846196868008948,
+                0.9516083119840593,
+                0.9869782971619365
+              ],
+              "original_graph_components": 1,
+              "candidate_graph_components": 1,
+              "edge_stretch_p01": 0.4575776307023475,
+              "edge_stretch_p50": 1.0109583361816759,
+              "edge_stretch_p99": 2.2805425125099967,
+              "edge_stretch_p999": 4.510390107115008,
+              "significant_component_size": 32,
+              "original_significant_components": 1,
+              "candidate_significant_components": 1,
+              "candidate_small_component_mass": 0,
+              "edge_strain_limits_enforced": false
+            },
+            "preserve_target_amplitude": false,
+            "hard_target_constraints": false,
+            "node_minimum_edge_compression": null,
+            "line_search": [
+              {
+                "alpha": 1.0,
+                "observed_residual_before": 0.005676197041016438,
+                "observed_residual_after": 0.002869616280712229,
+                "observed_improvement": 0.49444738088261186,
+                "hidden_coverage_ratio": 0.9289795918367347,
+                "hidden_coverage_per_view": [
+                  0.9753593429158111,
+                  0.9289795918367347,
+                  1.0017750524447313
+                ],
+                "original_graph_components": 1,
+                "candidate_graph_components": 1,
+                "significant_component_size": 100,
+                "original_significant_components": 1,
+                "candidate_significant_components": 1,
+                "candidate_small_component_mass": 0,
+                "robust_edge_quantile": 0.99,
+                "edge_strain_limits_enforced": false,
+                "edge_stretch_p01": 0.5771380700912804,
+                "edge_stretch_p50": 1.0016656658589624,
+                "edge_stretch_p99": 1.740147437636218,
+                "edge_stretch_p999": 2.64584588077214
+              },
+              {
+                "alpha": 0.85,
+                "observed_residual_before": 0.005676197041016438,
+                "observed_residual_after": 0.003047050705638789,
+                "observed_improvement": 0.4631879965369995,
+                "hidden_coverage_ratio": 0.9354169286882154,
+                "hidden_coverage_per_view": [
+                  0.9730419623957166,
+                  0.9354169286882154,
+                  0.9999193418293273
+                ],
+                "original_graph_components": 1,
+                "candidate_graph_components": 1,
+                "significant_component_size": 100,
+                "original_significant_components": 1,
+                "candidate_significant_components": 1,
+                "candidate_small_component_mass": 0,
+                "robust_edge_quantile": 0.99,
+                "edge_strain_limits_enforced": false,
+                "edge_stretch_p01": 0.6019668912863425,
+                "edge_stretch_p50": 1.0003689976729906,
+                "edge_stretch_p99": 1.5981269095413864,
+                "edge_stretch_p999": 2.3446332509655865
+              },
+              {
+                "alpha": 0.7,
+                "observed_residual_before": 0.005676197041016438,
+                "observed_residual_after": 0.003342820460247291,
+                "observed_improvement": 0.4110809691608782,
+                "hidden_coverage_ratio": 0.9460907944514502,
+                "hidden_coverage_per_view": [
+                  0.9739846528167696,
+                  0.9460907944514502,
+                  0.9986296953087216
+                ],
+                "original_graph_components": 1,
+                "candidate_graph_components": 1,
+                "significant_component_size": 100,
+                "original_significant_components": 1,
+                "candidate_significant_components": 1,
+                "candidate_small_component_mass": 0,
+                "robust_edge_quantile": 0.99,
+                "edge_strain_limits_enforced": false,
+                "edge_stretch_p01": 0.6361968758039267,
+                "edge_stretch_p50": 0.9996290321409975,
+                "edge_stretch_p99": 1.4654132839596465,
+                "edge_stretch_p999": 2.0567878336672707
+              },
+              {
+                "alpha": 0.55,
+                "observed_residual_before": 0.005676197041016438,
+                "observed_residual_after": 0.0037005752825901503,
+                "observed_improvement": 0.3480537663069766,
+                "hidden_coverage_ratio": 0.9544161345387874,
+                "hidden_coverage_per_view": [
+                  0.9770438481266028,
+                  0.9544161345387874,
+                  1.0012124151309407
+                ],
+                "original_graph_components": 1,
+                "candidate_graph_components": 1,
+                "significant_component_size": 100,
+                "original_significant_components": 1,
+                "candidate_significant_components": 1,
+                "candidate_small_component_mass": 0,
+                "robust_edge_quantile": 0.99,
+                "edge_strain_limits_enforced": false,
+                "edge_stretch_p01": 0.6847972129982891,
+                "edge_stretch_p50": 0.9990986590805843,
+                "edge_stretch_p99": 1.3457694763528651,
+                "edge_stretch_p999": 1.7869800881666589
+              }
+            ],
+            "alpha": 0.55,
+            "observed_residual_before": 0.005676197041016438,
+            "observed_residual_after": 0.0037005752825901503,
+            "observed_improvement": 0.3480537663069766,
+            "hidden_coverage_ratio": 0.9544161345387874,
+            "hidden_coverage_per_view": [
+              0.9770438481266028,
+              0.9544161345387874,
+              1.0012124151309407
+            ],
+            "original_graph_components": 1,
+            "candidate_graph_components": 1,
+            "significant_component_size": 100,
+            "original_significant_components": 1,
+            "candidate_significant_components": 1,
+            "candidate_small_component_mass": 0,
+            "robust_edge_quantile": 0.99,
+            "edge_strain_limits_enforced": false,
+            "edge_stretch_p01": 0.6847972129982891,
+            "edge_stretch_p50": 0.9990986590805843,
+            "edge_stretch_p99": 1.3457694763528651,
+            "edge_stretch_p999": 1.7869800881666589
+          },
+          "topology_projection": {
+            "active": true,
+            "corrected_points": 1,
+            "passes": [
+              {
+                "pass": 0,
+                "components_before": 2,
+                "new_small_fragment_points": 1
+              },
+              {
+                "pass": 1,
+                "components_before": 2,
+                "new_small_fragment_points": 1
+              },
+              {
+                "pass": 2,
+                "components_before": 2,
+                "new_small_fragment_points": 1
+              }
+            ]
+          }
+        },
+        "slender_rigidity_projection": {
+          "active": false,
+          "reason": "disabled",
+          "method": "covariance_detected_slender_region_se3_projection"
+        },
+        "posterior_diagnostics": {
+          "selection_gate_used": false,
+          "initial": {
+            "objective": 0.1171829629172057,
+            "visible_3d": 0.039412939578610036,
+            "visible_pair_count": 11097,
+            "silhouette_iou": 0.7705516265912306,
+            "coverage": 0.9818686468171004,
+            "leakage": 0.2183258243177318,
+            "depth_error_normalized": 0.04798863656257944
+          },
+          "candidate": {
+            "objective": 0.10362842497175673,
+            "visible_3d": 0.02365922183123386,
+            "visible_pair_count": 11093,
+            "silhouette_iou": 0.7763953935287335,
+            "coverage": 0.983004109292769,
+            "leakage": 0.21304071797535568,
+            "depth_error_normalized": 0.04161657663382018
+          },
+          "objective_delta": -0.013554537945448975,
+          "ground_truth_cd_emd_used": false
+        },
+        "edge_stretch_p01": 0.6847969239270834,
+        "edge_stretch_p50": 0.9990986590805843,
+        "edge_stretch_p99": 1.3457710478482108,
+        "edge_stretch_p999": 1.786980193121679
+      },
+      "strain": {
+        "edge_stretch_p01": 0.6866508170146716,
+        "edge_stretch_p50": 0.999147032205649,
+        "edge_stretch_p99": 1.3332360834630295,
+        "edge_stretch_p999": 1.752523137545696
+      },
+      "mean_before": 0.009461311622285626,
+      "mean_after": 0.0061469263163699845,
+      "connectivity": {
+        "passed": true,
+        "broken_components": 0,
+        "merged_components": 0,
+        "minimum_significant_size": 100,
+        "carrier_slots": 100000
+      },
+      "solver_integrity_passed": true,
+      "hard_passed": true,
+      "integrity_audit": {
+        "carrier_slots": 100000,
+        "finite": true,
+        "protected_slots": {
+          "count": 0,
+          "reference": "frozen_loop_initial_carrier",
+          "reference_coordinates_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "candidate_coordinates_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "exactly_preserved": true,
+          "maximum_displacement": 0.0
+        },
+        "cumulative_strain": {
+          "edge_stretch_p01": 0.5335886528930781,
+          "edge_stretch_p50": 0.9992646955157299,
+          "edge_stretch_p99": 1.6189952706348083,
+          "edge_stretch_p999": 2.3565733262338573
+        },
+        "strain_policy": "diagnostic_only_no_absolute_stretch_threshold",
+        "cumulative_reference": "fixed edges and coordinates at start of this loop, not previous round",
+        "maximum_step_displacement": 0.02602978790138807,
+        "passed": true
+      },
+      "current_regional_support": {
+        "passed": true,
+        "normalization": "partial_bbox_diagonal",
+        "camera": "saved_acquisition",
+        "regions": [
+          {
+            "tile": 2,
+            "observations": 34,
+            "mean_before": 0.03247577837120155,
+            "mean_after": 0.02441775760457783,
+            "regression": -0.008058020766623724
+          },
+          {
+            "tile": 3,
+            "observations": 57,
+            "mean_before": 0.012631424417826293,
+            "mean_after": 0.008517582385894304,
+            "regression": -0.00411384203193199
+          },
+          {
+            "tile": 5,
+            "observations": 99,
+            "mean_before": 0.002955801922245753,
+            "mean_after": 0.002166892501976032,
+            "regression": -0.0007889094202697207
+          },
+          {
+            "tile": 6,
+            "observations": 393,
+            "mean_before": 0.006052475993901103,
+            "mean_after": 0.0041421593114018985,
+            "regression": -0.0019103166824992032
+          },
+          {
+            "tile": 7,
+            "observations": 61,
+            "mean_before": 0.002072126127273009,
+            "mean_after": 0.0015472886447581947,
+            "regression": -0.0005248374825148148
+          },
+          {
+            "tile": 10,
+            "observations": 156,
+            "mean_before": 0.01080220877017723,
+            "mean_after": 0.007394056765282791,
+            "regression": -0.003408152004894438
+          },
+          {
+            "tile": 11,
+            "observations": 468,
+            "mean_before": 0.003869864741491747,
+            "mean_after": 0.002456741513245217,
+            "regression": -0.0014131232282465305
+          },
+          {
+            "tile": 12,
+            "observations": 442,
+            "mean_before": 0.005437633677921095,
+            "mean_after": 0.003811046695014482,
+            "regression": -0.0016265869829066126
+          },
+          {
+            "tile": 13,
+            "observations": 464,
+            "mean_before": 0.00420793444410705,
+            "mean_after": 0.002825803336432234,
+            "regression": -0.0013821311076748159
+          },
+          {
+            "tile": 14,
+            "observations": 475,
+            "mean_before": 0.0031594540683072873,
+            "mean_after": 0.0020558841571078445,
+            "regression": -0.0011035699111994425
+          },
+          {
+            "tile": 15,
+            "observations": 225,
+            "mean_before": 0.004259272638885066,
+            "mean_after": 0.0023666511636989667,
+            "regression": -0.001892621475186099
+          },
+          {
+            "tile": 18,
+            "observations": 69,
+            "mean_before": 0.0024083294709034662,
+            "mean_after": 0.0017252813784532253,
+            "regression": -0.0006830480924502408
+          },
+          {
+            "tile": 19,
+            "observations": 459,
+            "mean_before": 0.003088029561456756,
+            "mean_after": 0.0018730024355083034,
+            "regression": -0.0012150271259484529
+          },
+          {
+            "tile": 20,
+            "observations": 487,
+            "mean_before": 0.003104979998423231,
+            "mean_after": 0.0019225178928317925,
+            "regression": -0.0011824621055914386
+          },
+          {
+            "tile": 21,
+            "observations": 489,
+            "mean_before": 0.0044651154810918785,
+            "mean_after": 0.002462142958503893,
+            "regression": -0.002002972522587986
+          },
+          {
+            "tile": 22,
+            "observations": 454,
+            "mean_before": 0.0031465513605138545,
+            "mean_after": 0.0018785100529631097,
+            "regression": -0.0012680413075507446
+          },
+          {
+            "tile": 23,
+            "observations": 275,
+            "mean_before": 0.0023621860844779546,
+            "mean_after": 0.0016810333521954425,
+            "regression": -0.0006811527322825119
+          },
+          {
+            "tile": 27,
+            "observations": 111,
+            "mean_before": 0.003512513958657621,
+            "mean_after": 0.00207940761413891,
+            "regression": -0.0014331063445187113
+          },
+          {
+            "tile": 28,
+            "observations": 444,
+            "mean_before": 0.002245795220863153,
+            "mean_after": 0.0016880195072721239,
+            "regression": -0.0005577757135910287
+          },
+          {
+            "tile": 29,
+            "observations": 464,
+            "mean_before": 0.0037933145528813686,
+            "mean_after": 0.0022537081949557873,
+            "regression": -0.0015396063579255802
+          },
+          {
+            "tile": 30,
+            "observations": 427,
+            "mean_before": 0.0024995707342857936,
+            "mean_after": 0.001827285268319241,
+            "regression": -0.0006722854659665527
+          },
+          {
+            "tile": 31,
+            "observations": 20,
+            "mean_before": 0.0016184113723661663,
+            "mean_after": 0.0014948655013851913,
+            "regression": -0.0001235458709809745
+          },
+          {
+            "tile": 34,
+            "observations": 63,
+            "mean_before": 0.0070453907255360985,
+            "mean_after": 0.0058023709866371585,
+            "regression": -0.0012430197388989402
+          },
+          {
+            "tile": 35,
+            "observations": 269,
+            "mean_before": 0.0020715601635743486,
+            "mean_after": 0.0017779253756970397,
+            "regression": -0.0002936347878773091
+          },
+          {
+            "tile": 36,
+            "observations": 442,
+            "mean_before": 0.0015702090348940973,
+            "mean_after": 0.0014030195142694817,
+            "regression": -0.0001671895206246153
+          },
+          {
+            "tile": 37,
+            "observations": 468,
+            "mean_before": 0.0018777991913928713,
+            "mean_after": 0.0016882133239661406,
+            "regression": -0.00018958586742673063
+          },
+          {
+            "tile": 38,
+            "observations": 473,
+            "mean_before": 0.0027809906906277994,
+            "mean_after": 0.0019919272588812364,
+            "regression": -0.0007890634317465627
+          },
+          {
+            "tile": 39,
+            "observations": 21,
+            "mean_before": 0.0030157983898308873,
+            "mean_after": 0.00191164152244704,
+            "regression": -0.0011041568673838477
+          },
+          {
+            "tile": 41,
+            "observations": 27,
+            "mean_before": 0.013382148213511058,
+            "mean_after": 0.007551864470433095,
+            "regression": -0.00583028374307796
+          },
+          {
+            "tile": 42,
+            "observations": 393,
+            "mean_before": 0.010147359927444479,
+            "mean_after": 0.005871858615436843,
+            "regression": -0.004275501312007637
+          },
+          {
+            "tile": 43,
+            "observations": 449,
+            "mean_before": 0.01767152277508179,
+            "mean_after": 0.01276174014196345,
+            "regression": -0.004909782633118336
+          },
+          {
+            "tile": 44,
+            "observations": 474,
+            "mean_before": 0.0021751452610696336,
+            "mean_after": 0.0017074402388902862,
+            "regression": -0.00046770502217934756
+          },
+          {
+            "tile": 45,
+            "observations": 377,
+            "mean_before": 0.0023062852850751435,
+            "mean_after": 0.001813183373478653,
+            "regression": -0.0004931019115964905
+          },
+          {
+            "tile": 46,
+            "observations": 397,
+            "mean_before": 0.0024327129646820977,
+            "mean_after": 0.0018452983246989925,
+            "regression": -0.0005874146399831049
+          },
+          {
+            "tile": 48,
+            "observations": 179,
+            "mean_before": 0.009235232535009094,
+            "mean_after": 0.005232940195111098,
+            "regression": -0.004002292339897996
+          },
+          {
+            "tile": 49,
+            "observations": 389,
+            "mean_before": 0.006169281085705522,
+            "mean_after": 0.0034864744572241533,
+            "regression": -0.0026828066284813675
+          },
+          {
+            "tile": 50,
+            "observations": 473,
+            "mean_before": 0.017657615245513222,
+            "mean_after": 0.011514888272762303,
+            "regression": -0.006142726972750917
+          },
+          {
+            "tile": 51,
+            "observations": 239,
+            "mean_before": 0.02658946559038365,
+            "mean_after": 0.018479535622303925,
+            "regression": -0.008109929968079726
+          },
+          {
+            "tile": 52,
+            "observations": 479,
+            "mean_before": 0.0062936326577979216,
+            "mean_after": 0.0033548092619828094,
+            "regression": -0.002938823395815112
+          },
+          {
+            "tile": 53,
+            "observations": 249,
+            "mean_before": 0.0028454550899912473,
+            "mean_after": 0.0023193768406389276,
+            "regression": -0.0005260782493523193
+          },
+          {
+            "tile": 54,
+            "observations": 390,
+            "mean_before": 0.0017266594248253942,
+            "mean_after": 0.0014594032702889442,
+            "regression": -0.00026725615453644983
+          },
+          {
+            "tile": 55,
+            "observations": 44,
+            "mean_before": 0.001614237154083533,
+            "mean_after": 0.0016395629031474757,
+            "regression": 2.5325749063942752e-05
+          },
+          {
+            "tile": 56,
+            "observations": 332,
+            "mean_before": 0.009975384499720349,
+            "mean_after": 0.00533924897762782,
+            "regression": -0.0046361355220925285
+          },
+          {
+            "tile": 57,
+            "observations": 469,
+            "mean_before": 0.01746362726503005,
+            "mean_after": 0.009118309770611469,
+            "regression": -0.008345317494418582
+          },
+          {
+            "tile": 58,
+            "observations": 395,
+            "mean_before": 0.011252680243556634,
+            "mean_after": 0.007063116224671128,
+            "regression": -0.004189564018885506
+          },
+          {
+            "tile": 59,
+            "observations": 28,
+            "mean_before": 0.012367864165750092,
+            "mean_after": 0.00875188418479149,
+            "regression": -0.003615979980958605
+          },
+          {
+            "tile": 60,
+            "observations": 382,
+            "mean_before": 0.004598862946495512,
+            "mean_after": 0.003341398531849971,
+            "regression": -0.0012574644146455412
+          },
+          {
+            "tile": 61,
+            "observations": 88,
+            "mean_before": 0.008147728173957001,
+            "mean_after": 0.005510200310365156,
+            "regression": -0.0026375278635918462
+          },
+          {
+            "tile": 62,
+            "observations": 145,
+            "mean_before": 0.0018624237001950339,
+            "mean_after": 0.0015713139975919712,
+            "regression": -0.00029110970260306227
+          },
+          {
+            "tile": 63,
+            "observations": 89,
+            "mean_before": 0.001460335104165076,
+            "mean_after": 0.0013686766325542196,
+            "regression": -9.165847161085608e-05
+          }
+        ],
+        "regressed_fraction": 0.0,
+        "maximum_regression": 2.5325749063942752e-05,
+        "regional_tolerance": 0.002,
+        "maximum_regressed_fraction": 0.2,
+        "maximum_allowed_regression": 0.006,
+        "no_immobile_part_assumption": true
+      },
+      "initial_regional_support": {
+        "passed": true,
+        "normalization": "partial_bbox_diagonal",
+        "camera": "saved_acquisition",
+        "regions": [
+          {
+            "tile": 2,
+            "observations": 34,
+            "mean_before": 0.03765737458425234,
+            "mean_after": 0.02441775760457783,
+            "regression": -0.013239616979674514
+          },
+          {
+            "tile": 3,
+            "observations": 57,
+            "mean_before": 0.017215534149439805,
+            "mean_after": 0.008517582385894304,
+            "regression": -0.008697951763545504
+          },
+          {
+            "tile": 5,
+            "observations": 99,
+            "mean_before": 0.004443347622912872,
+            "mean_after": 0.002166892501976032,
+            "regression": -0.002276455120936839
+          },
+          {
+            "tile": 6,
+            "observations": 393,
+            "mean_before": 0.0100657562107657,
+            "mean_after": 0.0041421593114018985,
+            "regression": -0.005923596899363803
+          },
+          {
+            "tile": 7,
+            "observations": 61,
+            "mean_before": 0.004763765290432025,
+            "mean_after": 0.0015472886447581947,
+            "regression": -0.003216476645673831
+          },
+          {
+            "tile": 10,
+            "observations": 156,
+            "mean_before": 0.015441190438618703,
+            "mean_after": 0.007394056765282791,
+            "regression": -0.008047133673335911
+          },
+          {
+            "tile": 11,
+            "observations": 468,
+            "mean_before": 0.006738573627520826,
+            "mean_after": 0.002456741513245217,
+            "regression": -0.004281832114275611
+          },
+          {
+            "tile": 12,
+            "observations": 442,
+            "mean_before": 0.008929138893156397,
+            "mean_after": 0.003811046695014482,
+            "regression": -0.005118092198141916
+          },
+          {
+            "tile": 13,
+            "observations": 464,
+            "mean_before": 0.00749779011364203,
+            "mean_after": 0.002825803336432234,
+            "regression": -0.004671986777209796
+          },
+          {
+            "tile": 14,
+            "observations": 475,
+            "mean_before": 0.006418126681146042,
+            "mean_after": 0.0020558841571078445,
+            "regression": -0.004362242524038198
+          },
+          {
+            "tile": 15,
+            "observations": 225,
+            "mean_before": 0.008874325797369104,
+            "mean_after": 0.0023666511636989667,
+            "regression": -0.006507674633670136
+          },
+          {
+            "tile": 18,
+            "observations": 69,
+            "mean_before": 0.0036884412839411304,
+            "mean_after": 0.0017252813784532253,
+            "regression": -0.0019631599054879046
+          },
+          {
+            "tile": 19,
+            "observations": 459,
+            "mean_before": 0.007510399865566317,
+            "mean_after": 0.0018730024355083034,
+            "regression": -0.005637397430058014
+          },
+          {
+            "tile": 20,
+            "observations": 487,
+            "mean_before": 0.008498195323888276,
+            "mean_after": 0.0019225178928317925,
+            "regression": -0.006575677431056484
+          },
+          {
+            "tile": 21,
+            "observations": 489,
+            "mean_before": 0.008804045878169613,
+            "mean_after": 0.002462142958503893,
+            "regression": -0.006341902919665721
+          },
+          {
+            "tile": 22,
+            "observations": 454,
+            "mean_before": 0.009294804271995418,
+            "mean_after": 0.0018785100529631097,
+            "regression": -0.007416294219032308
+          },
+          {
+            "tile": 23,
+            "observations": 275,
+            "mean_before": 0.005833453361100883,
+            "mean_after": 0.0016810333521954425,
+            "regression": -0.004152420008905441
+          },
+          {
+            "tile": 27,
+            "observations": 111,
+            "mean_before": 0.005075588877516018,
+            "mean_after": 0.00207940761413891,
+            "regression": -0.0029961812633771093
+          },
+          {
+            "tile": 28,
+            "observations": 444,
+            "mean_before": 0.004129701721545212,
+            "mean_after": 0.0016880195072721239,
+            "regression": -0.0024416822142730877
+          },
+          {
+            "tile": 29,
+            "observations": 464,
+            "mean_before": 0.007583027955480054,
+            "mean_after": 0.0022537081949557873,
+            "regression": -0.005329319760524265
+          },
+          {
+            "tile": 30,
+            "observations": 427,
+            "mean_before": 0.005130221325890858,
+            "mean_after": 0.001827285268319241,
+            "regression": -0.003302936057571618
+          },
+          {
+            "tile": 31,
+            "observations": 20,
+            "mean_before": 0.003371819464247936,
+            "mean_after": 0.0014948655013851913,
+            "regression": -0.0018769539628627444
+          },
+          {
+            "tile": 34,
+            "observations": 63,
+            "mean_before": 0.008918701230164123,
+            "mean_after": 0.0058023709866371585,
+            "regression": -0.0031163302435269625
+          },
+          {
+            "tile": 35,
+            "observations": 269,
+            "mean_before": 0.0036392455115519906,
+            "mean_after": 0.0017779253756970397,
+            "regression": -0.0018613201358549508
+          },
+          {
+            "tile": 36,
+            "observations": 442,
+            "mean_before": 0.0022855430978951847,
+            "mean_after": 0.0014030195142694817,
+            "regression": -0.0008825235836257033
+          },
+          {
+            "tile": 37,
+            "observations": 468,
+            "mean_before": 0.0035454169220713525,
+            "mean_after": 0.0016882133239661406,
+            "regression": -0.001857203598105212
+          },
+          {
+            "tile": 38,
+            "observations": 473,
+            "mean_before": 0.004160768990004953,
+            "mean_after": 0.0019919272588812364,
+            "regression": -0.002168841731123716
+          },
+          {
+            "tile": 39,
+            "observations": 21,
+            "mean_before": 0.005764501442225645,
+            "mean_after": 0.00191164152244704,
+            "regression": -0.003852859919778606
+          },
+          {
+            "tile": 41,
+            "observations": 27,
+            "mean_before": 0.018610565320046298,
+            "mean_after": 0.007551864470433095,
+            "regression": -0.011058700849613197
+          },
+          {
+            "tile": 42,
+            "observations": 393,
+            "mean_before": 0.014948603302777584,
+            "mean_after": 0.005871858615436843,
+            "regression": -0.00907674468734074
+          },
+          {
+            "tile": 43,
+            "observations": 449,
+            "mean_before": 0.023006147938244435,
+            "mean_after": 0.01276174014196345,
+            "regression": -0.010244407796280981
+          },
+          {
+            "tile": 44,
+            "observations": 474,
+            "mean_before": 0.0033044558939427236,
+            "mean_after": 0.0017074402388902862,
+            "regression": -0.0015970156550524374
+          },
+          {
+            "tile": 45,
+            "observations": 377,
+            "mean_before": 0.00448260128787058,
+            "mean_after": 0.001813183373478653,
+            "regression": -0.002669417914391928
+          },
+          {
+            "tile": 46,
+            "observations": 397,
+            "mean_before": 0.005298041416120443,
+            "mean_after": 0.0018452983246989925,
+            "regression": -0.0034527430914214497
+          },
+          {
+            "tile": 48,
+            "observations": 179,
+            "mean_before": 0.013220773432134127,
+            "mean_after": 0.005232940195111098,
+            "regression": -0.00798783323702303
+          },
+          {
+            "tile": 49,
+            "observations": 389,
+            "mean_before": 0.01147946859721285,
+            "mean_after": 0.0034864744572241533,
+            "regression": -0.007992994139988698
+          },
+          {
+            "tile": 50,
+            "observations": 473,
+            "mean_before": 0.023298617337116984,
+            "mean_after": 0.011514888272762303,
+            "regression": -0.011783729064354681
+          },
+          {
+            "tile": 51,
+            "observations": 239,
+            "mean_before": 0.03266809110867958,
+            "mean_after": 0.018479535622303925,
+            "regression": -0.014188555486375664
+          },
+          {
+            "tile": 52,
+            "observations": 479,
+            "mean_before": 0.010817858934755528,
+            "mean_after": 0.0033548092619828094,
+            "regression": -0.007463049672772718
+          },
+          {
+            "tile": 53,
+            "observations": 249,
+            "mean_before": 0.005565197243384599,
+            "mean_after": 0.0023193768406389276,
+            "regression": -0.0032458204027456714
+          },
+          {
+            "tile": 54,
+            "observations": 390,
+            "mean_before": 0.003464499378221291,
+            "mean_after": 0.0014594032702889442,
+            "regression": -0.0020050961079323467
+          },
+          {
+            "tile": 55,
+            "observations": 44,
+            "mean_before": 0.002104062879369741,
+            "mean_after": 0.0016395629031474757,
+            "regression": -0.00046449997622226546
+          },
+          {
+            "tile": 56,
+            "observations": 332,
+            "mean_before": 0.014253065825635541,
+            "mean_after": 0.00533924897762782,
+            "regression": -0.008913816848007721
+          },
+          {
+            "tile": 57,
+            "observations": 469,
+            "mean_before": 0.023633759034804754,
+            "mean_after": 0.009118309770611469,
+            "regression": -0.014515449264193287
+          },
+          {
+            "tile": 58,
+            "observations": 395,
+            "mean_before": 0.014636860538667699,
+            "mean_after": 0.007063116224671128,
+            "regression": -0.007573744313996569
+          },
+          {
+            "tile": 59,
+            "observations": 28,
+            "mean_before": 0.017853135499633944,
+            "mean_after": 0.00875188418479149,
+            "regression": -0.009101251314842459
+          },
+          {
+            "tile": 60,
+            "observations": 382,
+            "mean_before": 0.007168328743424698,
+            "mean_after": 0.003341398531849971,
+            "regression": -0.0038269302115747266
+          },
+          {
+            "tile": 61,
+            "observations": 88,
+            "mean_before": 0.012836966837361468,
+            "mean_after": 0.005510200310365156,
+            "regression": -0.00732676652699631
+          },
+          {
+            "tile": 62,
+            "observations": 145,
+            "mean_before": 0.004031893235507612,
+            "mean_after": 0.0015713139975919712,
+            "regression": -0.0024605792379156404
+          },
+          {
+            "tile": 63,
+            "observations": 89,
+            "mean_before": 0.002186349888940481,
+            "mean_after": 0.0013686766325542196,
+            "regression": -0.0008176732563862615
+          }
+        ],
+        "regressed_fraction": 0.0,
+        "maximum_regression": -0.00046449997622226546,
+        "regional_tolerance": 0.002,
+        "maximum_regressed_fraction": 0.2,
+        "maximum_allowed_regression": 0.006,
+        "no_immobile_part_assumption": true
+      }
+    },
+    "image_generation_steps_cfg_scheduler": "NOT APPLICABLE"
+  },
+  "postprocessing": "Baseline partial-OT posterior update after prior semantic corrections and two observation fields. No new Image Gen/RMBG/Pixal/MoGe or final fusion in this candidate.",
+  "preservation": "Keep this approved checkpoint unchanged; new candidates may improve all regions. Prioritize the single remaining foot and check the other regions for regression.",
+  "reproducibility": "Not exactly reproducible as a hosted MLLM run: checkpoint/seed unknown. Frozen point cloud, prompts, decisions and source snapshots are recorded."
+}
+```
+
+
+## 2026-11-05T11:21:40.396849+00:00 — Fox same-foot candidate verified (not user approved)
+
+- Preserved user-approved joint round-05 baseline unchanged; both user circles identify one physical foot in views 2 and 5.
+- New candidate: `/data/project/cr/CompAgent/workspace/semantic_refinement_astra/custom10/cartoon_fox/local_correspondence_run/selected_100k.ply`; SHA256 `647f485061039f0a3f2443cd4c608ee773d05178cb3e822013e1413712f9fd95`; 100,000 ordered points, refinement only.
+- Round 2 accepted with paired prior/observed windows and cross-view controls. Later round 3/4 proposals rejected; independent fixed-slot part review also accepted round 2. No exact region locks or hard strain-ratio vetoes.
+- Fixed-part observed mean 0.0277272 → 0.00757518; one view-local regression 0.01107 → 0.01714 remains a documented tradeoff.
+- Frozen offline CD-L1×100 / EMD×100: approved baseline 2.559833 / 3.189849; candidate 2.311149 / 2.785310. GT scores never entered agent prompts or selection.
+- GPT-6 Astra medium; exact prompts, source snapshots, inputs, point-cloud hashes, annotations, candidates and reviews are under `/data/project/cr/CompAgent/workspace/semantic_refinement_astra/custom10/cartoon_fox/local_correspondence_run`. Hosted checkpoint/seed/temperature UNKNOWN. This is human-assisted, not autonomous cross-dataset validation or mainline promotion.
+
+
+## 2026-11-05T19:27:54.558004+08:00 — USER APPROVED fox local correction and colored overlay
+
+Exact artifact copies and complete acceptance record: `/data/project/cr/CompAgent/workspace/semantic_refinement_astra/custom10/cartoon_fox/approved_local_round02/acceptance.json`. This supersedes the earlier not-yet-approved status; all verbatim prompts and full numerical parameters follow. No automatic generalization claim.
+
+```json
+{
+  "timestamp": "2026-11-05T19:27:54.558004+08:00",
+  "sample": "cartoon_fox",
+  "user_approval": "效果可以说非常好 我要的就是这种感觉",
+  "scope": "The new red/blue point-cloud overlay and final local correction are approved. This remains a human-assisted reference, not evidence of autonomous generalization.",
+  "outputs": [
+    {
+      "path": "/data/project/cr/CompAgent/workspace/semantic_refinement_astra/custom10/cartoon_fox/approved_local_round02/approved_100k.ply",
+      "sha256": "647f485061039f0a3f2443cd4c608ee773d05178cb3e822013e1413712f9fd95"
+    },
+    {
+      "path": "/data/project/cr/CompAgent/workspace/semantic_refinement_astra/custom10/cartoon_fox/approved_local_round02/approved_red_partial_blue.ply",
+      "sha256": "a1139c1346b406b59ef570998a56ac79623c6936c67df8bf5a85177e93f1807e"
+    },
+    {
+      "path": "/data/project/cr/CompAgent/workspace/semantic_refinement_astra/custom10/cartoon_fox/approved_local_round02/approved.png",
+      "sha256": "28a88ac788eb33624434f686345a4d98cdfb3a3d0707fd39ea9254bad8b0456f"
+    },
+    {
+      "path": "/data/project/cr/CompAgent/workspace/semantic_refinement_astra/custom10/cartoon_fox/approved_local_round02/part_comparison.png",
+      "sha256": "d4e1d08c64301fe9a6a916c67ec9b5a7346064fe9c53b15aaa2e65ef2662b9ff"
+    }
+  ],
+  "inputs": {
+    "prior": "/data/project/cr/CompAgent/workspace/semantic_refinement_astra/custom10/cartoon_fox/local_correspondence_run/initial_registered_100k.ply",
+    "partial": "/data/project/cr/CompAgent/workspace/semantic_refinement_astra/custom10/cartoon_fox/local_correspondence_run/inputs/partial/cartoon_fox.ply",
+    "camera": "/data/project/cr/CompAgent/workspace/semantic_refinement_astra/custom10/cartoon_fox/local_correspondence_run/inputs/camera/cartoon_fox/camera.pth",
+    "annotations": [
+      "/data/project/cr/CompAgent/workspace/semantic_refinement_astra/custom10/cartoon_fox/local_correspondence_run/feedback/annotation_1.png",
+      "/data/project/cr/CompAgent/workspace/semantic_refinement_astra/custom10/cartoon_fox/local_correspondence_run/feedback/annotation_2.png"
+    ],
+    "parent_provenance": {
+      "timestamp": "2026-11-05T19:01:21.242846+08:00",
+      "sample": "cartoon_fox",
+      "user_approval": [
+        "效果还不错 只剩下我圈起来的这个脚还有些差距了",
+        "还有这个圈起来的 这两代表的是一个脚",
+        "除此之外都挺满意的"
+      ],
+      "scope": "Overall result satisfactory except the SAME foot indicated in diagnostic views 2 and 5. Preserve as comparison baseline, not a coordinate lock.",
+      "output": "/data/project/cr/CompAgent/workspace/semantic_refinement_astra/custom10/cartoon_fox/approved_joint_round05/approved_100k.ply",
+      "output_sha256": "4559c99c1f65ab5e2fce12deb3cc75b63f540c5e4d1938ecfc83b0e50a263861",
+      "source": "/data/project/cr/CompAgent/workspace/semantic_refinement_astra/custom10/cartoon_fox/joint_refinement_run/round_05/accepted_100k.ply",
+      "image": "/data/project/cr/CompAgent/workspace/semantic_refinement_astra/custom10/cartoon_fox/approved_joint_round05/approved.png",
+      "inputs": {
+        "carrier": "/data/project/cr/CompAgent/workspace/semantic_refinement_astra/custom10/cartoon_fox/joint_refinement_run/round_03/accepted_100k.ply",
+        "partial": "/data/project/cr/CompAgent/workspace/semantic_refinement_astra/custom10/cartoon_fox/joint_refinement_run/inputs/partial/cartoon_fox.ply",
+        "camera": "/data/project/cr/CompAgent/workspace/semantic_refinement_astra/custom10/cartoon_fox/joint_refinement_run/inputs/camera/cartoon_fox/camera.pth",
+        "diagnostic_views": "/data/project/cr/CompAgent/workspace/semantic_refinement_astra/custom10/cartoon_fox/joint_refinement_run/render_manifest.json"
+      },
+      "model": "gpt-6-astra",
+      "reasoning_effort": "medium",
+      "checkpoint": "UNKNOWN",
+      "transformer_path": "NOT APPLICABLE (hosted Codex model)",
+      "seed": "UNKNOWN",
+      "temperature": "UNKNOWN",
+      "negative_prompt": "NONE; structured geometric planning/review, no image generation in this stage",
+      "prompt_verbatim": {
+        "instructions": "You control geometric refinement of a complete generated prior against an incomplete physical scan. Attached images are paired 512x512 panels: LEFT BLUE is observed partial, RIGHT RED is complete prior. Both use the same camera. Each image is one view numbered consecutively from zero; the supplied payload gives the view count. Grid coordinates are percentages of each individual panel, not of the whole image. Unobserved prior surfaces must remain complete. First distinguish common global misalignment from a specific corresponding part with different pose/shape. Choose DEFORM_REGION only when the SAME physical part and its attachment are identifiable in both clouds. Choose REFINE_ALIGNMENT if several reliable parts share a common pose/scale offset; choose KEEP_CURRENT if ambiguous. For DEFORM_REGION, name the part, and outline its entire prior extent using a tight polygon in TWO different views; include its attachment boundary, exclude adjacent unrelated parts. Give 3 to 5 physically corresponding visible SURFACE landmarks along attachment, middle and extremity; never click empty space, a hidden centreline, or different sides of a part. Landmarks may use different views; select the clearest visible surface. Keep the first attachment landmark near its current location when attachment is already correct. Explain correspondence and intended deformation using multi-view depth and contour evidence. Do not use ground truth or invent numeric 3D coordinates or transforms. Do not force deformation just to improve overlap. Return uncertainty explicitly. Prioritize the largest coherent unresolved semantic mismatch, not tiny surface noise. Additional tools are available: coherent rigid part motion and smooth low-frequency RBF bending/length correction, both with graph attachment transitions. Missing scan connections alone do not make a visible distal part impossible to correct: use visible corresponding surfaces, preserve the unobserved attachment smoothly, and let geometry checks bound the proposal. When a clear local mismatch remains, uncertainty should trigger closer inspection of supplied zooms, new visible surface correspondences or trying another part/tool. KEEP_CURRENT is justified only when fit is adequate or concrete alternative routes have been exhausted. Explain which routes were tried. Extra images are magnified windows of the original views; their grid labels remain ORIGINAL panel percentages. Do not copy pixel positions from previous geometry blindly. Each candidate is audited against fixed loop-start rest edges and exact protected coordinates. Review receives explicit coordinate hashes and maximum protected displacement. Protection applies only to listed slots, not automatically to every previously edited part. Do not repeat a deterministic action at unchanged geometry after its candidate fractions are exhausted. Use the concrete rejection evidence to change correspondence/tool or justify stopping. A previously approved shape is a comparison baseline, not an immutable part. When protected_surface_slots is zero, every part may move or deform, including through global registration. Regional observed-support checks limit regressions against the current and frozen initial carrier without locking point coordinates. Judge both local improvement and natural complete structure. Edge-stretch percentiles, including cumulative strain, are DIAGNOSTICS ONLY. There is no universal 1.5 expansion or 0.6 compression rejection rule: a mismatched generated prior may need substantial changes of proportion. Earlier rejections based solely on those ratios are superseded. Judge supported alignment and natural structure; use large strain as a reason to inspect the changed region, not automatic rejection or automatic acceptance. REFINE_OBSERVED is also available: the existing baseline continuous observation field performs small distributed surface corrections using reliable cross-view matches, without requiring semantic part landmarks. Use it when part poses are reasonable but nontrivial distributed 3D residual remains. This tool was absent in earlier semantic-only pilots. It is a candidate requiring the same preservation and visual review, not an automatic acceptance. Consider this route before declaring remaining errors uncorrectable. Protected slots remain exactly fixed. UPDATE_POSTERIOR is available for broader distributed mismatch: the existing baseline coarse-to-fine partial optimal transport and PosteriorAdapter uses the actual saved acquisition camera for transport, with diagnostic views for positive surface support. This is an alternative to small observation-field steps or semantic part landmarks, not a mandatory action. Its full/half/quarter proposals undergo the SAME fixed-rest and exact-protection checks; the rest reference is not reset. Consider it if clear distributed mismatch remains and fine surface steps are inadequate. Do not use it to force hidden completion to fit missing scan data.",
+        "payload": {
+          "available_actions": [
+            "DEFORM_REGION",
+            "REFINE_ALIGNMENT",
+            "KEEP_CURRENT",
+            "REFINE_OBSERVED",
+            "UPDATE_POSTERIOR"
+          ],
+          "view_count": 6,
+          "protected_surface_slots": 0,
+          "round": 5,
+          "remaining_rounds": 3,
+          "observation": {
+            "coverage": [
+              0.9810835443037975,
+              0.9563893370906529,
+              0.9496631301788895,
+              0.9443718443718444,
+              0.9534707328555736,
+              0.9709295774647887
+            ],
+            "depth": [
+              0.04333255464367284,
+              0.06332007935523516,
+              0.03952766572668281,
+              0.05570028928400369,
+              0.049472641548239694,
+              0.04769554512886671
+            ],
+            "partial_to_carrier_p90": 0.015964193238446205,
+            "partial_to_carrier_p99": 0.04145350402155288,
+            "partial_to_carrier_median": 0.0027073669697769195
+          },
+          "user_feedback": "Continue from accepted geometry. No region is frozen by prior approval. Edge-stretch ratios are diagnostics only, now at both controller and nested solver levels; previous ratio-based rejections are superseded. Choose geometry tools according to visible residuals and accept supported improvements with natural complete structure. Do not replace the removed limits with invented numeric strain cutoffs. No GT or offline scores are available.",
+          "history": [
+            {
+              "action": "REFINE_OBSERVED",
+              "part": "Distributed visible surfaces of the head, legs, and tail",
+              "accepted": true,
+              "review": {
+                "action": "ACCEPT_UPDATE",
+                "reason": "Small distributed corrections improve measured 3D alignment while preserving plausible fox anatomy and visible attachments, with no demonstrated structural regression.",
+                "evidence": [
+                  "Whole-scan mean residual decreases from 0.01505 to 0.01308; median decreases from 0.00617 to 0.00446. Depth residuals improve in all six views.",
+                  "The corresponding ear crop improves from 0.02968 to 0.02552; the least-improved crop also improves slightly. No evaluated region regresses.",
+                  "Across the boards, ears, head, legs, paws, and tail retain consistent semantic correspondence and natural structure; no visible collapse or detachment appears.",
+                  "Connectivity reports zero broken or merged components. Fixed-rest cumulative strain has p01 0.761 and p99 1.255; hidden coverage remains 0.9899.",
+                  "The integrity audit passes, but its protected-slot count is zero, so it establishes no protected anatomical region."
+                ]
+              },
+              "error": null,
+              "geometric_rejections": null,
+              "correspondence_validation": null,
+              "repeated_candidates": null
+            },
+            {
+              "action": "REFINE_OBSERVED",
+              "part": "Visible ear, leg, paw, and tail surfaces",
+              "accepted": true,
+              "review": {
+                "action": "ACCEPT_UPDATE",
+                "reason": "Small distributed corrections improve measured 3D alignment while preserving visible fox structure and plausible part correspondence, with no demonstrated structural regression.",
+                "evidence": [
+                  "Whole-scan mean distance improves from 0.013085 to 0.012015; depth residuals improve in all six views and every evaluated region improves.",
+                  "The corresponding ear crop improves from 0.02552 to 0.02283; even the least-improved crop improves slightly.",
+                  "Before/after views retain natural ears, legs, paws, torso, and tail attachments without visible collapse or wrong-part association; connectivity reports zero broken or merged components.",
+                  "Step strain p01/p99 is 0.855/1.140; cumulative fixed-rest strain p01/p99 is 0.705/1.361. Integrity passes, but protected-slot count is zero, so no coordinate protection is inferred."
+                ]
+              },
+              "error": null,
+              "geometric_rejections": [
+                {
+                  "operator": "baseline_fine_observation_field",
+                  "fraction": 1.0,
+                  "strain": {
+                    "edge_stretch_p01": 0.7450844010550294,
+                    "edge_stretch_p50": 1.0,
+                    "edge_stretch_p99": 1.3078903387916176,
+                    "edge_stretch_p999": 1.7049796192491766
+                  },
+                  "solver_integrity_passed": true,
+                  "integrity_audit": {
+                    "carrier_slots": 100000,
+                    "finite": true,
+                    "protected_slots": {
+                      "count": 0,
+                      "reference": "frozen_loop_initial_carrier",
+                      "reference_coordinates_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                      "candidate_coordinates_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                      "exactly_preserved": true,
+                      "maximum_displacement": 0.0
+                    },
+                    "cumulative_strain": {
+                      "edge_stretch_p01": 0.6421328689492354,
+                      "edge_stretch_p50": 1.0,
+                      "edge_stretch_p99": 1.5177384408049355,
+                      "edge_stretch_p999": 2.1603524103006184
+                    },
+                    "cumulative_reference": "fixed edges and coordinates at start of this loop, not previous round",
+                    "maximum_step_displacement": 0.014622244627665397,
+                    "passed": false
+                  },
+                  "current_regional_support": {
+                    "passed": true,
+                    "normalization": "partial_bbox_diagonal",
+                    "camera": "saved_acquisition",
+                    "regressed_fraction": 0.0,
+                    "maximum_regression": -0.00018428233233338563,
+                    "regional_tolerance": 0.002,
+                    "maximum_regressed_fraction": 0.2,
+                    "maximum_allowed_regression": 0.006,
+                    "no_immobile_part_assumption": true
+                  },
+                  "initial_regional_support": {
+                    "passed": true,
+                    "normalization": "partial_bbox_diagonal",
+                    "camera": "saved_acquisition",
+                    "regressed_fraction": 0.0,
+                    "maximum_regression": -0.00026824286477138284,
+                    "regional_tolerance": 0.002,
+                    "maximum_regressed_fraction": 0.2,
+                    "maximum_allowed_regression": 0.006,
+                    "no_immobile_part_assumption": true
+                  }
+                }
+              ],
+              "correspondence_validation": null,
+              "repeated_candidates": null
+            },
+            {
+              "action": "UPDATE_POSTERIOR",
+              "part": "Distributed observed ear, hind-leg, paw, and tail surfaces",
+              "accepted": true,
+              "review": {
+                "action": "ACCEPT_UPDATE",
+                "reason": "Supported local 3D alignment gains accompany stable fox anatomy and intact attachments, with no demonstrated structural regression.",
+                "evidence": [
+                  "Whole-scan mean distance improves from 0.01201 to 0.00946; depth residuals decrease in all six views.",
+                  "The leg/paw crops retain plausible correspondence: view 5 distance improves from 0.03016 to 0.02053, and the least-improved crop improves from 0.00292 to 0.00260.",
+                  "Full-object views preserve recognizable ears, limbs, paws, and tail without visible collapse or detachment; connectivity reports zero broken or merged components.",
+                  "Maximum regional regression is only 0.000036. Fixed-rest cumulative strain passes, with p01/p99 stretch 0.621/1.424.",
+                  "There are zero protected slots; the protection audit does not establish any immobile anatomy."
+                ]
+              },
+              "error": null,
+              "geometric_rejections": null,
+              "correspondence_validation": null,
+              "repeated_candidates": null
+            },
+            {
+              "action": "UPDATE_POSTERIOR",
+              "part": "Distributed visible ear, hind-leg, paw, and tail surfaces",
+              "accepted": false,
+              "review": null,
+              "error": "Interrupted to propagate diagnostic-only strain policy through nested solvers; not a geometric rejection.",
+              "geometric_rejections": null,
+              "correspondence_validation": null,
+              "repeated_candidates": null
+            }
+          ]
+        }
+      },
+      "review_prompt_verbatim": {
+        "instructions": "Review a proposed geometric update. Image 1 is BEFORE and image 2 AFTER, identical cameras and depth scales. Each view has blue OBSERVED PARTIAL, red COMPLETE PRIOR, then overlay. Image 3, if present, contains identical local crops: observed / before overlay / after overlay, including the most improved and the most regressed (or least improved) observed regions. Purple is screen overlap only; use 3D residuals for depth agreement. Require semantic correspondence and local alignment improvement while keeping the full object natural and attachments intact. Missing scan geometry is unknown. The integrity_audit directly measures protected slot coordinates against the frozen loop start: exactly_preserved=true and zero maximum_displacement verify those slots. Do not infer that other slots are protected. Cumulative strain uses a fixed rest graph. For small distributed corrections, measured local 3D gains with stable visible structure can support acceptance even when the full-object board change is subtle. Nearest-distance gains alone do not prove a semantic correspondence; reject identifiable wrong associations, stretching, collapse, or detachment. ACCEPT_UPDATE with supported improvement and no demonstrated structural regression; otherwise TRY_NEXT_CANDIDATE or STOP_KEEP_CURRENT with concrete evidence. Never use GT. Stretch percentiles are descriptive only; do not use 1.5 expansion, 0.6 compression, or another invented universal ratio as an acceptance boundary. Substantial proportional correction can be appropriate for a generated prior. Distinguish supported shape correction from visible unnatural distortion, folding, wrong correspondence or collapse. Cite concrete local evidence when rejecting shape changes.",
+        "payload": {
+          "proposal_action": "UPDATE_POSTERIOR",
+          "semantic_plan": {
+            "action": "UPDATE_POSTERIOR",
+            "part": "Distributed visible ear, leg, paw, and tail surfaces",
+            "evidence": [
+              "Residuals vary by part and view rather than sharing one clear global translation or scale offset; global registration is not supported.",
+              "Views 1–3 show remaining ear and hind-leg contour differences, while view 5 shows residual paw and tail differences.",
+              "The supplied leg zooms show remaining differences in limb width and paw contours. Missing scan connections do not justify removing complete prior attachments.",
+              "Earlier observation-field steps improved alignment, and the accepted posterior update produced further supported improvement while preserving natural structure.",
+              "The subsequent posterior attempt was interrupted for policy propagation, not geometrically rejected or exhausted. Resume that route from the accepted geometry using visible surface support."
+            ],
+            "uncertainty": "Moderate: incomplete sampling and overlapping limbs make isolated semantic handles unreliable. Evaluate posterior proposals for cross-view surface improvement and natural complete anatomy; preserve unobserved connections and do not fit hidden surfaces to scan gaps. Treat cumulative strain as diagnostic.",
+            "windows": [],
+            "handles": []
+          },
+          "geometry": {
+            "operator": "baseline_partial_ot_posterior",
+            "fraction": 1.0,
+            "field": {
+              "active": true,
+              "method": "structure_aware_partial_ot_complete_gaussian_posterior",
+              "strict_zero_shot": true,
+              "ground_truth_cd_emd_used": false,
+              "category_or_part_rules_used": false,
+              "carrier_slots_before": 100000,
+              "carrier_slots_after": 100000,
+              "carrier_slots_preserved": true,
+              "config": {
+                "partial_samples": 3072,
+                "prior_samples": 6144,
+                "normal_neighbours": 24,
+                "transport_iterations": 60,
+                "transport_relaxation": 0.72,
+                "transport_temperature_floor": 0.012,
+                "maximum_3d_ratio": 0.34,
+                "maximum_screen_ratio": 0.28,
+                "maximum_depth_ratio": 0.34,
+                "structural_rescue_candidates": 48,
+                "structural_rescue_screen_fraction": 0.55,
+                "structural_rescue_depth_fraction": 0.7,
+                "intrinsic_landmarks": 8,
+                "intrinsic_graph_neighbours": 12,
+                "minimum_transport_pairs": 96,
+                "stable_spacing_multiplier": 3.0,
+                "stable_residual_quantile": 0.22,
+                "residual_quantile": 0.42,
+                "require_localized_residual_evidence": true,
+                "coarse_node_fraction": 0.02,
+                "fine_node_fraction": 0.055,
+                "minimum_graph_nodes": 192,
+                "maximum_graph_nodes": 6144,
+                "skinning_neighbours": 4,
+                "low_frequency_modes": 24,
+                "low_frequency_regularization": 0.035,
+                "low_frequency_stable_weight": 6.0,
+                "coarse_neighbours": 18,
+                "coarse_edge_ratio": 2.45,
+                "coarse_data_weight": 2.5,
+                "coarse_screening": 0.0008,
+                "coarse_iterations": 5,
+                "coarse_displacement_ratio": 0.28,
+                "fine_neighbours": 10,
+                "fine_edge_ratio": 1.85,
+                "fine_data_weight": 4.0,
+                "fine_screening": 0.003,
+                "fine_iterations": 5,
+                "fine_displacement_ratio": 0.12,
+                "bending_regularization": 0.0,
+                "attachment_edge_ratio": 3.2,
+                "minimum_observed_improvement": 0.025,
+                "minimum_edge_compression": 0.55,
+                "maximum_edge_stretch": 2.8,
+                "enforce_edge_strain_limits": false,
+                "minimum_hidden_coverage": 0.95,
+                "coverage_resolution": 160,
+                "integrated_observation_fusion": true,
+                "assimilation_samples": 6144,
+                "assimilation_pixel_radius": 1.0,
+                "assimilation_cross_view_pixel_radius": 2.0,
+                "assimilation_minimum_view_support": 1,
+                "assimilation_separate_stable_anchors": false,
+                "assimilation_stable_quantile": 0.25,
+                "assimilation_hard_residual_targets": false,
+                "assimilation_coherent_residual_targets": false,
+                "assimilation_data_weight": 2.0,
+                "assimilation_screening": 0.004,
+                "assimilation_iterations": 3,
+                "assimilation_displacement_ratio": 0.05,
+                "assimilation_anchor_residual_ratio": 0.03,
+                "slender_rigidity_projection": false,
+                "slender_neighbours": 128,
+                "slender_linearity_quantile": 0.95,
+                "slender_minimum_fraction": 0.003,
+                "slender_minimum_aspect_ratio": 6.0,
+                "slender_dilation_steps": 2
+              },
+              "stages": [
+                {
+                  "stage": "coarse",
+                  "active": false,
+                  "reason": "insufficient_residual_transport_pairs",
+                  "transport": {
+                    "active": false,
+                    "method": "multiview_camera_structure_unbalanced_partial_transport",
+                    "device": "cuda",
+                    "view_count": 1,
+                    "view_evidence": [
+                      {
+                        "view": 0,
+                        "partial_visible": 2842,
+                        "prior_visible": 6144,
+                        "supported_pairs": 17461248
+                      }
+                    ],
+                    "partial_diagonal": 1.5934643873839316,
+                    "partial_spacing": 0.0033872161310978133,
+                    "visible_prior": 29184,
+                    "partial_samples": 3072,
+                    "prior_samples": 6144,
+                    "valid_transport_rows": 2842,
+                    "retained_capacity_pairs": 0,
+                    "stable_pairs": 626,
+                    "coherent_residual_rows": 0,
+                    "raw_coherent_residual_rows": 1604,
+                    "coherent_residual_fraction": 0.5643912737508796,
+                    "coherent_prior_support_fraction": 0.16536458333333334,
+                    "localization_bound": 0.19999999999999998,
+                    "localized_residual_evidence": false,
+                    "residual_pairs": 0,
+                    "stable_prior": 2692,
+                    "residual_prior": 0,
+                    "unsupported_prior": 97308,
+                    "unmatched_partial_fraction": 0.7962239583333334,
+                    "temperature": 0.012,
+                    "stable_limit": 0.024174688869072827,
+                    "residual_limit": 0.0423140842071864,
+                    "residual_median": null,
+                    "residual_p90": null
+                  }
+                }
+              ],
+              "supported_stable": 2692,
+              "supported_stable_final": 0,
+              "supported_residual": 0,
+              "unsupported": 97308,
+              "moved": 100000,
+              "hidden_coverage_ratio": 0.9544161345387874,
+              "hidden_coverage_per_view": [
+                0.9770438481266028,
+                0.9544161345387874,
+                1.0012124151309407
+              ],
+              "integrity": {
+                "input_connected_components": 2,
+                "output_connected_components": 2,
+                "new_connected_components": 0,
+                "component_significance_size": 100,
+                "input_significant_components": 1,
+                "output_significant_components": 1,
+                "input_component_sizes": [
+                  99999,
+                  1
+                ],
+                "output_component_sizes": [
+                  99999,
+                  1
+                ],
+                "tracked_original_edges": 499487,
+                "tracked_edge_replacement_fraction": 7.207394787051515e-05,
+                "stable_motion_p50": 0.0022677101302881154,
+                "stable_motion_p95": 0.008953360159487282,
+                "stable_motion_max": 0.014569198954531968,
+                "passed": true
+              },
+              "topology_projection": {
+                "active": false,
+                "corrected_points": 0,
+                "passes": [
+                  {
+                    "pass": 0,
+                    "components_before": 2,
+                    "new_small_fragment_points": 0
+                  }
+                ]
+              },
+              "observation_assimilation": {
+                "active": true,
+                "method": "integrated_four_view_observation_assimilation",
+                "positive_evidence": {
+                  "views": [
+                    {
+                      "view_index": 0,
+                      "partial_visible_pixels": 14306,
+                      "prior_visible_pixels": 60111,
+                      "nearby_pixel_pairs": 14172,
+                      "mutual_pixel_pairs": 10767,
+                      "max_pixel_distance": 1.0,
+                      "radius_relaxed": false,
+                      "pair_subsample_limit": 100000
+                    },
+                    {
+                      "view_index": 1,
+                      "partial_visible_pixels": 13240,
+                      "prior_visible_pixels": 66545,
+                      "nearby_pixel_pairs": 12907,
+                      "mutual_pixel_pairs": 9367,
+                      "max_pixel_distance": 1.0,
+                      "radius_relaxed": false,
+                      "pair_subsample_limit": 100000
+                    },
+                    {
+                      "view_index": 2,
+                      "partial_visible_pixels": 11369,
+                      "prior_visible_pixels": 66806,
+                      "nearby_pixel_pairs": 10954,
+                      "mutual_pixel_pairs": 7765,
+                      "max_pixel_distance": 1.0,
+                      "radius_relaxed": false,
+                      "pair_subsample_limit": 100000
+                    },
+                    {
+                      "view_index": 3,
+                      "partial_visible_pixels": 10906,
+                      "prior_visible_pixels": 63304,
+                      "nearby_pixel_pairs": 10496,
+                      "mutual_pixel_pairs": 7303,
+                      "max_pixel_distance": 1.0,
+                      "radius_relaxed": false,
+                      "pair_subsample_limit": 100000
+                    },
+                    {
+                      "view_index": 4,
+                      "partial_visible_pixels": 12340,
+                      "prior_visible_pixels": 55556,
+                      "nearby_pixel_pairs": 12009,
+                      "mutual_pixel_pairs": 8503,
+                      "max_pixel_distance": 1.0,
+                      "radius_relaxed": false,
+                      "pair_subsample_limit": 100000
+                    },
+                    {
+                      "view_index": 5,
+                      "partial_visible_pixels": 11895,
+                      "prior_visible_pixels": 53965,
+                      "nearby_pixel_pairs": 11722,
+                      "mutual_pixel_pairs": 8286,
+                      "max_pixel_distance": 1.0,
+                      "radius_relaxed": false,
+                      "pair_subsample_limit": 100000
+                    }
+                  ],
+                  "raw_visible_pairs": 51991,
+                  "unique_physical_pairs": 50314,
+                  "support_histogram": {
+                    "0": 23207,
+                    "1": 10713,
+                    "2": 4838,
+                    "3": 2166,
+                    "4": 1071,
+                    "5": 1369,
+                    "6": 6950
+                  },
+                  "cross_view_pixel_radius": 2.0,
+                  "cross_view_depth_limit": 0.04780393162151795
+                },
+                "assignment": {
+                  "pixel_pairs": 27107,
+                  "within_metric_limit": 26883,
+                  "collision_free_pairs": 12021,
+                  "max_residual": 0.04780393162151795,
+                  "residual_median": 0.009816916090353263,
+                  "residual_p90": 0.03559549207810468,
+                  "selected_support_mean": 3.7238166541885036
+                },
+                "retained_anchors": 6144,
+                "residual_anchors": 6144,
+                "stable_gaussians": 0,
+                "stable_limit": null,
+                "solver": {
+                  "active": true,
+                  "field": "hierarchical_embedded_arap_posterior",
+                  "graph_nodes": 11257,
+                  "node_graph_edges": 56202,
+                  "attachment_edges": 0,
+                  "carrier_graph_edges": 499487,
+                  "carrier_attachment_edges": 2,
+                  "target_gaussians": 6144,
+                  "stable_gaussians": 0,
+                  "moved_gaussians": 100000,
+                  "moved_fraction": 1.0,
+                  "maximum_displacement": 0.02602978790138807,
+                  "mean_displacement": 0.006428859727310346,
+                  "coherent_targets": {
+                    "components": 0,
+                    "regularized_targets": 0
+                  },
+                  "node_solver": {
+                    "active": true,
+                    "field": "soft_full_surface_arap_posterior",
+                    "surface_graph_edges": 56202,
+                    "attachment_edges": 0,
+                    "coherent_targets": {
+                      "components": 0,
+                      "regularized_targets": 0
+                    },
+                    "hard_target_constraints": false,
+                    "line_search": [
+                      {
+                        "alpha": 1.0,
+                        "observed_residual_before": 0.005676197041016438,
+                        "observed_residual_after": 0.0012242836626745,
+                        "observed_improvement": 0.7843126914327013,
+                        "hidden_coverage_ratio": 0.9516083119840593,
+                        "hidden_coverage_per_view": [
+                          0.9846196868008948,
+                          0.9516083119840593,
+                          0.9869782971619365
+                        ],
+                        "original_graph_components": 1,
+                        "candidate_graph_components": 1,
+                        "edge_stretch_p01": 0.4575776307023475,
+                        "edge_stretch_p50": 1.0109583361816759,
+                        "edge_stretch_p99": 2.2805425125099967,
+                        "edge_stretch_p999": 4.510390107115008,
+                        "significant_component_size": 32,
+                        "original_significant_components": 1,
+                        "candidate_significant_components": 1,
+                        "candidate_small_component_mass": 0,
+                        "edge_strain_limits_enforced": false
+                      }
+                    ],
+                    "target_gaussians": 6144,
+                    "stable_gaussians": 0,
+                    "moved_gaussians": 11257,
+                    "moved_fraction": 1.0,
+                    "maximum_displacement": 0.04507219497538258,
+                    "mean_displacement": 0.011499366969218982,
+                    "cg_status": [
+                      0,
+                      0,
+                      0
+                    ],
+                    "alpha": 1.0,
+                    "observed_residual_before": 0.005676197041016438,
+                    "observed_residual_after": 0.0012242836626745,
+                    "observed_improvement": 0.7843126914327013,
+                    "hidden_coverage_ratio": 0.9516083119840593,
+                    "hidden_coverage_per_view": [
+                      0.9846196868008948,
+                      0.9516083119840593,
+                      0.9869782971619365
+                    ],
+                    "original_graph_components": 1,
+                    "candidate_graph_components": 1,
+                    "edge_stretch_p01": 0.4575776307023475,
+                    "edge_stretch_p50": 1.0109583361816759,
+                    "edge_stretch_p99": 2.2805425125099967,
+                    "edge_stretch_p999": 4.510390107115008,
+                    "significant_component_size": 32,
+                    "original_significant_components": 1,
+                    "candidate_significant_components": 1,
+                    "candidate_small_component_mass": 0,
+                    "edge_strain_limits_enforced": false
+                  },
+                  "preserve_target_amplitude": false,
+                  "hard_target_constraints": false,
+                  "node_minimum_edge_compression": null,
+                  "line_search": [
+                    {
+                      "alpha": 1.0,
+                      "observed_residual_before": 0.005676197041016438,
+                      "observed_residual_after": 0.002869616280712229,
+                      "observed_improvement": 0.49444738088261186,
+                      "hidden_coverage_ratio": 0.9289795918367347,
+                      "hidden_coverage_per_view": [
+                        0.9753593429158111,
+                        0.9289795918367347,
+                        1.0017750524447313
+                      ],
+                      "original_graph_components": 1,
+                      "candidate_graph_components": 1,
+                      "significant_component_size": 100,
+                      "original_significant_components": 1,
+                      "candidate_significant_components": 1,
+                      "candidate_small_component_mass": 0,
+                      "robust_edge_quantile": 0.99,
+                      "edge_strain_limits_enforced": false,
+                      "edge_stretch_p01": 0.5771380700912804,
+                      "edge_stretch_p50": 1.0016656658589624,
+                      "edge_stretch_p99": 1.740147437636218,
+                      "edge_stretch_p999": 2.64584588077214
+                    },
+                    {
+                      "alpha": 0.85,
+                      "observed_residual_before": 0.005676197041016438,
+                      "observed_residual_after": 0.003047050705638789,
+                      "observed_improvement": 0.4631879965369995,
+                      "hidden_coverage_ratio": 0.9354169286882154,
+                      "hidden_coverage_per_view": [
+                        0.9730419623957166,
+                        0.9354169286882154,
+                        0.9999193418293273
+                      ],
+                      "original_graph_components": 1,
+                      "candidate_graph_components": 1,
+                      "significant_component_size": 100,
+                      "original_significant_components": 1,
+                      "candidate_significant_components": 1,
+                      "candidate_small_component_mass": 0,
+                      "robust_edge_quantile": 0.99,
+                      "edge_strain_limits_enforced": false,
+                      "edge_stretch_p01": 0.6019668912863425,
+                      "edge_stretch_p50": 1.0003689976729906,
+                      "edge_stretch_p99": 1.5981269095413864,
+                      "edge_stretch_p999": 2.3446332509655865
+                    },
+                    {
+                      "alpha": 0.7,
+                      "observed_residual_before": 0.005676197041016438,
+                      "observed_residual_after": 0.003342820460247291,
+                      "observed_improvement": 0.4110809691608782,
+                      "hidden_coverage_ratio": 0.9460907944514502,
+                      "hidden_coverage_per_view": [
+                        0.9739846528167696,
+                        0.9460907944514502,
+                        0.9986296953087216
+                      ],
+                      "original_graph_components": 1,
+                      "candidate_graph_components": 1,
+                      "significant_component_size": 100,
+                      "original_significant_components": 1,
+                      "candidate_significant_components": 1,
+                      "candidate_small_component_mass": 0,
+                      "robust_edge_quantile": 0.99,
+                      "edge_strain_limits_enforced": false,
+                      "edge_stretch_p01": 0.6361968758039267,
+                      "edge_stretch_p50": 0.9996290321409975,
+                      "edge_stretch_p99": 1.4654132839596465,
+                      "edge_stretch_p999": 2.0567878336672707
+                    },
+                    {
+                      "alpha": 0.55,
+                      "observed_residual_before": 0.005676197041016438,
+                      "observed_residual_after": 0.0037005752825901503,
+                      "observed_improvement": 0.3480537663069766,
+                      "hidden_coverage_ratio": 0.9544161345387874,
+                      "hidden_coverage_per_view": [
+                        0.9770438481266028,
+                        0.9544161345387874,
+                        1.0012124151309407
+                      ],
+                      "original_graph_components": 1,
+                      "candidate_graph_components": 1,
+                      "significant_component_size": 100,
+                      "original_significant_components": 1,
+                      "candidate_significant_components": 1,
+                      "candidate_small_component_mass": 0,
+                      "robust_edge_quantile": 0.99,
+                      "edge_strain_limits_enforced": false,
+                      "edge_stretch_p01": 0.6847972129982891,
+                      "edge_stretch_p50": 0.9990986590805843,
+                      "edge_stretch_p99": 1.3457694763528651,
+                      "edge_stretch_p999": 1.7869800881666589
+                    }
+                  ],
+                  "alpha": 0.55,
+                  "observed_residual_before": 0.005676197041016438,
+                  "observed_residual_after": 0.0037005752825901503,
+                  "observed_improvement": 0.3480537663069766,
+                  "hidden_coverage_ratio": 0.9544161345387874,
+                  "hidden_coverage_per_view": [
+                    0.9770438481266028,
+                    0.9544161345387874,
+                    1.0012124151309407
+                  ],
+                  "original_graph_components": 1,
+                  "candidate_graph_components": 1,
+                  "significant_component_size": 100,
+                  "original_significant_components": 1,
+                  "candidate_significant_components": 1,
+                  "candidate_small_component_mass": 0,
+                  "robust_edge_quantile": 0.99,
+                  "edge_strain_limits_enforced": false,
+                  "edge_stretch_p01": 0.6847972129982891,
+                  "edge_stretch_p50": 0.9990986590805843,
+                  "edge_stretch_p99": 1.3457694763528651,
+                  "edge_stretch_p999": 1.7869800881666589
+                },
+                "topology_projection": {
+                  "active": true,
+                  "corrected_points": 1,
+                  "passes": [
+                    {
+                      "pass": 0,
+                      "components_before": 2,
+                      "new_small_fragment_points": 1
+                    },
+                    {
+                      "pass": 1,
+                      "components_before": 2,
+                      "new_small_fragment_points": 1
+                    },
+                    {
+                      "pass": 2,
+                      "components_before": 2,
+                      "new_small_fragment_points": 1
+                    }
+                  ]
+                }
+              },
+              "slender_rigidity_projection": {
+                "active": false,
+                "reason": "disabled",
+                "method": "covariance_detected_slender_region_se3_projection"
+              },
+              "posterior_diagnostics": {
+                "selection_gate_used": false,
+                "initial": {
+                  "objective": 0.1171829629172057,
+                  "visible_3d": 0.039412939578610036,
+                  "visible_pair_count": 11097,
+                  "silhouette_iou": 0.7705516265912306,
+                  "coverage": 0.9818686468171004,
+                  "leakage": 0.2183258243177318,
+                  "depth_error_normalized": 0.04798863656257944
+                },
+                "candidate": {
+                  "objective": 0.10362842497175673,
+                  "visible_3d": 0.02365922183123386,
+                  "visible_pair_count": 11093,
+                  "silhouette_iou": 0.7763953935287335,
+                  "coverage": 0.983004109292769,
+                  "leakage": 0.21304071797535568,
+                  "depth_error_normalized": 0.04161657663382018
+                },
+                "objective_delta": -0.013554537945448975,
+                "ground_truth_cd_emd_used": false
+              },
+              "edge_stretch_p01": 0.6847969239270834,
+              "edge_stretch_p50": 0.9990986590805843,
+              "edge_stretch_p99": 1.3457710478482108,
+              "edge_stretch_p999": 1.786980193121679
+            },
+            "strain": {
+              "edge_stretch_p01": 0.6866508170146716,
+              "edge_stretch_p50": 0.999147032205649,
+              "edge_stretch_p99": 1.3332360834630295,
+              "edge_stretch_p999": 1.752523137545696
+            },
+            "mean_before": 0.009461311622285626,
+            "mean_after": 0.0061469263163699845,
+            "connectivity": {
+              "passed": true,
+              "broken_components": 0,
+              "merged_components": 0,
+              "minimum_significant_size": 100,
+              "carrier_slots": 100000
+            },
+            "solver_integrity_passed": true,
+            "hard_passed": true,
+            "integrity_audit": {
+              "carrier_slots": 100000,
+              "finite": true,
+              "protected_slots": {
+                "count": 0,
+                "reference": "frozen_loop_initial_carrier",
+                "reference_coordinates_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                "candidate_coordinates_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                "exactly_preserved": true,
+                "maximum_displacement": 0.0
+              },
+              "cumulative_strain": {
+                "edge_stretch_p01": 0.5335886528930781,
+                "edge_stretch_p50": 0.9992646955157299,
+                "edge_stretch_p99": 1.6189952706348083,
+                "edge_stretch_p999": 2.3565733262338573
+              },
+              "strain_policy": "diagnostic_only_no_absolute_stretch_threshold",
+              "cumulative_reference": "fixed edges and coordinates at start of this loop, not previous round",
+              "maximum_step_displacement": 0.02602978790138807,
+              "passed": true
+            },
+            "current_regional_support": {
+              "passed": true,
+              "normalization": "partial_bbox_diagonal",
+              "camera": "saved_acquisition",
+              "regions": [
+                {
+                  "tile": 2,
+                  "observations": 34,
+                  "mean_before": 0.03247577837120155,
+                  "mean_after": 0.02441775760457783,
+                  "regression": -0.008058020766623724
+                },
+                {
+                  "tile": 3,
+                  "observations": 57,
+                  "mean_before": 0.012631424417826293,
+                  "mean_after": 0.008517582385894304,
+                  "regression": -0.00411384203193199
+                },
+                {
+                  "tile": 5,
+                  "observations": 99,
+                  "mean_before": 0.002955801922245753,
+                  "mean_after": 0.002166892501976032,
+                  "regression": -0.0007889094202697207
+                },
+                {
+                  "tile": 6,
+                  "observations": 393,
+                  "mean_before": 0.006052475993901103,
+                  "mean_after": 0.0041421593114018985,
+                  "regression": -0.0019103166824992032
+                },
+                {
+                  "tile": 7,
+                  "observations": 61,
+                  "mean_before": 0.002072126127273009,
+                  "mean_after": 0.0015472886447581947,
+                  "regression": -0.0005248374825148148
+                },
+                {
+                  "tile": 10,
+                  "observations": 156,
+                  "mean_before": 0.01080220877017723,
+                  "mean_after": 0.007394056765282791,
+                  "regression": -0.003408152004894438
+                },
+                {
+                  "tile": 11,
+                  "observations": 468,
+                  "mean_before": 0.003869864741491747,
+                  "mean_after": 0.002456741513245217,
+                  "regression": -0.0014131232282465305
+                },
+                {
+                  "tile": 12,
+                  "observations": 442,
+                  "mean_before": 0.005437633677921095,
+                  "mean_after": 0.003811046695014482,
+                  "regression": -0.0016265869829066126
+                },
+                {
+                  "tile": 13,
+                  "observations": 464,
+                  "mean_before": 0.00420793444410705,
+                  "mean_after": 0.002825803336432234,
+                  "regression": -0.0013821311076748159
+                },
+                {
+                  "tile": 14,
+                  "observations": 475,
+                  "mean_before": 0.0031594540683072873,
+                  "mean_after": 0.0020558841571078445,
+                  "regression": -0.0011035699111994425
+                },
+                {
+                  "tile": 15,
+                  "observations": 225,
+                  "mean_before": 0.004259272638885066,
+                  "mean_after": 0.0023666511636989667,
+                  "regression": -0.001892621475186099
+                },
+                {
+                  "tile": 18,
+                  "observations": 69,
+                  "mean_before": 0.0024083294709034662,
+                  "mean_after": 0.0017252813784532253,
+                  "regression": -0.0006830480924502408
+                },
+                {
+                  "tile": 19,
+                  "observations": 459,
+                  "mean_before": 0.003088029561456756,
+                  "mean_after": 0.0018730024355083034,
+                  "regression": -0.0012150271259484529
+                },
+                {
+                  "tile": 20,
+                  "observations": 487,
+                  "mean_before": 0.003104979998423231,
+                  "mean_after": 0.0019225178928317925,
+                  "regression": -0.0011824621055914386
+                },
+                {
+                  "tile": 21,
+                  "observations": 489,
+                  "mean_before": 0.0044651154810918785,
+                  "mean_after": 0.002462142958503893,
+                  "regression": -0.002002972522587986
+                },
+                {
+                  "tile": 22,
+                  "observations": 454,
+                  "mean_before": 0.0031465513605138545,
+                  "mean_after": 0.0018785100529631097,
+                  "regression": -0.0012680413075507446
+                },
+                {
+                  "tile": 23,
+                  "observations": 275,
+                  "mean_before": 0.0023621860844779546,
+                  "mean_after": 0.0016810333521954425,
+                  "regression": -0.0006811527322825119
+                },
+                {
+                  "tile": 27,
+                  "observations": 111,
+                  "mean_before": 0.003512513958657621,
+                  "mean_after": 0.00207940761413891,
+                  "regression": -0.0014331063445187113
+                },
+                {
+                  "tile": 28,
+                  "observations": 444,
+                  "mean_before": 0.002245795220863153,
+                  "mean_after": 0.0016880195072721239,
+                  "regression": -0.0005577757135910287
+                },
+                {
+                  "tile": 29,
+                  "observations": 464,
+                  "mean_before": 0.0037933145528813686,
+                  "mean_after": 0.0022537081949557873,
+                  "regression": -0.0015396063579255802
+                },
+                {
+                  "tile": 30,
+                  "observations": 427,
+                  "mean_before": 0.0024995707342857936,
+                  "mean_after": 0.001827285268319241,
+                  "regression": -0.0006722854659665527
+                },
+                {
+                  "tile": 31,
+                  "observations": 20,
+                  "mean_before": 0.0016184113723661663,
+                  "mean_after": 0.0014948655013851913,
+                  "regression": -0.0001235458709809745
+                },
+                {
+                  "tile": 34,
+                  "observations": 63,
+                  "mean_before": 0.0070453907255360985,
+                  "mean_after": 0.0058023709866371585,
+                  "regression": -0.0012430197388989402
+                },
+                {
+                  "tile": 35,
+                  "observations": 269,
+                  "mean_before": 0.0020715601635743486,
+                  "mean_after": 0.0017779253756970397,
+                  "regression": -0.0002936347878773091
+                },
+                {
+                  "tile": 36,
+                  "observations": 442,
+                  "mean_before": 0.0015702090348940973,
+                  "mean_after": 0.0014030195142694817,
+                  "regression": -0.0001671895206246153
+                },
+                {
+                  "tile": 37,
+                  "observations": 468,
+                  "mean_before": 0.0018777991913928713,
+                  "mean_after": 0.0016882133239661406,
+                  "regression": -0.00018958586742673063
+                },
+                {
+                  "tile": 38,
+                  "observations": 473,
+                  "mean_before": 0.0027809906906277994,
+                  "mean_after": 0.0019919272588812364,
+                  "regression": -0.0007890634317465627
+                },
+                {
+                  "tile": 39,
+                  "observations": 21,
+                  "mean_before": 0.0030157983898308873,
+                  "mean_after": 0.00191164152244704,
+                  "regression": -0.0011041568673838477
+                },
+                {
+                  "tile": 41,
+                  "observations": 27,
+                  "mean_before": 0.013382148213511058,
+                  "mean_after": 0.007551864470433095,
+                  "regression": -0.00583028374307796
+                },
+                {
+                  "tile": 42,
+                  "observations": 393,
+                  "mean_before": 0.010147359927444479,
+                  "mean_after": 0.005871858615436843,
+                  "regression": -0.004275501312007637
+                },
+                {
+                  "tile": 43,
+                  "observations": 449,
+                  "mean_before": 0.01767152277508179,
+                  "mean_after": 0.01276174014196345,
+                  "regression": -0.004909782633118336
+                },
+                {
+                  "tile": 44,
+                  "observations": 474,
+                  "mean_before": 0.0021751452610696336,
+                  "mean_after": 0.0017074402388902862,
+                  "regression": -0.00046770502217934756
+                },
+                {
+                  "tile": 45,
+                  "observations": 377,
+                  "mean_before": 0.0023062852850751435,
+                  "mean_after": 0.001813183373478653,
+                  "regression": -0.0004931019115964905
+                },
+                {
+                  "tile": 46,
+                  "observations": 397,
+                  "mean_before": 0.0024327129646820977,
+                  "mean_after": 0.0018452983246989925,
+                  "regression": -0.0005874146399831049
+                },
+                {
+                  "tile": 48,
+                  "observations": 179,
+                  "mean_before": 0.009235232535009094,
+                  "mean_after": 0.005232940195111098,
+                  "regression": -0.004002292339897996
+                },
+                {
+                  "tile": 49,
+                  "observations": 389,
+                  "mean_before": 0.006169281085705522,
+                  "mean_after": 0.0034864744572241533,
+                  "regression": -0.0026828066284813675
+                },
+                {
+                  "tile": 50,
+                  "observations": 473,
+                  "mean_before": 0.017657615245513222,
+                  "mean_after": 0.011514888272762303,
+                  "regression": -0.006142726972750917
+                },
+                {
+                  "tile": 51,
+                  "observations": 239,
+                  "mean_before": 0.02658946559038365,
+                  "mean_after": 0.018479535622303925,
+                  "regression": -0.008109929968079726
+                },
+                {
+                  "tile": 52,
+                  "observations": 479,
+                  "mean_before": 0.0062936326577979216,
+                  "mean_after": 0.0033548092619828094,
+                  "regression": -0.002938823395815112
+                },
+                {
+                  "tile": 53,
+                  "observations": 249,
+                  "mean_before": 0.0028454550899912473,
+                  "mean_after": 0.0023193768406389276,
+                  "regression": -0.0005260782493523193
+                },
+                {
+                  "tile": 54,
+                  "observations": 390,
+                  "mean_before": 0.0017266594248253942,
+                  "mean_after": 0.0014594032702889442,
+                  "regression": -0.00026725615453644983
+                },
+                {
+                  "tile": 55,
+                  "observations": 44,
+                  "mean_before": 0.001614237154083533,
+                  "mean_after": 0.0016395629031474757,
+                  "regression": 2.5325749063942752e-05
+                },
+                {
+                  "tile": 56,
+                  "observations": 332,
+                  "mean_before": 0.009975384499720349,
+                  "mean_after": 0.00533924897762782,
+                  "regression": -0.0046361355220925285
+                },
+                {
+                  "tile": 57,
+                  "observations": 469,
+                  "mean_before": 0.01746362726503005,
+                  "mean_after": 0.009118309770611469,
+                  "regression": -0.008345317494418582
+                },
+                {
+                  "tile": 58,
+                  "observations": 395,
+                  "mean_before": 0.011252680243556634,
+                  "mean_after": 0.007063116224671128,
+                  "regression": -0.004189564018885506
+                },
+                {
+                  "tile": 59,
+                  "observations": 28,
+                  "mean_before": 0.012367864165750092,
+                  "mean_after": 0.00875188418479149,
+                  "regression": -0.003615979980958605
+                },
+                {
+                  "tile": 60,
+                  "observations": 382,
+                  "mean_before": 0.004598862946495512,
+                  "mean_after": 0.003341398531849971,
+                  "regression": -0.0012574644146455412
+                },
+                {
+                  "tile": 61,
+                  "observations": 88,
+                  "mean_before": 0.008147728173957001,
+                  "mean_after": 0.005510200310365156,
+                  "regression": -0.0026375278635918462
+                },
+                {
+                  "tile": 62,
+                  "observations": 145,
+                  "mean_before": 0.0018624237001950339,
+                  "mean_after": 0.0015713139975919712,
+                  "regression": -0.00029110970260306227
+                },
+                {
+                  "tile": 63,
+                  "observations": 89,
+                  "mean_before": 0.001460335104165076,
+                  "mean_after": 0.0013686766325542196,
+                  "regression": -9.165847161085608e-05
+                }
+              ],
+              "regressed_fraction": 0.0,
+              "maximum_regression": 2.5325749063942752e-05,
+              "regional_tolerance": 0.002,
+              "maximum_regressed_fraction": 0.2,
+              "maximum_allowed_regression": 0.006,
+              "no_immobile_part_assumption": true
+            },
+            "initial_regional_support": {
+              "passed": true,
+              "normalization": "partial_bbox_diagonal",
+              "camera": "saved_acquisition",
+              "regions": [
+                {
+                  "tile": 2,
+                  "observations": 34,
+                  "mean_before": 0.03765737458425234,
+                  "mean_after": 0.02441775760457783,
+                  "regression": -0.013239616979674514
+                },
+                {
+                  "tile": 3,
+                  "observations": 57,
+                  "mean_before": 0.017215534149439805,
+                  "mean_after": 0.008517582385894304,
+                  "regression": -0.008697951763545504
+                },
+                {
+                  "tile": 5,
+                  "observations": 99,
+                  "mean_before": 0.004443347622912872,
+                  "mean_after": 0.002166892501976032,
+                  "regression": -0.002276455120936839
+                },
+                {
+                  "tile": 6,
+                  "observations": 393,
+                  "mean_before": 0.0100657562107657,
+                  "mean_after": 0.0041421593114018985,
+                  "regression": -0.005923596899363803
+                },
+                {
+                  "tile": 7,
+                  "observations": 61,
+                  "mean_before": 0.004763765290432025,
+                  "mean_after": 0.0015472886447581947,
+                  "regression": -0.003216476645673831
+                },
+                {
+                  "tile": 10,
+                  "observations": 156,
+                  "mean_before": 0.015441190438618703,
+                  "mean_after": 0.007394056765282791,
+                  "regression": -0.008047133673335911
+                },
+                {
+                  "tile": 11,
+                  "observations": 468,
+                  "mean_before": 0.006738573627520826,
+                  "mean_after": 0.002456741513245217,
+                  "regression": -0.004281832114275611
+                },
+                {
+                  "tile": 12,
+                  "observations": 442,
+                  "mean_before": 0.008929138893156397,
+                  "mean_after": 0.003811046695014482,
+                  "regression": -0.005118092198141916
+                },
+                {
+                  "tile": 13,
+                  "observations": 464,
+                  "mean_before": 0.00749779011364203,
+                  "mean_after": 0.002825803336432234,
+                  "regression": -0.004671986777209796
+                },
+                {
+                  "tile": 14,
+                  "observations": 475,
+                  "mean_before": 0.006418126681146042,
+                  "mean_after": 0.0020558841571078445,
+                  "regression": -0.004362242524038198
+                },
+                {
+                  "tile": 15,
+                  "observations": 225,
+                  "mean_before": 0.008874325797369104,
+                  "mean_after": 0.0023666511636989667,
+                  "regression": -0.006507674633670136
+                },
+                {
+                  "tile": 18,
+                  "observations": 69,
+                  "mean_before": 0.0036884412839411304,
+                  "mean_after": 0.0017252813784532253,
+                  "regression": -0.0019631599054879046
+                },
+                {
+                  "tile": 19,
+                  "observations": 459,
+                  "mean_before": 0.007510399865566317,
+                  "mean_after": 0.0018730024355083034,
+                  "regression": -0.005637397430058014
+                },
+                {
+                  "tile": 20,
+                  "observations": 487,
+                  "mean_before": 0.008498195323888276,
+                  "mean_after": 0.0019225178928317925,
+                  "regression": -0.006575677431056484
+                },
+                {
+                  "tile": 21,
+                  "observations": 489,
+                  "mean_before": 0.008804045878169613,
+                  "mean_after": 0.002462142958503893,
+                  "regression": -0.006341902919665721
+                },
+                {
+                  "tile": 22,
+                  "observations": 454,
+                  "mean_before": 0.009294804271995418,
+                  "mean_after": 0.0018785100529631097,
+                  "regression": -0.007416294219032308
+                },
+                {
+                  "tile": 23,
+                  "observations": 275,
+                  "mean_before": 0.005833453361100883,
+                  "mean_after": 0.0016810333521954425,
+                  "regression": -0.004152420008905441
+                },
+                {
+                  "tile": 27,
+                  "observations": 111,
+                  "mean_before": 0.005075588877516018,
+                  "mean_after": 0.00207940761413891,
+                  "regression": -0.0029961812633771093
+                },
+                {
+                  "tile": 28,
+                  "observations": 444,
+                  "mean_before": 0.004129701721545212,
+                  "mean_after": 0.0016880195072721239,
+                  "regression": -0.0024416822142730877
+                },
+                {
+                  "tile": 29,
+                  "observations": 464,
+                  "mean_before": 0.007583027955480054,
+                  "mean_after": 0.0022537081949557873,
+                  "regression": -0.005329319760524265
+                },
+                {
+                  "tile": 30,
+                  "observations": 427,
+                  "mean_before": 0.005130221325890858,
+                  "mean_after": 0.001827285268319241,
+                  "regression": -0.003302936057571618
+                },
+                {
+                  "tile": 31,
+                  "observations": 20,
+                  "mean_before": 0.003371819464247936,
+                  "mean_after": 0.0014948655013851913,
+                  "regression": -0.0018769539628627444
+                },
+                {
+                  "tile": 34,
+                  "observations": 63,
+                  "mean_before": 0.008918701230164123,
+                  "mean_after": 0.0058023709866371585,
+                  "regression": -0.0031163302435269625
+                },
+                {
+                  "tile": 35,
+                  "observations": 269,
+                  "mean_before": 0.0036392455115519906,
+                  "mean_after": 0.0017779253756970397,
+                  "regression": -0.0018613201358549508
+                },
+                {
+                  "tile": 36,
+                  "observations": 442,
+                  "mean_before": 0.0022855430978951847,
+                  "mean_after": 0.0014030195142694817,
+                  "regression": -0.0008825235836257033
+                },
+                {
+                  "tile": 37,
+                  "observations": 468,
+                  "mean_before": 0.0035454169220713525,
+                  "mean_after": 0.0016882133239661406,
+                  "regression": -0.001857203598105212
+                },
+                {
+                  "tile": 38,
+                  "observations": 473,
+                  "mean_before": 0.004160768990004953,
+                  "mean_after": 0.0019919272588812364,
+                  "regression": -0.002168841731123716
+                },
+                {
+                  "tile": 39,
+                  "observations": 21,
+                  "mean_before": 0.005764501442225645,
+                  "mean_after": 0.00191164152244704,
+                  "regression": -0.003852859919778606
+                },
+                {
+                  "tile": 41,
+                  "observations": 27,
+                  "mean_before": 0.018610565320046298,
+                  "mean_after": 0.007551864470433095,
+                  "regression": -0.011058700849613197
+                },
+                {
+                  "tile": 42,
+                  "observations": 393,
+                  "mean_before": 0.014948603302777584,
+                  "mean_after": 0.005871858615436843,
+                  "regression": -0.00907674468734074
+                },
+                {
+                  "tile": 43,
+                  "observations": 449,
+                  "mean_before": 0.023006147938244435,
+                  "mean_after": 0.01276174014196345,
+                  "regression": -0.010244407796280981
+                },
+                {
+                  "tile": 44,
+                  "observations": 474,
+                  "mean_before": 0.0033044558939427236,
+                  "mean_after": 0.0017074402388902862,
+                  "regression": -0.0015970156550524374
+                },
+                {
+                  "tile": 45,
+                  "observations": 377,
+                  "mean_before": 0.00448260128787058,
+                  "mean_after": 0.001813183373478653,
+                  "regression": -0.002669417914391928
+                },
+                {
+                  "tile": 46,
+                  "observations": 397,
+                  "mean_before": 0.005298041416120443,
+                  "mean_after": 0.0018452983246989925,
+                  "regression": -0.0034527430914214497
+                },
+                {
+                  "tile": 48,
+                  "observations": 179,
+                  "mean_before": 0.013220773432134127,
+                  "mean_after": 0.005232940195111098,
+                  "regression": -0.00798783323702303
+                },
+                {
+                  "tile": 49,
+                  "observations": 389,
+                  "mean_before": 0.01147946859721285,
+                  "mean_after": 0.0034864744572241533,
+                  "regression": -0.007992994139988698
+                },
+                {
+                  "tile": 50,
+                  "observations": 473,
+                  "mean_before": 0.023298617337116984,
+                  "mean_after": 0.011514888272762303,
+                  "regression": -0.011783729064354681
+                },
+                {
+                  "tile": 51,
+                  "observations": 239,
+                  "mean_before": 0.03266809110867958,
+                  "mean_after": 0.018479535622303925,
+                  "regression": -0.014188555486375664
+                },
+                {
+                  "tile": 52,
+                  "observations": 479,
+                  "mean_before": 0.010817858934755528,
+                  "mean_after": 0.0033548092619828094,
+                  "regression": -0.007463049672772718
+                },
+                {
+                  "tile": 53,
+                  "observations": 249,
+                  "mean_before": 0.005565197243384599,
+                  "mean_after": 0.0023193768406389276,
+                  "regression": -0.0032458204027456714
+                },
+                {
+                  "tile": 54,
+                  "observations": 390,
+                  "mean_before": 0.003464499378221291,
+                  "mean_after": 0.0014594032702889442,
+                  "regression": -0.0020050961079323467
+                },
+                {
+                  "tile": 55,
+                  "observations": 44,
+                  "mean_before": 0.002104062879369741,
+                  "mean_after": 0.0016395629031474757,
+                  "regression": -0.00046449997622226546
+                },
+                {
+                  "tile": 56,
+                  "observations": 332,
+                  "mean_before": 0.014253065825635541,
+                  "mean_after": 0.00533924897762782,
+                  "regression": -0.008913816848007721
+                },
+                {
+                  "tile": 57,
+                  "observations": 469,
+                  "mean_before": 0.023633759034804754,
+                  "mean_after": 0.009118309770611469,
+                  "regression": -0.014515449264193287
+                },
+                {
+                  "tile": 58,
+                  "observations": 395,
+                  "mean_before": 0.014636860538667699,
+                  "mean_after": 0.007063116224671128,
+                  "regression": -0.007573744313996569
+                },
+                {
+                  "tile": 59,
+                  "observations": 28,
+                  "mean_before": 0.017853135499633944,
+                  "mean_after": 0.00875188418479149,
+                  "regression": -0.009101251314842459
+                },
+                {
+                  "tile": 60,
+                  "observations": 382,
+                  "mean_before": 0.007168328743424698,
+                  "mean_after": 0.003341398531849971,
+                  "regression": -0.0038269302115747266
+                },
+                {
+                  "tile": 61,
+                  "observations": 88,
+                  "mean_before": 0.012836966837361468,
+                  "mean_after": 0.005510200310365156,
+                  "regression": -0.00732676652699631
+                },
+                {
+                  "tile": 62,
+                  "observations": 145,
+                  "mean_before": 0.004031893235507612,
+                  "mean_after": 0.0015713139975919712,
+                  "regression": -0.0024605792379156404
+                },
+                {
+                  "tile": 63,
+                  "observations": 89,
+                  "mean_before": 0.002186349888940481,
+                  "mean_after": 0.0013686766325542196,
+                  "regression": -0.0008176732563862615
+                }
+              ],
+              "regressed_fraction": 0.0,
+              "maximum_regression": -0.00046449997622226546,
+              "regional_tolerance": 0.002,
+              "maximum_regressed_fraction": 0.2,
+              "maximum_allowed_regression": 0.006,
+              "no_immobile_part_assumption": true
+            }
+          },
+          "before": {
+            "coverage": [
+              0.9810835443037975,
+              0.9563893370906529,
+              0.9496631301788895,
+              0.9443718443718444,
+              0.9534707328555736,
+              0.9709295774647887
+            ],
+            "depth": [
+              0.04333255464367284,
+              0.06332007935523516,
+              0.03952766572668281,
+              0.05570028928400369,
+              0.049472641548239694,
+              0.04769554512886671
+            ],
+            "partial_to_carrier_p90": 0.015964193238446205,
+            "partial_to_carrier_p99": 0.04145350402155288,
+            "partial_to_carrier_median": 0.0027073669697769195
+          },
+          "after": {
+            "coverage": [
+              0.9825620253164556,
+              0.9628661682158035,
+              0.9598595730400888,
+              0.9554796554796555,
+              0.9619971752890097,
+              0.9723943661971831
+            ],
+            "depth": [
+              0.038619652427165585,
+              0.05912194278562614,
+              0.03461249719559176,
+              0.05104798082929353,
+              0.04223233788533792,
+              0.04049019462136707
+            ],
+            "partial_to_carrier_p90": 0.008516912101499205,
+            "partial_to_carrier_p99": 0.03167536517796426,
+            "partial_to_carrier_median": 0.001985786615593758
+          },
+          "local_evidence": {
+            "metric": "observed-to-carrier nearest distance; not semantic correctness",
+            "synthetic_views_are_not_independent_observations": true,
+            "whole_scan_mean_before": 0.009461311622285626,
+            "whole_scan_mean_after": 0.0061469263163699845,
+            "review_regions": [
+              {
+                "view": 3,
+                "tile": [
+                  5,
+                  6
+                ],
+                "observed_points": 474,
+                "mean_before": 0.03193019439491025,
+                "mean_after": 0.018127274380093907,
+                "mean_gain": 0.013802920014816351,
+                "box": [
+                  288,
+                  352,
+                  416,
+                  480
+                ],
+                "role": "largest_measured_gain"
+              },
+              {
+                "view": 4,
+                "tile": [
+                  4,
+                  1
+                ],
+                "observed_points": 11,
+                "mean_before": 0.007772139657592079,
+                "mean_after": 0.00782843181382555,
+                "mean_gain": -5.629215623346882e-05,
+                "box": [
+                  224,
+                  32,
+                  352,
+                  160
+                ],
+                "role": "largest_regression_or_smallest_gain"
+              }
+            ]
+          }
+        },
+        "images": [
+          "workspace/semantic_refinement_astra/custom10/cartoon_fox/joint_refinement_run/round_05/before.png",
+          "workspace/semantic_refinement_astra/custom10/cartoon_fox/joint_refinement_run/round_05/after_0.png",
+          "workspace/semantic_refinement_astra/custom10/cartoon_fox/joint_refinement_run/round_05/local_comparison_0.png"
+        ]
+      },
+      "parameters": {
+        "point_count": 100000,
+        "diagnostic_resolution": [
+          512,
+          512
+        ],
+        "view_count": 6,
+        "view_policy": "preserve_four_plus_fixed_elevation_pair_v1",
+        "resize_policy": "shared cameras and canvases; no point-cloud crop or recentering",
+        "solver": {
+          "operator": "baseline_partial_ot_posterior",
+          "fraction": 1.0,
+          "field": {
+            "active": true,
+            "method": "structure_aware_partial_ot_complete_gaussian_posterior",
+            "strict_zero_shot": true,
+            "ground_truth_cd_emd_used": false,
+            "category_or_part_rules_used": false,
+            "carrier_slots_before": 100000,
+            "carrier_slots_after": 100000,
+            "carrier_slots_preserved": true,
+            "config": {
+              "partial_samples": 3072,
+              "prior_samples": 6144,
+              "normal_neighbours": 24,
+              "transport_iterations": 60,
+              "transport_relaxation": 0.72,
+              "transport_temperature_floor": 0.012,
+              "maximum_3d_ratio": 0.34,
+              "maximum_screen_ratio": 0.28,
+              "maximum_depth_ratio": 0.34,
+              "structural_rescue_candidates": 48,
+              "structural_rescue_screen_fraction": 0.55,
+              "structural_rescue_depth_fraction": 0.7,
+              "intrinsic_landmarks": 8,
+              "intrinsic_graph_neighbours": 12,
+              "minimum_transport_pairs": 96,
+              "stable_spacing_multiplier": 3.0,
+              "stable_residual_quantile": 0.22,
+              "residual_quantile": 0.42,
+              "require_localized_residual_evidence": true,
+              "coarse_node_fraction": 0.02,
+              "fine_node_fraction": 0.055,
+              "minimum_graph_nodes": 192,
+              "maximum_graph_nodes": 6144,
+              "skinning_neighbours": 4,
+              "low_frequency_modes": 24,
+              "low_frequency_regularization": 0.035,
+              "low_frequency_stable_weight": 6.0,
+              "coarse_neighbours": 18,
+              "coarse_edge_ratio": 2.45,
+              "coarse_data_weight": 2.5,
+              "coarse_screening": 0.0008,
+              "coarse_iterations": 5,
+              "coarse_displacement_ratio": 0.28,
+              "fine_neighbours": 10,
+              "fine_edge_ratio": 1.85,
+              "fine_data_weight": 4.0,
+              "fine_screening": 0.003,
+              "fine_iterations": 5,
+              "fine_displacement_ratio": 0.12,
+              "bending_regularization": 0.0,
+              "attachment_edge_ratio": 3.2,
+              "minimum_observed_improvement": 0.025,
+              "minimum_edge_compression": 0.55,
+              "maximum_edge_stretch": 2.8,
+              "enforce_edge_strain_limits": false,
+              "minimum_hidden_coverage": 0.95,
+              "coverage_resolution": 160,
+              "integrated_observation_fusion": true,
+              "assimilation_samples": 6144,
+              "assimilation_pixel_radius": 1.0,
+              "assimilation_cross_view_pixel_radius": 2.0,
+              "assimilation_minimum_view_support": 1,
+              "assimilation_separate_stable_anchors": false,
+              "assimilation_stable_quantile": 0.25,
+              "assimilation_hard_residual_targets": false,
+              "assimilation_coherent_residual_targets": false,
+              "assimilation_data_weight": 2.0,
+              "assimilation_screening": 0.004,
+              "assimilation_iterations": 3,
+              "assimilation_displacement_ratio": 0.05,
+              "assimilation_anchor_residual_ratio": 0.03,
+              "slender_rigidity_projection": false,
+              "slender_neighbours": 128,
+              "slender_linearity_quantile": 0.95,
+              "slender_minimum_fraction": 0.003,
+              "slender_minimum_aspect_ratio": 6.0,
+              "slender_dilation_steps": 2
+            },
+            "stages": [
+              {
+                "stage": "coarse",
+                "active": false,
+                "reason": "insufficient_residual_transport_pairs",
+                "transport": {
+                  "active": false,
+                  "method": "multiview_camera_structure_unbalanced_partial_transport",
+                  "device": "cuda",
+                  "view_count": 1,
+                  "view_evidence": [
+                    {
+                      "view": 0,
+                      "partial_visible": 2842,
+                      "prior_visible": 6144,
+                      "supported_pairs": 17461248
+                    }
+                  ],
+                  "partial_diagonal": 1.5934643873839316,
+                  "partial_spacing": 0.0033872161310978133,
+                  "visible_prior": 29184,
+                  "partial_samples": 3072,
+                  "prior_samples": 6144,
+                  "valid_transport_rows": 2842,
+                  "retained_capacity_pairs": 0,
+                  "stable_pairs": 626,
+                  "coherent_residual_rows": 0,
+                  "raw_coherent_residual_rows": 1604,
+                  "coherent_residual_fraction": 0.5643912737508796,
+                  "coherent_prior_support_fraction": 0.16536458333333334,
+                  "localization_bound": 0.19999999999999998,
+                  "localized_residual_evidence": false,
+                  "residual_pairs": 0,
+                  "stable_prior": 2692,
+                  "residual_prior": 0,
+                  "unsupported_prior": 97308,
+                  "unmatched_partial_fraction": 0.7962239583333334,
+                  "temperature": 0.012,
+                  "stable_limit": 0.024174688869072827,
+                  "residual_limit": 0.0423140842071864,
+                  "residual_median": null,
+                  "residual_p90": null
+                }
+              }
+            ],
+            "supported_stable": 2692,
+            "supported_stable_final": 0,
+            "supported_residual": 0,
+            "unsupported": 97308,
+            "moved": 100000,
+            "hidden_coverage_ratio": 0.9544161345387874,
+            "hidden_coverage_per_view": [
+              0.9770438481266028,
+              0.9544161345387874,
+              1.0012124151309407
+            ],
+            "integrity": {
+              "input_connected_components": 2,
+              "output_connected_components": 2,
+              "new_connected_components": 0,
+              "component_significance_size": 100,
+              "input_significant_components": 1,
+              "output_significant_components": 1,
+              "input_component_sizes": [
+                99999,
+                1
+              ],
+              "output_component_sizes": [
+                99999,
+                1
+              ],
+              "tracked_original_edges": 499487,
+              "tracked_edge_replacement_fraction": 7.207394787051515e-05,
+              "stable_motion_p50": 0.0022677101302881154,
+              "stable_motion_p95": 0.008953360159487282,
+              "stable_motion_max": 0.014569198954531968,
+              "passed": true
+            },
+            "topology_projection": {
+              "active": false,
+              "corrected_points": 0,
+              "passes": [
+                {
+                  "pass": 0,
+                  "components_before": 2,
+                  "new_small_fragment_points": 0
+                }
+              ]
+            },
+            "observation_assimilation": {
+              "active": true,
+              "method": "integrated_four_view_observation_assimilation",
+              "positive_evidence": {
+                "views": [
+                  {
+                    "view_index": 0,
+                    "partial_visible_pixels": 14306,
+                    "prior_visible_pixels": 60111,
+                    "nearby_pixel_pairs": 14172,
+                    "mutual_pixel_pairs": 10767,
+                    "max_pixel_distance": 1.0,
+                    "radius_relaxed": false,
+                    "pair_subsample_limit": 100000
+                  },
+                  {
+                    "view_index": 1,
+                    "partial_visible_pixels": 13240,
+                    "prior_visible_pixels": 66545,
+                    "nearby_pixel_pairs": 12907,
+                    "mutual_pixel_pairs": 9367,
+                    "max_pixel_distance": 1.0,
+                    "radius_relaxed": false,
+                    "pair_subsample_limit": 100000
+                  },
+                  {
+                    "view_index": 2,
+                    "partial_visible_pixels": 11369,
+                    "prior_visible_pixels": 66806,
+                    "nearby_pixel_pairs": 10954,
+                    "mutual_pixel_pairs": 7765,
+                    "max_pixel_distance": 1.0,
+                    "radius_relaxed": false,
+                    "pair_subsample_limit": 100000
+                  },
+                  {
+                    "view_index": 3,
+                    "partial_visible_pixels": 10906,
+                    "prior_visible_pixels": 63304,
+                    "nearby_pixel_pairs": 10496,
+                    "mutual_pixel_pairs": 7303,
+                    "max_pixel_distance": 1.0,
+                    "radius_relaxed": false,
+                    "pair_subsample_limit": 100000
+                  },
+                  {
+                    "view_index": 4,
+                    "partial_visible_pixels": 12340,
+                    "prior_visible_pixels": 55556,
+                    "nearby_pixel_pairs": 12009,
+                    "mutual_pixel_pairs": 8503,
+                    "max_pixel_distance": 1.0,
+                    "radius_relaxed": false,
+                    "pair_subsample_limit": 100000
+                  },
+                  {
+                    "view_index": 5,
+                    "partial_visible_pixels": 11895,
+                    "prior_visible_pixels": 53965,
+                    "nearby_pixel_pairs": 11722,
+                    "mutual_pixel_pairs": 8286,
+                    "max_pixel_distance": 1.0,
+                    "radius_relaxed": false,
+                    "pair_subsample_limit": 100000
+                  }
+                ],
+                "raw_visible_pairs": 51991,
+                "unique_physical_pairs": 50314,
+                "support_histogram": {
+                  "0": 23207,
+                  "1": 10713,
+                  "2": 4838,
+                  "3": 2166,
+                  "4": 1071,
+                  "5": 1369,
+                  "6": 6950
+                },
+                "cross_view_pixel_radius": 2.0,
+                "cross_view_depth_limit": 0.04780393162151795
+              },
+              "assignment": {
+                "pixel_pairs": 27107,
+                "within_metric_limit": 26883,
+                "collision_free_pairs": 12021,
+                "max_residual": 0.04780393162151795,
+                "residual_median": 0.009816916090353263,
+                "residual_p90": 0.03559549207810468,
+                "selected_support_mean": 3.7238166541885036
+              },
+              "retained_anchors": 6144,
+              "residual_anchors": 6144,
+              "stable_gaussians": 0,
+              "stable_limit": null,
+              "solver": {
+                "active": true,
+                "field": "hierarchical_embedded_arap_posterior",
+                "graph_nodes": 11257,
+                "node_graph_edges": 56202,
+                "attachment_edges": 0,
+                "carrier_graph_edges": 499487,
+                "carrier_attachment_edges": 2,
+                "target_gaussians": 6144,
+                "stable_gaussians": 0,
+                "moved_gaussians": 100000,
+                "moved_fraction": 1.0,
+                "maximum_displacement": 0.02602978790138807,
+                "mean_displacement": 0.006428859727310346,
+                "coherent_targets": {
+                  "components": 0,
+                  "regularized_targets": 0
+                },
+                "node_solver": {
+                  "active": true,
+                  "field": "soft_full_surface_arap_posterior",
+                  "surface_graph_edges": 56202,
+                  "attachment_edges": 0,
+                  "coherent_targets": {
+                    "components": 0,
+                    "regularized_targets": 0
+                  },
+                  "hard_target_constraints": false,
+                  "line_search": [
+                    {
+                      "alpha": 1.0,
+                      "observed_residual_before": 0.005676197041016438,
+                      "observed_residual_after": 0.0012242836626745,
+                      "observed_improvement": 0.7843126914327013,
+                      "hidden_coverage_ratio": 0.9516083119840593,
+                      "hidden_coverage_per_view": [
+                        0.9846196868008948,
+                        0.9516083119840593,
+                        0.9869782971619365
+                      ],
+                      "original_graph_components": 1,
+                      "candidate_graph_components": 1,
+                      "edge_stretch_p01": 0.4575776307023475,
+                      "edge_stretch_p50": 1.0109583361816759,
+                      "edge_stretch_p99": 2.2805425125099967,
+                      "edge_stretch_p999": 4.510390107115008,
+                      "significant_component_size": 32,
+                      "original_significant_components": 1,
+                      "candidate_significant_components": 1,
+                      "candidate_small_component_mass": 0,
+                      "edge_strain_limits_enforced": false
+                    }
+                  ],
+                  "target_gaussians": 6144,
+                  "stable_gaussians": 0,
+                  "moved_gaussians": 11257,
+                  "moved_fraction": 1.0,
+                  "maximum_displacement": 0.04507219497538258,
+                  "mean_displacement": 0.011499366969218982,
+                  "cg_status": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "alpha": 1.0,
+                  "observed_residual_before": 0.005676197041016438,
+                  "observed_residual_after": 0.0012242836626745,
+                  "observed_improvement": 0.7843126914327013,
+                  "hidden_coverage_ratio": 0.9516083119840593,
+                  "hidden_coverage_per_view": [
+                    0.9846196868008948,
+                    0.9516083119840593,
+                    0.9869782971619365
+                  ],
+                  "original_graph_components": 1,
+                  "candidate_graph_components": 1,
+                  "edge_stretch_p01": 0.4575776307023475,
+                  "edge_stretch_p50": 1.0109583361816759,
+                  "edge_stretch_p99": 2.2805425125099967,
+                  "edge_stretch_p999": 4.510390107115008,
+                  "significant_component_size": 32,
+                  "original_significant_components": 1,
+                  "candidate_significant_components": 1,
+                  "candidate_small_component_mass": 0,
+                  "edge_strain_limits_enforced": false
+                },
+                "preserve_target_amplitude": false,
+                "hard_target_constraints": false,
+                "node_minimum_edge_compression": null,
+                "line_search": [
+                  {
+                    "alpha": 1.0,
+                    "observed_residual_before": 0.005676197041016438,
+                    "observed_residual_after": 0.002869616280712229,
+                    "observed_improvement": 0.49444738088261186,
+                    "hidden_coverage_ratio": 0.9289795918367347,
+                    "hidden_coverage_per_view": [
+                      0.9753593429158111,
+                      0.9289795918367347,
+                      1.0017750524447313
+                    ],
+                    "original_graph_components": 1,
+                    "candidate_graph_components": 1,
+                    "significant_component_size": 100,
+                    "original_significant_components": 1,
+                    "candidate_significant_components": 1,
+                    "candidate_small_component_mass": 0,
+                    "robust_edge_quantile": 0.99,
+                    "edge_strain_limits_enforced": false,
+                    "edge_stretch_p01": 0.5771380700912804,
+                    "edge_stretch_p50": 1.0016656658589624,
+                    "edge_stretch_p99": 1.740147437636218,
+                    "edge_stretch_p999": 2.64584588077214
+                  },
+                  {
+                    "alpha": 0.85,
+                    "observed_residual_before": 0.005676197041016438,
+                    "observed_residual_after": 0.003047050705638789,
+                    "observed_improvement": 0.4631879965369995,
+                    "hidden_coverage_ratio": 0.9354169286882154,
+                    "hidden_coverage_per_view": [
+                      0.9730419623957166,
+                      0.9354169286882154,
+                      0.9999193418293273
+                    ],
+                    "original_graph_components": 1,
+                    "candidate_graph_components": 1,
+                    "significant_component_size": 100,
+                    "original_significant_components": 1,
+                    "candidate_significant_components": 1,
+                    "candidate_small_component_mass": 0,
+                    "robust_edge_quantile": 0.99,
+                    "edge_strain_limits_enforced": false,
+                    "edge_stretch_p01": 0.6019668912863425,
+                    "edge_stretch_p50": 1.0003689976729906,
+                    "edge_stretch_p99": 1.5981269095413864,
+                    "edge_stretch_p999": 2.3446332509655865
+                  },
+                  {
+                    "alpha": 0.7,
+                    "observed_residual_before": 0.005676197041016438,
+                    "observed_residual_after": 0.003342820460247291,
+                    "observed_improvement": 0.4110809691608782,
+                    "hidden_coverage_ratio": 0.9460907944514502,
+                    "hidden_coverage_per_view": [
+                      0.9739846528167696,
+                      0.9460907944514502,
+                      0.9986296953087216
+                    ],
+                    "original_graph_components": 1,
+                    "candidate_graph_components": 1,
+                    "significant_component_size": 100,
+                    "original_significant_components": 1,
+                    "candidate_significant_components": 1,
+                    "candidate_small_component_mass": 0,
+                    "robust_edge_quantile": 0.99,
+                    "edge_strain_limits_enforced": false,
+                    "edge_stretch_p01": 0.6361968758039267,
+                    "edge_stretch_p50": 0.9996290321409975,
+                    "edge_stretch_p99": 1.4654132839596465,
+                    "edge_stretch_p999": 2.0567878336672707
+                  },
+                  {
+                    "alpha": 0.55,
+                    "observed_residual_before": 0.005676197041016438,
+                    "observed_residual_after": 0.0037005752825901503,
+                    "observed_improvement": 0.3480537663069766,
+                    "hidden_coverage_ratio": 0.9544161345387874,
+                    "hidden_coverage_per_view": [
+                      0.9770438481266028,
+                      0.9544161345387874,
+                      1.0012124151309407
+                    ],
+                    "original_graph_components": 1,
+                    "candidate_graph_components": 1,
+                    "significant_component_size": 100,
+                    "original_significant_components": 1,
+                    "candidate_significant_components": 1,
+                    "candidate_small_component_mass": 0,
+                    "robust_edge_quantile": 0.99,
+                    "edge_strain_limits_enforced": false,
+                    "edge_stretch_p01": 0.6847972129982891,
+                    "edge_stretch_p50": 0.9990986590805843,
+                    "edge_stretch_p99": 1.3457694763528651,
+                    "edge_stretch_p999": 1.7869800881666589
+                  }
+                ],
+                "alpha": 0.55,
+                "observed_residual_before": 0.005676197041016438,
+                "observed_residual_after": 0.0037005752825901503,
+                "observed_improvement": 0.3480537663069766,
+                "hidden_coverage_ratio": 0.9544161345387874,
+                "hidden_coverage_per_view": [
+                  0.9770438481266028,
+                  0.9544161345387874,
+                  1.0012124151309407
+                ],
+                "original_graph_components": 1,
+                "candidate_graph_components": 1,
+                "significant_component_size": 100,
+                "original_significant_components": 1,
+                "candidate_significant_components": 1,
+                "candidate_small_component_mass": 0,
+                "robust_edge_quantile": 0.99,
+                "edge_strain_limits_enforced": false,
+                "edge_stretch_p01": 0.6847972129982891,
+                "edge_stretch_p50": 0.9990986590805843,
+                "edge_stretch_p99": 1.3457694763528651,
+                "edge_stretch_p999": 1.7869800881666589
+              },
+              "topology_projection": {
+                "active": true,
+                "corrected_points": 1,
+                "passes": [
+                  {
+                    "pass": 0,
+                    "components_before": 2,
+                    "new_small_fragment_points": 1
+                  },
+                  {
+                    "pass": 1,
+                    "components_before": 2,
+                    "new_small_fragment_points": 1
+                  },
+                  {
+                    "pass": 2,
+                    "components_before": 2,
+                    "new_small_fragment_points": 1
+                  }
+                ]
+              }
+            },
+            "slender_rigidity_projection": {
+              "active": false,
+              "reason": "disabled",
+              "method": "covariance_detected_slender_region_se3_projection"
+            },
+            "posterior_diagnostics": {
+              "selection_gate_used": false,
+              "initial": {
+                "objective": 0.1171829629172057,
+                "visible_3d": 0.039412939578610036,
+                "visible_pair_count": 11097,
+                "silhouette_iou": 0.7705516265912306,
+                "coverage": 0.9818686468171004,
+                "leakage": 0.2183258243177318,
+                "depth_error_normalized": 0.04798863656257944
+              },
+              "candidate": {
+                "objective": 0.10362842497175673,
+                "visible_3d": 0.02365922183123386,
+                "visible_pair_count": 11093,
+                "silhouette_iou": 0.7763953935287335,
+                "coverage": 0.983004109292769,
+                "leakage": 0.21304071797535568,
+                "depth_error_normalized": 0.04161657663382018
+              },
+              "objective_delta": -0.013554537945448975,
+              "ground_truth_cd_emd_used": false
+            },
+            "edge_stretch_p01": 0.6847969239270834,
+            "edge_stretch_p50": 0.9990986590805843,
+            "edge_stretch_p99": 1.3457710478482108,
+            "edge_stretch_p999": 1.786980193121679
+          },
+          "strain": {
+            "edge_stretch_p01": 0.6866508170146716,
+            "edge_stretch_p50": 0.999147032205649,
+            "edge_stretch_p99": 1.3332360834630295,
+            "edge_stretch_p999": 1.752523137545696
+          },
+          "mean_before": 0.009461311622285626,
+          "mean_after": 0.0061469263163699845,
+          "connectivity": {
+            "passed": true,
+            "broken_components": 0,
+            "merged_components": 0,
+            "minimum_significant_size": 100,
+            "carrier_slots": 100000
+          },
+          "solver_integrity_passed": true,
+          "hard_passed": true,
+          "integrity_audit": {
+            "carrier_slots": 100000,
+            "finite": true,
+            "protected_slots": {
+              "count": 0,
+              "reference": "frozen_loop_initial_carrier",
+              "reference_coordinates_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "candidate_coordinates_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "exactly_preserved": true,
+              "maximum_displacement": 0.0
+            },
+            "cumulative_strain": {
+              "edge_stretch_p01": 0.5335886528930781,
+              "edge_stretch_p50": 0.9992646955157299,
+              "edge_stretch_p99": 1.6189952706348083,
+              "edge_stretch_p999": 2.3565733262338573
+            },
+            "strain_policy": "diagnostic_only_no_absolute_stretch_threshold",
+            "cumulative_reference": "fixed edges and coordinates at start of this loop, not previous round",
+            "maximum_step_displacement": 0.02602978790138807,
+            "passed": true
+          },
+          "current_regional_support": {
+            "passed": true,
+            "normalization": "partial_bbox_diagonal",
+            "camera": "saved_acquisition",
+            "regions": [
+              {
+                "tile": 2,
+                "observations": 34,
+                "mean_before": 0.03247577837120155,
+                "mean_after": 0.02441775760457783,
+                "regression": -0.008058020766623724
+              },
+              {
+                "tile": 3,
+                "observations": 57,
+                "mean_before": 0.012631424417826293,
+                "mean_after": 0.008517582385894304,
+                "regression": -0.00411384203193199
+              },
+              {
+                "tile": 5,
+                "observations": 99,
+                "mean_before": 0.002955801922245753,
+                "mean_after": 0.002166892501976032,
+                "regression": -0.0007889094202697207
+              },
+              {
+                "tile": 6,
+                "observations": 393,
+                "mean_before": 0.006052475993901103,
+                "mean_after": 0.0041421593114018985,
+                "regression": -0.0019103166824992032
+              },
+              {
+                "tile": 7,
+                "observations": 61,
+                "mean_before": 0.002072126127273009,
+                "mean_after": 0.0015472886447581947,
+                "regression": -0.0005248374825148148
+              },
+              {
+                "tile": 10,
+                "observations": 156,
+                "mean_before": 0.01080220877017723,
+                "mean_after": 0.007394056765282791,
+                "regression": -0.003408152004894438
+              },
+              {
+                "tile": 11,
+                "observations": 468,
+                "mean_before": 0.003869864741491747,
+                "mean_after": 0.002456741513245217,
+                "regression": -0.0014131232282465305
+              },
+              {
+                "tile": 12,
+                "observations": 442,
+                "mean_before": 0.005437633677921095,
+                "mean_after": 0.003811046695014482,
+                "regression": -0.0016265869829066126
+              },
+              {
+                "tile": 13,
+                "observations": 464,
+                "mean_before": 0.00420793444410705,
+                "mean_after": 0.002825803336432234,
+                "regression": -0.0013821311076748159
+              },
+              {
+                "tile": 14,
+                "observations": 475,
+                "mean_before": 0.0031594540683072873,
+                "mean_after": 0.0020558841571078445,
+                "regression": -0.0011035699111994425
+              },
+              {
+                "tile": 15,
+                "observations": 225,
+                "mean_before": 0.004259272638885066,
+                "mean_after": 0.0023666511636989667,
+                "regression": -0.001892621475186099
+              },
+              {
+                "tile": 18,
+                "observations": 69,
+                "mean_before": 0.0024083294709034662,
+                "mean_after": 0.0017252813784532253,
+                "regression": -0.0006830480924502408
+              },
+              {
+                "tile": 19,
+                "observations": 459,
+                "mean_before": 0.003088029561456756,
+                "mean_after": 0.0018730024355083034,
+                "regression": -0.0012150271259484529
+              },
+              {
+                "tile": 20,
+                "observations": 487,
+                "mean_before": 0.003104979998423231,
+                "mean_after": 0.0019225178928317925,
+                "regression": -0.0011824621055914386
+              },
+              {
+                "tile": 21,
+                "observations": 489,
+                "mean_before": 0.0044651154810918785,
+                "mean_after": 0.002462142958503893,
+                "regression": -0.002002972522587986
+              },
+              {
+                "tile": 22,
+                "observations": 454,
+                "mean_before": 0.0031465513605138545,
+                "mean_after": 0.0018785100529631097,
+                "regression": -0.0012680413075507446
+              },
+              {
+                "tile": 23,
+                "observations": 275,
+                "mean_before": 0.0023621860844779546,
+                "mean_after": 0.0016810333521954425,
+                "regression": -0.0006811527322825119
+              },
+              {
+                "tile": 27,
+                "observations": 111,
+                "mean_before": 0.003512513958657621,
+                "mean_after": 0.00207940761413891,
+                "regression": -0.0014331063445187113
+              },
+              {
+                "tile": 28,
+                "observations": 444,
+                "mean_before": 0.002245795220863153,
+                "mean_after": 0.0016880195072721239,
+                "regression": -0.0005577757135910287
+              },
+              {
+                "tile": 29,
+                "observations": 464,
+                "mean_before": 0.0037933145528813686,
+                "mean_after": 0.0022537081949557873,
+                "regression": -0.0015396063579255802
+              },
+              {
+                "tile": 30,
+                "observations": 427,
+                "mean_before": 0.0024995707342857936,
+                "mean_after": 0.001827285268319241,
+                "regression": -0.0006722854659665527
+              },
+              {
+                "tile": 31,
+                "observations": 20,
+                "mean_before": 0.0016184113723661663,
+                "mean_after": 0.0014948655013851913,
+                "regression": -0.0001235458709809745
+              },
+              {
+                "tile": 34,
+                "observations": 63,
+                "mean_before": 0.0070453907255360985,
+                "mean_after": 0.0058023709866371585,
+                "regression": -0.0012430197388989402
+              },
+              {
+                "tile": 35,
+                "observations": 269,
+                "mean_before": 0.0020715601635743486,
+                "mean_after": 0.0017779253756970397,
+                "regression": -0.0002936347878773091
+              },
+              {
+                "tile": 36,
+                "observations": 442,
+                "mean_before": 0.0015702090348940973,
+                "mean_after": 0.0014030195142694817,
+                "regression": -0.0001671895206246153
+              },
+              {
+                "tile": 37,
+                "observations": 468,
+                "mean_before": 0.0018777991913928713,
+                "mean_after": 0.0016882133239661406,
+                "regression": -0.00018958586742673063
+              },
+              {
+                "tile": 38,
+                "observations": 473,
+                "mean_before": 0.0027809906906277994,
+                "mean_after": 0.0019919272588812364,
+                "regression": -0.0007890634317465627
+              },
+              {
+                "tile": 39,
+                "observations": 21,
+                "mean_before": 0.0030157983898308873,
+                "mean_after": 0.00191164152244704,
+                "regression": -0.0011041568673838477
+              },
+              {
+                "tile": 41,
+                "observations": 27,
+                "mean_before": 0.013382148213511058,
+                "mean_after": 0.007551864470433095,
+                "regression": -0.00583028374307796
+              },
+              {
+                "tile": 42,
+                "observations": 393,
+                "mean_before": 0.010147359927444479,
+                "mean_after": 0.005871858615436843,
+                "regression": -0.004275501312007637
+              },
+              {
+                "tile": 43,
+                "observations": 449,
+                "mean_before": 0.01767152277508179,
+                "mean_after": 0.01276174014196345,
+                "regression": -0.004909782633118336
+              },
+              {
+                "tile": 44,
+                "observations": 474,
+                "mean_before": 0.0021751452610696336,
+                "mean_after": 0.0017074402388902862,
+                "regression": -0.00046770502217934756
+              },
+              {
+                "tile": 45,
+                "observations": 377,
+                "mean_before": 0.0023062852850751435,
+                "mean_after": 0.001813183373478653,
+                "regression": -0.0004931019115964905
+              },
+              {
+                "tile": 46,
+                "observations": 397,
+                "mean_before": 0.0024327129646820977,
+                "mean_after": 0.0018452983246989925,
+                "regression": -0.0005874146399831049
+              },
+              {
+                "tile": 48,
+                "observations": 179,
+                "mean_before": 0.009235232535009094,
+                "mean_after": 0.005232940195111098,
+                "regression": -0.004002292339897996
+              },
+              {
+                "tile": 49,
+                "observations": 389,
+                "mean_before": 0.006169281085705522,
+                "mean_after": 0.0034864744572241533,
+                "regression": -0.0026828066284813675
+              },
+              {
+                "tile": 50,
+                "observations": 473,
+                "mean_before": 0.017657615245513222,
+                "mean_after": 0.011514888272762303,
+                "regression": -0.006142726972750917
+              },
+              {
+                "tile": 51,
+                "observations": 239,
+                "mean_before": 0.02658946559038365,
+                "mean_after": 0.018479535622303925,
+                "regression": -0.008109929968079726
+              },
+              {
+                "tile": 52,
+                "observations": 479,
+                "mean_before": 0.0062936326577979216,
+                "mean_after": 0.0033548092619828094,
+                "regression": -0.002938823395815112
+              },
+              {
+                "tile": 53,
+                "observations": 249,
+                "mean_before": 0.0028454550899912473,
+                "mean_after": 0.0023193768406389276,
+                "regression": -0.0005260782493523193
+              },
+              {
+                "tile": 54,
+                "observations": 390,
+                "mean_before": 0.0017266594248253942,
+                "mean_after": 0.0014594032702889442,
+                "regression": -0.00026725615453644983
+              },
+              {
+                "tile": 55,
+                "observations": 44,
+                "mean_before": 0.001614237154083533,
+                "mean_after": 0.0016395629031474757,
+                "regression": 2.5325749063942752e-05
+              },
+              {
+                "tile": 56,
+                "observations": 332,
+                "mean_before": 0.009975384499720349,
+                "mean_after": 0.00533924897762782,
+                "regression": -0.0046361355220925285
+              },
+              {
+                "tile": 57,
+                "observations": 469,
+                "mean_before": 0.01746362726503005,
+                "mean_after": 0.009118309770611469,
+                "regression": -0.008345317494418582
+              },
+              {
+                "tile": 58,
+                "observations": 395,
+                "mean_before": 0.011252680243556634,
+                "mean_after": 0.007063116224671128,
+                "regression": -0.004189564018885506
+              },
+              {
+                "tile": 59,
+                "observations": 28,
+                "mean_before": 0.012367864165750092,
+                "mean_after": 0.00875188418479149,
+                "regression": -0.003615979980958605
+              },
+              {
+                "tile": 60,
+                "observations": 382,
+                "mean_before": 0.004598862946495512,
+                "mean_after": 0.003341398531849971,
+                "regression": -0.0012574644146455412
+              },
+              {
+                "tile": 61,
+                "observations": 88,
+                "mean_before": 0.008147728173957001,
+                "mean_after": 0.005510200310365156,
+                "regression": -0.0026375278635918462
+              },
+              {
+                "tile": 62,
+                "observations": 145,
+                "mean_before": 0.0018624237001950339,
+                "mean_after": 0.0015713139975919712,
+                "regression": -0.00029110970260306227
+              },
+              {
+                "tile": 63,
+                "observations": 89,
+                "mean_before": 0.001460335104165076,
+                "mean_after": 0.0013686766325542196,
+                "regression": -9.165847161085608e-05
+              }
+            ],
+            "regressed_fraction": 0.0,
+            "maximum_regression": 2.5325749063942752e-05,
+            "regional_tolerance": 0.002,
+            "maximum_regressed_fraction": 0.2,
+            "maximum_allowed_regression": 0.006,
+            "no_immobile_part_assumption": true
+          },
+          "initial_regional_support": {
+            "passed": true,
+            "normalization": "partial_bbox_diagonal",
+            "camera": "saved_acquisition",
+            "regions": [
+              {
+                "tile": 2,
+                "observations": 34,
+                "mean_before": 0.03765737458425234,
+                "mean_after": 0.02441775760457783,
+                "regression": -0.013239616979674514
+              },
+              {
+                "tile": 3,
+                "observations": 57,
+                "mean_before": 0.017215534149439805,
+                "mean_after": 0.008517582385894304,
+                "regression": -0.008697951763545504
+              },
+              {
+                "tile": 5,
+                "observations": 99,
+                "mean_before": 0.004443347622912872,
+                "mean_after": 0.002166892501976032,
+                "regression": -0.002276455120936839
+              },
+              {
+                "tile": 6,
+                "observations": 393,
+                "mean_before": 0.0100657562107657,
+                "mean_after": 0.0041421593114018985,
+                "regression": -0.005923596899363803
+              },
+              {
+                "tile": 7,
+                "observations": 61,
+                "mean_before": 0.004763765290432025,
+                "mean_after": 0.0015472886447581947,
+                "regression": -0.003216476645673831
+              },
+              {
+                "tile": 10,
+                "observations": 156,
+                "mean_before": 0.015441190438618703,
+                "mean_after": 0.007394056765282791,
+                "regression": -0.008047133673335911
+              },
+              {
+                "tile": 11,
+                "observations": 468,
+                "mean_before": 0.006738573627520826,
+                "mean_after": 0.002456741513245217,
+                "regression": -0.004281832114275611
+              },
+              {
+                "tile": 12,
+                "observations": 442,
+                "mean_before": 0.008929138893156397,
+                "mean_after": 0.003811046695014482,
+                "regression": -0.005118092198141916
+              },
+              {
+                "tile": 13,
+                "observations": 464,
+                "mean_before": 0.00749779011364203,
+                "mean_after": 0.002825803336432234,
+                "regression": -0.004671986777209796
+              },
+              {
+                "tile": 14,
+                "observations": 475,
+                "mean_before": 0.006418126681146042,
+                "mean_after": 0.0020558841571078445,
+                "regression": -0.004362242524038198
+              },
+              {
+                "tile": 15,
+                "observations": 225,
+                "mean_before": 0.008874325797369104,
+                "mean_after": 0.0023666511636989667,
+                "regression": -0.006507674633670136
+              },
+              {
+                "tile": 18,
+                "observations": 69,
+                "mean_before": 0.0036884412839411304,
+                "mean_after": 0.0017252813784532253,
+                "regression": -0.0019631599054879046
+              },
+              {
+                "tile": 19,
+                "observations": 459,
+                "mean_before": 0.007510399865566317,
+                "mean_after": 0.0018730024355083034,
+                "regression": -0.005637397430058014
+              },
+              {
+                "tile": 20,
+                "observations": 487,
+                "mean_before": 0.008498195323888276,
+                "mean_after": 0.0019225178928317925,
+                "regression": -0.006575677431056484
+              },
+              {
+                "tile": 21,
+                "observations": 489,
+                "mean_before": 0.008804045878169613,
+                "mean_after": 0.002462142958503893,
+                "regression": -0.006341902919665721
+              },
+              {
+                "tile": 22,
+                "observations": 454,
+                "mean_before": 0.009294804271995418,
+                "mean_after": 0.0018785100529631097,
+                "regression": -0.007416294219032308
+              },
+              {
+                "tile": 23,
+                "observations": 275,
+                "mean_before": 0.005833453361100883,
+                "mean_after": 0.0016810333521954425,
+                "regression": -0.004152420008905441
+              },
+              {
+                "tile": 27,
+                "observations": 111,
+                "mean_before": 0.005075588877516018,
+                "mean_after": 0.00207940761413891,
+                "regression": -0.0029961812633771093
+              },
+              {
+                "tile": 28,
+                "observations": 444,
+                "mean_before": 0.004129701721545212,
+                "mean_after": 0.0016880195072721239,
+                "regression": -0.0024416822142730877
+              },
+              {
+                "tile": 29,
+                "observations": 464,
+                "mean_before": 0.007583027955480054,
+                "mean_after": 0.0022537081949557873,
+                "regression": -0.005329319760524265
+              },
+              {
+                "tile": 30,
+                "observations": 427,
+                "mean_before": 0.005130221325890858,
+                "mean_after": 0.001827285268319241,
+                "regression": -0.003302936057571618
+              },
+              {
+                "tile": 31,
+                "observations": 20,
+                "mean_before": 0.003371819464247936,
+                "mean_after": 0.0014948655013851913,
+                "regression": -0.0018769539628627444
+              },
+              {
+                "tile": 34,
+                "observations": 63,
+                "mean_before": 0.008918701230164123,
+                "mean_after": 0.0058023709866371585,
+                "regression": -0.0031163302435269625
+              },
+              {
+                "tile": 35,
+                "observations": 269,
+                "mean_before": 0.0036392455115519906,
+                "mean_after": 0.0017779253756970397,
+                "regression": -0.0018613201358549508
+              },
+              {
+                "tile": 36,
+                "observations": 442,
+                "mean_before": 0.0022855430978951847,
+                "mean_after": 0.0014030195142694817,
+                "regression": -0.0008825235836257033
+              },
+              {
+                "tile": 37,
+                "observations": 468,
+                "mean_before": 0.0035454169220713525,
+                "mean_after": 0.0016882133239661406,
+                "regression": -0.001857203598105212
+              },
+              {
+                "tile": 38,
+                "observations": 473,
+                "mean_before": 0.004160768990004953,
+                "mean_after": 0.0019919272588812364,
+                "regression": -0.002168841731123716
+              },
+              {
+                "tile": 39,
+                "observations": 21,
+                "mean_before": 0.005764501442225645,
+                "mean_after": 0.00191164152244704,
+                "regression": -0.003852859919778606
+              },
+              {
+                "tile": 41,
+                "observations": 27,
+                "mean_before": 0.018610565320046298,
+                "mean_after": 0.007551864470433095,
+                "regression": -0.011058700849613197
+              },
+              {
+                "tile": 42,
+                "observations": 393,
+                "mean_before": 0.014948603302777584,
+                "mean_after": 0.005871858615436843,
+                "regression": -0.00907674468734074
+              },
+              {
+                "tile": 43,
+                "observations": 449,
+                "mean_before": 0.023006147938244435,
+                "mean_after": 0.01276174014196345,
+                "regression": -0.010244407796280981
+              },
+              {
+                "tile": 44,
+                "observations": 474,
+                "mean_before": 0.0033044558939427236,
+                "mean_after": 0.0017074402388902862,
+                "regression": -0.0015970156550524374
+              },
+              {
+                "tile": 45,
+                "observations": 377,
+                "mean_before": 0.00448260128787058,
+                "mean_after": 0.001813183373478653,
+                "regression": -0.002669417914391928
+              },
+              {
+                "tile": 46,
+                "observations": 397,
+                "mean_before": 0.005298041416120443,
+                "mean_after": 0.0018452983246989925,
+                "regression": -0.0034527430914214497
+              },
+              {
+                "tile": 48,
+                "observations": 179,
+                "mean_before": 0.013220773432134127,
+                "mean_after": 0.005232940195111098,
+                "regression": -0.00798783323702303
+              },
+              {
+                "tile": 49,
+                "observations": 389,
+                "mean_before": 0.01147946859721285,
+                "mean_after": 0.0034864744572241533,
+                "regression": -0.007992994139988698
+              },
+              {
+                "tile": 50,
+                "observations": 473,
+                "mean_before": 0.023298617337116984,
+                "mean_after": 0.011514888272762303,
+                "regression": -0.011783729064354681
+              },
+              {
+                "tile": 51,
+                "observations": 239,
+                "mean_before": 0.03266809110867958,
+                "mean_after": 0.018479535622303925,
+                "regression": -0.014188555486375664
+              },
+              {
+                "tile": 52,
+                "observations": 479,
+                "mean_before": 0.010817858934755528,
+                "mean_after": 0.0033548092619828094,
+                "regression": -0.007463049672772718
+              },
+              {
+                "tile": 53,
+                "observations": 249,
+                "mean_before": 0.005565197243384599,
+                "mean_after": 0.0023193768406389276,
+                "regression": -0.0032458204027456714
+              },
+              {
+                "tile": 54,
+                "observations": 390,
+                "mean_before": 0.003464499378221291,
+                "mean_after": 0.0014594032702889442,
+                "regression": -0.0020050961079323467
+              },
+              {
+                "tile": 55,
+                "observations": 44,
+                "mean_before": 0.002104062879369741,
+                "mean_after": 0.0016395629031474757,
+                "regression": -0.00046449997622226546
+              },
+              {
+                "tile": 56,
+                "observations": 332,
+                "mean_before": 0.014253065825635541,
+                "mean_after": 0.00533924897762782,
+                "regression": -0.008913816848007721
+              },
+              {
+                "tile": 57,
+                "observations": 469,
+                "mean_before": 0.023633759034804754,
+                "mean_after": 0.009118309770611469,
+                "regression": -0.014515449264193287
+              },
+              {
+                "tile": 58,
+                "observations": 395,
+                "mean_before": 0.014636860538667699,
+                "mean_after": 0.007063116224671128,
+                "regression": -0.007573744313996569
+              },
+              {
+                "tile": 59,
+                "observations": 28,
+                "mean_before": 0.017853135499633944,
+                "mean_after": 0.00875188418479149,
+                "regression": -0.009101251314842459
+              },
+              {
+                "tile": 60,
+                "observations": 382,
+                "mean_before": 0.007168328743424698,
+                "mean_after": 0.003341398531849971,
+                "regression": -0.0038269302115747266
+              },
+              {
+                "tile": 61,
+                "observations": 88,
+                "mean_before": 0.012836966837361468,
+                "mean_after": 0.005510200310365156,
+                "regression": -0.00732676652699631
+              },
+              {
+                "tile": 62,
+                "observations": 145,
+                "mean_before": 0.004031893235507612,
+                "mean_after": 0.0015713139975919712,
+                "regression": -0.0024605792379156404
+              },
+              {
+                "tile": 63,
+                "observations": 89,
+                "mean_before": 0.002186349888940481,
+                "mean_after": 0.0013686766325542196,
+                "regression": -0.0008176732563862615
+              }
+            ],
+            "regressed_fraction": 0.0,
+            "maximum_regression": -0.00046449997622226546,
+            "regional_tolerance": 0.002,
+            "maximum_regressed_fraction": 0.2,
+            "maximum_allowed_regression": 0.006,
+            "no_immobile_part_assumption": true
+          }
+        },
+        "image_generation_steps_cfg_scheduler": "NOT APPLICABLE"
+      },
+      "postprocessing": "Baseline partial-OT posterior update after prior semantic corrections and two observation fields. No new Image Gen/RMBG/Pixal/MoGe or final fusion in this candidate.",
+      "preservation": "Keep this approved checkpoint unchanged; new candidates may improve all regions. Prioritize the single remaining foot and check the other regions for regression.",
+      "reproducibility": "Not exactly reproducible as a hosted MLLM run: checkpoint/seed unknown. Frozen point cloud, prompts, decisions and source snapshots are recorded."
+    }
+  },
+  "model": "gpt-6-astra",
+  "reasoning_effort": "medium",
+  "checkpoint": "UNKNOWN",
+  "transformer_path": "UNKNOWN",
+  "seed": "UNKNOWN",
+  "temperature": "UNKNOWN",
+  "negative_prompt": "NONE; structured geometry planning/review",
+  "prompt_verbatim": {
+    "instructions": "You control geometric refinement of a complete generated prior against an incomplete physical scan. Attached images are paired 512x512 panels: LEFT BLUE is observed partial, RIGHT RED is complete prior. Both use the same camera. Each image is one view numbered consecutively from zero; the supplied payload gives the view count. Grid coordinates are percentages of each individual panel, not of the whole image. Unobserved prior surfaces must remain complete. First distinguish common global misalignment from a specific corresponding part with different pose/shape. Choose DEFORM_REGION only when the SAME physical part and its attachment are identifiable in both clouds. Choose REFINE_ALIGNMENT if several reliable parts share a common pose/scale offset; choose KEEP_CURRENT if ambiguous. For DEFORM_REGION, name the part, and outline its entire prior extent using a tight polygon in TWO different views; include its attachment boundary, exclude adjacent unrelated parts. Give 3 to 5 physically corresponding visible SURFACE landmarks along attachment, middle and extremity; never click empty space, a hidden centreline, or different sides of a part. Landmarks may use different views; select the clearest visible surface. Keep the first attachment landmark near its current location when attachment is already correct. Explain correspondence and intended deformation using multi-view depth and contour evidence. Do not use ground truth or invent numeric 3D coordinates or transforms. Do not force deformation just to improve overlap. Return uncertainty explicitly. Prioritize the largest coherent unresolved semantic mismatch, not tiny surface noise. Additional tools are available: coherent rigid part motion and smooth low-frequency RBF bending/length correction, both with graph attachment transitions. Missing scan connections alone do not make a visible distal part impossible to correct: use visible corresponding surfaces, preserve the unobserved attachment smoothly, and let geometry checks bound the proposal. When a clear local mismatch remains, uncertainty should trigger closer inspection of supplied zooms, new visible surface correspondences or trying another part/tool. KEEP_CURRENT is justified only when fit is adequate or concrete alternative routes have been exhausted. Explain which routes were tried. Extra images are magnified windows of the original views; their grid labels remain ORIGINAL panel percentages. Do not copy pixel positions from previous geometry blindly. Each candidate is audited against fixed loop-start rest edges and exact protected coordinates. Review receives explicit coordinate hashes and maximum protected displacement. Protection applies only to listed slots, not automatically to every previously edited part. Do not repeat a deterministic action at unchanged geometry after its candidate fractions are exhausted. Use the concrete rejection evidence to change correspondence/tool or justify stopping. A previously approved shape is a comparison baseline, not an immutable part. When protected_surface_slots is zero, every part may move or deform, including through global registration. Regional observed-support checks limit regressions against the current and frozen initial carrier without locking point coordinates. Judge both local improvement and natural complete structure. Edge-stretch percentiles, including cumulative strain, are DIAGNOSTICS ONLY. There is no universal 1.5 expansion or 0.6 compression rejection rule: a mismatched generated prior may need substantial changes of proportion. Earlier rejections based solely on those ratios are superseded. Judge supported alignment and natural structure; use large strain as a reason to inspect the changed region, not automatic rejection or automatic acceptance. For DEFORM_REGION, also provide target_windows bounding the corresponding OBSERVED part in the SAME TWO view indices as the prior windows. Reprojected target landmarks must lie inside these observed windows in both views; windows identify one physical part, not whichever neighbouring surface is nearest. Missing scan connections remain unknown. For other actions target_windows may be empty. Some extra images may be user-annotated full diagnostic boards with different layout; they provide correspondence hints, not direct grid coordinates. Infer fresh landmarks from the current paired grid images. When the remaining issue is localized to a corresponding part and other regions already fit, prioritize that part and its attachment rather than repeating distributed updates for small global score gains. REFINE_OBSERVED is also available: the existing baseline continuous observation field performs small distributed surface corrections using reliable cross-view matches, without requiring semantic part landmarks. Use it when part poses are reasonable but nontrivial distributed 3D residual remains. This tool was absent in earlier semantic-only pilots. It is a candidate requiring the same preservation and visual review, not an automatic acceptance. Consider this route before declaring remaining errors uncorrectable. Protected slots remain exactly fixed. UPDATE_POSTERIOR is available for broader distributed mismatch: the existing baseline coarse-to-fine partial optimal transport and PosteriorAdapter uses the actual saved acquisition camera for transport, with diagnostic views for positive surface support. This is an alternative to small observation-field steps or semantic part landmarks, not a mandatory action. Its full/half/quarter proposals undergo the SAME fixed-rest and exact-protection checks; the rest reference is not reset. Consider it if clear distributed mismatch remains and fine surface steps are inadequate. Do not use it to force hidden completion to fit missing scan data.",
+    "payload": {
+      "available_actions": [
+        "DEFORM_REGION",
+        "REFINE_ALIGNMENT",
+        "KEEP_CURRENT",
+        "REFINE_OBSERVED",
+        "UPDATE_POSTERIOR"
+      ],
+      "view_count": 6,
+      "protected_surface_slots": 0,
+      "round": 2,
+      "remaining_rounds": 3,
+      "observation": {
+        "coverage": [
+          0.9825620253164556,
+          0.9628661682158035,
+          0.9598595730400888,
+          0.9554796554796555,
+          0.9619971752890097,
+          0.9723943661971831
+        ],
+        "depth": [
+          0.038619652427165585,
+          0.05912194278562614,
+          0.03461249719559176,
+          0.05104798082929353,
+          0.04223233788533792,
+          0.04049019462136707
+        ],
+        "partial_to_carrier_p90": 0.008516912101499205,
+        "partial_to_carrier_p99": 0.03167536517796426,
+        "partial_to_carrier_median": 0.001985786615593758
+      },
+      "user_feedback": "The user is satisfied with the current complete result EXCEPT ONE remaining foot. The two circled regions in attached full diagnostic boards identify the SAME physical foot: one in auxiliary view 2 and one in auxiliary view 5. Establish its prior-to-observed correspondence and attachment across current paired views. Prioritize correcting this localized mismatch; do not substitute distributed score improvements elsewhere for fixing the indicated foot. Other regions are comparison baselines, not coordinate locks; check them for regression. All strain ratios are descriptive only, including inside the solvers. No GT or offline metrics are available.",
+      "history": [
+        {
+          "action": "DEFORM_REGION",
+          "part": "Indicated hind foot and short ankle transition, corresponding to the circled foot in views 2 and 5",
+          "accepted": false,
+          "review": null,
+          "error": "Cross-view semantic correspondence inconsistent; see exact reprojections and green windows in diagnostic images.",
+          "geometric_rejections": null,
+          "correspondence_validation": {
+            "valid": false,
+            "issues": [
+              "Handle 0 (Proximal ankle surface) lifts to source point 79089, which projects to [50.19, 73.56] percent in view 2, OUTSIDE its part window. Correct the window or surface association; do not expand onto an unrelated part.",
+              "Handle 3 (Paw lower surface) target projects to [50.41, 80.94] percent in view 2, OUTSIDE the observed part window. Recheck the SAME physical part across views; do not associate a neighbouring limb or tail surface."
+            ],
+            "handles": [
+              {
+                "id": 0,
+                "name": "Proximal ankle surface",
+                "source_id": 79089,
+                "target_id": 4374,
+                "snap_pixels": [
+                  0.7907839648732203,
+                  0.4970324776500331
+                ],
+                "projections": [
+                  {
+                    "view": 2,
+                    "source_xy_percent": [
+                      50.19422933795651,
+                      73.5560534614833
+                    ],
+                    "target_xy_percent": [
+                      45.26694044276657,
+                      70.0873488572478
+                    ],
+                    "inside_source_window": false,
+                    "inside_target_window": true
+                  },
+                  {
+                    "view": 5,
+                    "source_xy_percent": [
+                      49.84562808042378,
+                      71.00491027769907
+                    ],
+                    "target_xy_percent": [
+                      49.978200469048325,
+                      71.90540265569342
+                    ],
+                    "inside_source_window": true,
+                    "inside_target_window": true
+                  }
+                ]
+              },
+              {
+                "id": 1,
+                "name": "Distal ankle surface",
+                "source_id": 27247,
+                "target_id": 10864,
+                "snap_pixels": [
+                  0.4100439567120059,
+                  0.8991086649688204
+                ],
+                "projections": [
+                  {
+                    "view": 2,
+                    "source_xy_percent": [
+                      52.9262553070433,
+                      75.03123461904117
+                    ],
+                    "target_xy_percent": [
+                      47.89244239486579,
+                      75.13881367589967
+                    ],
+                    "inside_source_window": true,
+                    "inside_target_window": true
+                  },
+                  {
+                    "view": 5,
+                    "source_xy_percent": [
+                      54.99308400349088,
+                      73.468656356843
+                    ],
+                    "target_xy_percent": [
+                      53.027950513717606,
+                      76.74091105899235
+                    ],
+                    "inside_source_window": true,
+                    "inside_target_window": true
+                  }
+                ]
+              },
+              {
+                "id": 2,
+                "name": "Paw outer tip",
+                "source_id": 94755,
+                "target_id": 14988,
+                "snap_pixels": [
+                  0.3188248435963228,
+                  0.9959859879287396
+                ],
+                "projections": [
+                  {
+                    "view": 2,
+                    "source_xy_percent": [
+                      58.964232783487184,
+                      79.23448140071028
+                    ],
+                    "target_xy_percent": [
+                      54.70682818422865,
+                      79.06760871988817
+                    ],
+                    "inside_source_window": true,
+                    "inside_target_window": true
+                  },
+                  {
+                    "view": 5,
+                    "source_xy_percent": [
+                      59.048349414389946,
+                      74.96075784833947
+                    ],
+                    "target_xy_percent": [
+                      57.81842922004071,
+                      77.93019029910553
+                    ],
+                    "inside_source_window": true,
+                    "inside_target_window": true
+                  }
+                ]
+              },
+              {
+                "id": 3,
+                "name": "Paw lower surface",
+                "source_id": 98458,
+                "target_id": 7172,
+                "snap_pixels": [
+                  0.92972901998124,
+                  0.7683610096724588
+                ],
+                "projections": [
+                  {
+                    "view": 2,
+                    "source_xy_percent": [
+                      53.8913830066589,
+                      80.94365794797515
+                    ],
+                    "target_xy_percent": [
+                      50.40961549530917,
+                      80.93631096800272
+                    ],
+                    "inside_source_window": true,
+                    "inside_target_window": false
+                  },
+                  {
+                    "view": 5,
+                    "source_xy_percent": [
+                      55.04803108574664,
+                      78.82487973473002
+                    ],
+                    "target_xy_percent": [
+                      54.89994088156618,
+                      81.8881548807486
+                    ],
+                    "inside_source_window": true,
+                    "inside_target_window": true
+                  }
+                ]
+              }
+            ],
+            "images": [
+              "/data/project/cr/CompAgent/workspace/semantic_refinement_astra/custom10/cartoon_fox/local_correspondence_run/round_01/correspondence_check/validated_view_2.png",
+              "/data/project/cr/CompAgent/workspace/semantic_refinement_astra/custom10/cartoon_fox/local_correspondence_run/round_01/correspondence_check/validated_view_5.png"
+            ]
+          },
+          "repeated_candidates": null
+        }
+      ]
+    }
+  },
+  "review_prompt_verbatim": {
+    "instructions": "Review a proposed geometric update. Image 1 is BEFORE and image 2 AFTER, identical cameras and depth scales. Each view has blue OBSERVED PARTIAL, red COMPLETE PRIOR, then overlay. Image 3, if present, contains identical local crops: observed / before overlay / after overlay, including the most improved and the most regressed (or least improved) observed regions. Purple is screen overlap only; use 3D residuals for depth agreement. Require semantic correspondence and local alignment improvement while keeping the full object natural and attachments intact. Missing scan geometry is unknown. The integrity_audit directly measures protected slot coordinates against the frozen loop start: exactly_preserved=true and zero maximum_displacement verify those slots. Do not infer that other slots are protected. Cumulative strain uses a fixed rest graph. For small distributed corrections, measured local 3D gains with stable visible structure can support acceptance even when the full-object board change is subtle. Nearest-distance gains alone do not prove a semantic correspondence; reject identifiable wrong associations, stretching, collapse, or detachment. ACCEPT_UPDATE with supported improvement and no demonstrated structural regression; otherwise TRY_NEXT_CANDIDATE or STOP_KEEP_CURRENT with concrete evidence. Never use GT. Stretch percentiles are descriptive only; do not use 1.5 expansion, 0.6 compression, or another invented universal ratio as an acceptance boundary. Substantial proportional correction can be appropriate for a generated prior. Distinguish supported shape correction from visible unnatural distortion, folding, wrong correspondence or collapse. Cite concrete local evidence when rejecting shape changes.",
+    "payload": {
+      "proposal_action": "DEFORM_REGION",
+      "semantic_plan": {
+        "action": "DEFORM_REGION",
+        "part": "Indicated hind paw and short ankle transition, visible in views 2 and 5",
+        "evidence": [
+          "The circled regions identify the same distal hind paw. Its ankle, projecting toe and lower surface correspond in both views; the other forepaw is a separate, higher structure.",
+          "In view 2 the prior paw extends farther right than the observed paw. View 5 shows the corresponding observed paw lower than the prior, supporting a local ankle bend and paw repositioning rather than global registration.",
+          "The previous proposal failed window validation before deformation. The corrected boundaries include the proximal ankle surface and observed lower paw surface identified by the cross-view reprojections, without extending onto the neighbouring foot or tail.",
+          "Use smooth local bending with an attachment transition, keeping the proximal landmark nearly stationary in view 5. Preserve complete unobserved surfaces and review surrounding regions for regression."
+        ],
+        "uncertainty": "Moderate: the distal paw correspondence is clear in two views, but the partially observed ankle leaves its full attachment uncertain. Bound the correction using both views and inspect the resulting ankle continuity and paw shape.",
+        "windows": [
+          {
+            "view": 2,
+            "polygon": [
+              [
+                53,
+                69
+              ],
+              [
+                59,
+                70
+              ],
+              [
+                57,
+                74
+              ],
+              [
+                60,
+                76
+              ],
+              [
+                60,
+                80
+              ],
+              [
+                55,
+                82
+              ],
+              [
+                51,
+                81
+              ],
+              [
+                49,
+                78
+              ],
+              [
+                49,
+                73
+              ]
+            ]
+          },
+          {
+            "view": 5,
+            "polygon": [
+              [
+                49,
+                69
+              ],
+              [
+                57,
+                70
+              ],
+              [
+                60,
+                74
+              ],
+              [
+                60,
+                77
+              ],
+              [
+                57,
+                80
+              ],
+              [
+                53,
+                80
+              ],
+              [
+                49,
+                78
+              ]
+            ]
+          }
+        ],
+        "target_windows": [
+          {
+            "view": 2,
+            "polygon": [
+              [
+                44,
+                68
+              ],
+              [
+                48,
+                68
+              ],
+              [
+                49,
+                73
+              ],
+              [
+                53,
+                75
+              ],
+              [
+                56,
+                77
+              ],
+              [
+                56,
+                80
+              ],
+              [
+                51,
+                82
+              ],
+              [
+                48,
+                80
+              ],
+              [
+                45,
+                77
+              ],
+              [
+                43,
+                73
+              ]
+            ]
+          },
+          {
+            "view": 5,
+            "polygon": [
+              [
+                48,
+                69
+              ],
+              [
+                52,
+                70
+              ],
+              [
+                53,
+                74
+              ],
+              [
+                57,
+                75
+              ],
+              [
+                60,
+                78
+              ],
+              [
+                57,
+                83
+              ],
+              [
+                53,
+                83
+              ],
+              [
+                49,
+                79
+              ]
+            ]
+          }
+        ],
+        "handles": [
+          {
+            "name": "Proximal ankle surface",
+            "source": {
+              "view": 5,
+              "xy": [
+                49.85,
+                71.0
+              ]
+            },
+            "target": {
+              "view": 5,
+              "xy": [
+                49.98,
+                71.91
+              ]
+            }
+          },
+          {
+            "name": "Distal ankle surface",
+            "source": {
+              "view": 2,
+              "xy": [
+                52.93,
+                75.03
+              ]
+            },
+            "target": {
+              "view": 2,
+              "xy": [
+                47.89,
+                75.14
+              ]
+            }
+          },
+          {
+            "name": "Paw outer tip",
+            "source": {
+              "view": 2,
+              "xy": [
+                58.96,
+                79.23
+              ]
+            },
+            "target": {
+              "view": 2,
+              "xy": [
+                54.71,
+                79.07
+              ]
+            }
+          },
+          {
+            "name": "Paw lower surface",
+            "source": {
+              "view": 5,
+              "xy": [
+                55.05,
+                78.82
+              ]
+            },
+            "target": {
+              "view": 5,
+              "xy": [
+                54.9,
+                81.89
+              ]
+            }
+          }
+        ]
+      },
+      "geometry": {
+        "operator": "semantic_smooth_rbf_with_intrinsic_transition",
+        "source_ids": [
+          79089,
+          27247,
+          88394,
+          98458
+        ],
+        "target_positions": [
+          [
+            0.0631684958934784,
+            -0.2751888632774353,
+            -0.15358471870422363
+          ],
+          [
+            0.0943848192691803,
+            -0.35003963112831116,
+            -0.18151962757110596
+          ],
+          [
+            0.152349054813385,
+            -0.434268057346344,
+            -0.13496136665344238
+          ],
+          [
+            0.11085090041160583,
+            -0.43757760524749756,
+            -0.1940324306488037
+          ]
+        ],
+        "part_points": 3577,
+        "affected_points": 25504,
+        "fraction": 1.0,
+        "strain": {
+          "edge_stretch_p01": 0.6972527838184364,
+          "edge_stretch_p50": 1.0059687935889878,
+          "edge_stretch_p99": 1.3488707786383631,
+          "edge_stretch_p999": 1.4366795173029328
+        },
+        "transition_width_ratio": 0.19736476075782283,
+        "handle_error_before": [
+          0.10764802034230331,
+          0.08186562957501173,
+          0.06959602302633323,
+          0.06945268330766945
+        ],
+        "handle_error_after": [
+          0.0018011086163492985,
+          0.00164599289997162,
+          0.0002996417455563253,
+          0.0007995939718719019
+        ],
+        "maximum_motion_ratio": 0.06578825358594094,
+        "minimum_full_rank_jacobian_determinant": 0.4509718741532652,
+        "full_rank_jacobians_checked": 512,
+        "observation_mean_before": 0.0061469263163699845,
+        "observation_mean_after": 0.0061402207753160284,
+        "connectivity": {
+          "passed": true,
+          "broken_components": 0,
+          "merged_components": 0,
+          "minimum_significant_size": 100,
+          "carrier_slots": 100000
+        },
+        "hard_passed": true,
+        "integrity_audit": {
+          "carrier_slots": 100000,
+          "finite": true,
+          "protected_slots": {
+            "count": 0,
+            "reference": "frozen_loop_initial_carrier",
+            "reference_coordinates_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "candidate_coordinates_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "exactly_preserved": true,
+            "maximum_displacement": 0.0
+          },
+          "cumulative_strain": {
+            "edge_stretch_p01": 0.7843899343914477,
+            "edge_stretch_p50": 1.0,
+            "edge_stretch_p99": 1.266453871506799,
+            "edge_stretch_p999": 1.3939375157991525
+          },
+          "strain_policy": "diagnostic_only_no_absolute_stretch_threshold",
+          "cumulative_reference": "fixed edges and coordinates at start of this loop, not previous round",
+          "maximum_step_displacement": 0.10638927482665048,
+          "passed": true
+        },
+        "current_regional_support": {
+          "passed": true,
+          "normalization": "partial_bbox_diagonal",
+          "camera": "saved_acquisition",
+          "regions": [
+            {
+              "tile": 2,
+              "observations": 34,
+              "mean_before": 0.02441775760457783,
+              "mean_after": 0.02441775760457783,
+              "regression": 0.0
+            },
+            {
+              "tile": 3,
+              "observations": 57,
+              "mean_before": 0.008517582385894304,
+              "mean_after": 0.008517582385894304,
+              "regression": 0.0
+            },
+            {
+              "tile": 5,
+              "observations": 99,
+              "mean_before": 0.002166892501976032,
+              "mean_after": 0.002166892501976032,
+              "regression": 0.0
+            },
+            {
+              "tile": 6,
+              "observations": 393,
+              "mean_before": 0.0041421593114018985,
+              "mean_after": 0.0041421593114018985,
+              "regression": 0.0
+            },
+            {
+              "tile": 7,
+              "observations": 61,
+              "mean_before": 0.0015472886447581947,
+              "mean_after": 0.0015472886447581947,
+              "regression": 0.0
+            },
+            {
+              "tile": 10,
+              "observations": 156,
+              "mean_before": 0.007394056765282791,
+              "mean_after": 0.007394056765282791,
+              "regression": 0.0
+            },
+            {
+              "tile": 11,
+              "observations": 468,
+              "mean_before": 0.002456741513245217,
+              "mean_after": 0.002456741513245217,
+              "regression": 0.0
+            },
+            {
+              "tile": 12,
+              "observations": 442,
+              "mean_before": 0.003811046695014482,
+              "mean_after": 0.003811046695014482,
+              "regression": 0.0
+            },
+            {
+              "tile": 13,
+              "observations": 464,
+              "mean_before": 0.002825803336432234,
+              "mean_after": 0.002825803336432234,
+              "regression": 0.0
+            },
+            {
+              "tile": 14,
+              "observations": 475,
+              "mean_before": 0.0020558841571078445,
+              "mean_after": 0.0020558841571078445,
+              "regression": 0.0
+            },
+            {
+              "tile": 15,
+              "observations": 225,
+              "mean_before": 0.0023666511636989667,
+              "mean_after": 0.0023666511636989667,
+              "regression": 0.0
+            },
+            {
+              "tile": 18,
+              "observations": 69,
+              "mean_before": 0.0017252813784532253,
+              "mean_after": 0.0017252813784532253,
+              "regression": 0.0
+            },
+            {
+              "tile": 19,
+              "observations": 459,
+              "mean_before": 0.0018730024355083034,
+              "mean_after": 0.0018730024355083034,
+              "regression": 0.0
+            },
+            {
+              "tile": 20,
+              "observations": 487,
+              "mean_before": 0.0019225178928317925,
+              "mean_after": 0.0019225178928317925,
+              "regression": 0.0
+            },
+            {
+              "tile": 21,
+              "observations": 489,
+              "mean_before": 0.002462142958503893,
+              "mean_after": 0.002462142958503893,
+              "regression": 0.0
+            },
+            {
+              "tile": 22,
+              "observations": 454,
+              "mean_before": 0.0018785100529631097,
+              "mean_after": 0.0018785100529631097,
+              "regression": 0.0
+            },
+            {
+              "tile": 23,
+              "observations": 275,
+              "mean_before": 0.0016810333521954425,
+              "mean_after": 0.0016810333521954425,
+              "regression": 0.0
+            },
+            {
+              "tile": 27,
+              "observations": 111,
+              "mean_before": 0.00207940761413891,
+              "mean_after": 0.00207940761413891,
+              "regression": 0.0
+            },
+            {
+              "tile": 28,
+              "observations": 444,
+              "mean_before": 0.0016880195072721239,
+              "mean_after": 0.0016880195072721239,
+              "regression": 0.0
+            },
+            {
+              "tile": 29,
+              "observations": 464,
+              "mean_before": 0.0022537081949557873,
+              "mean_after": 0.0022537081949557873,
+              "regression": 0.0
+            },
+            {
+              "tile": 30,
+              "observations": 427,
+              "mean_before": 0.001827285268319241,
+              "mean_after": 0.001827285268319241,
+              "regression": 0.0
+            },
+            {
+              "tile": 31,
+              "observations": 20,
+              "mean_before": 0.0014948655013851913,
+              "mean_after": 0.0014948655013851913,
+              "regression": 0.0
+            },
+            {
+              "tile": 34,
+              "observations": 63,
+              "mean_before": 0.0058023709866371585,
+              "mean_after": 0.0058023709866371585,
+              "regression": 0.0
+            },
+            {
+              "tile": 35,
+              "observations": 269,
+              "mean_before": 0.0017779253756970397,
+              "mean_after": 0.0017705765149735482,
+              "regression": -7.348860723491357e-06
+            },
+            {
+              "tile": 36,
+              "observations": 442,
+              "mean_before": 0.0014030195142694817,
+              "mean_after": 0.0014030195142694817,
+              "regression": 0.0
+            },
+            {
+              "tile": 37,
+              "observations": 468,
+              "mean_before": 0.0016882133239661406,
+              "mean_after": 0.0016882133239661406,
+              "regression": 0.0
+            },
+            {
+              "tile": 38,
+              "observations": 473,
+              "mean_before": 0.0019919272588812364,
+              "mean_after": 0.0019919272588812364,
+              "regression": 0.0
+            },
+            {
+              "tile": 39,
+              "observations": 21,
+              "mean_before": 0.00191164152244704,
+              "mean_after": 0.00191164152244704,
+              "regression": 0.0
+            },
+            {
+              "tile": 41,
+              "observations": 27,
+              "mean_before": 0.007551864470433095,
+              "mean_after": 0.007551864470433095,
+              "regression": 0.0
+            },
+            {
+              "tile": 42,
+              "observations": 393,
+              "mean_before": 0.005871858615436843,
+              "mean_after": 0.005681304926503161,
+              "regression": -0.00019055368893368182
+            },
+            {
+              "tile": 43,
+              "observations": 449,
+              "mean_before": 0.01276174014196345,
+              "mean_after": 0.011435680674162084,
+              "regression": -0.0013260594678013652
+            },
+            {
+              "tile": 44,
+              "observations": 474,
+              "mean_before": 0.0017074402388902862,
+              "mean_after": 0.0022127720777012382,
+              "regression": 0.0005053318388109524
+            },
+            {
+              "tile": 45,
+              "observations": 377,
+              "mean_before": 0.001813183373478653,
+              "mean_after": 0.0018873787616357565,
+              "regression": 7.419538815710339e-05
+            },
+            {
+              "tile": 46,
+              "observations": 397,
+              "mean_before": 0.0018452983246989925,
+              "mean_after": 0.0018630442829465125,
+              "regression": 1.7745958247519644e-05
+            },
+            {
+              "tile": 48,
+              "observations": 179,
+              "mean_before": 0.005232940195111098,
+              "mean_after": 0.005232940195111098,
+              "regression": 0.0
+            },
+            {
+              "tile": 49,
+              "observations": 389,
+              "mean_before": 0.0034864744572241533,
+              "mean_after": 0.003486494241151452,
+              "regression": 1.9783927298530264e-08
+            },
+            {
+              "tile": 50,
+              "observations": 473,
+              "mean_before": 0.011514888272762303,
+              "mean_after": 0.011476925657198461,
+              "regression": -3.79626155638435e-05
+            },
+            {
+              "tile": 51,
+              "observations": 239,
+              "mean_before": 0.018479535622303925,
+              "mean_after": 0.014791483069625353,
+              "regression": -0.0036880525526785707
+            },
+            {
+              "tile": 52,
+              "observations": 479,
+              "mean_before": 0.0033548092619828094,
+              "mean_after": 0.0034651308130764953,
+              "regression": 0.00011032155109368547
+            },
+            {
+              "tile": 53,
+              "observations": 249,
+              "mean_before": 0.0023193768406389276,
+              "mean_after": 0.002454828643888768,
+              "regression": 0.0001354518032498404
+            },
+            {
+              "tile": 54,
+              "observations": 390,
+              "mean_before": 0.0014594032702889442,
+              "mean_after": 0.0014582216750345146,
+              "regression": -1.1815952544299431e-06
+            },
+            {
+              "tile": 55,
+              "observations": 44,
+              "mean_before": 0.0016395629031474757,
+              "mean_after": 0.0016395629031474757,
+              "regression": 0.0
+            },
+            {
+              "tile": 56,
+              "observations": 332,
+              "mean_before": 0.00533924897762782,
+              "mean_after": 0.00533924897762782,
+              "regression": 0.0
+            },
+            {
+              "tile": 57,
+              "observations": 469,
+              "mean_before": 0.009118309770611469,
+              "mean_after": 0.009081108916443315,
+              "regression": -3.720085416815354e-05
+            },
+            {
+              "tile": 58,
+              "observations": 395,
+              "mean_before": 0.007063116224671128,
+              "mean_after": 0.009707685918808476,
+              "regression": 0.0026445696941373494
+            },
+            {
+              "tile": 59,
+              "observations": 28,
+              "mean_before": 0.00875188418479149,
+              "mean_after": 0.009026565440331738,
+              "regression": 0.0002746812555402489
+            },
+            {
+              "tile": 60,
+              "observations": 382,
+              "mean_before": 0.003341398531849971,
+              "mean_after": 0.004395335497195141,
+              "regression": 0.0010539369653451704
+            },
+            {
+              "tile": 61,
+              "observations": 88,
+              "mean_before": 0.005510200310365156,
+              "mean_after": 0.002818191809139255,
+              "regression": -0.0026920085012259007
+            },
+            {
+              "tile": 62,
+              "observations": 145,
+              "mean_before": 0.0015713139975919712,
+              "mean_after": 0.0015713139975919712,
+              "regression": 0.0
+            },
+            {
+              "tile": 63,
+              "observations": 89,
+              "mean_before": 0.0013686766325542196,
+              "mean_after": 0.0013686766325542196,
+              "regression": 0.0
+            }
+          ],
+          "regressed_fraction": 0.02,
+          "maximum_regression": 0.0026445696941373494,
+          "regional_tolerance": 0.002,
+          "maximum_regressed_fraction": 0.2,
+          "maximum_allowed_regression": 0.006,
+          "no_immobile_part_assumption": true
+        },
+        "initial_regional_support": {
+          "passed": true,
+          "normalization": "partial_bbox_diagonal",
+          "camera": "saved_acquisition",
+          "regions": [
+            {
+              "tile": 2,
+              "observations": 34,
+              "mean_before": 0.02441775760457783,
+              "mean_after": 0.02441775760457783,
+              "regression": 0.0
+            },
+            {
+              "tile": 3,
+              "observations": 57,
+              "mean_before": 0.008517582385894304,
+              "mean_after": 0.008517582385894304,
+              "regression": 0.0
+            },
+            {
+              "tile": 5,
+              "observations": 99,
+              "mean_before": 0.002166892501976032,
+              "mean_after": 0.002166892501976032,
+              "regression": 0.0
+            },
+            {
+              "tile": 6,
+              "observations": 393,
+              "mean_before": 0.0041421593114018985,
+              "mean_after": 0.0041421593114018985,
+              "regression": 0.0
+            },
+            {
+              "tile": 7,
+              "observations": 61,
+              "mean_before": 0.0015472886447581947,
+              "mean_after": 0.0015472886447581947,
+              "regression": 0.0
+            },
+            {
+              "tile": 10,
+              "observations": 156,
+              "mean_before": 0.007394056765282791,
+              "mean_after": 0.007394056765282791,
+              "regression": 0.0
+            },
+            {
+              "tile": 11,
+              "observations": 468,
+              "mean_before": 0.002456741513245217,
+              "mean_after": 0.002456741513245217,
+              "regression": 0.0
+            },
+            {
+              "tile": 12,
+              "observations": 442,
+              "mean_before": 0.003811046695014482,
+              "mean_after": 0.003811046695014482,
+              "regression": 0.0
+            },
+            {
+              "tile": 13,
+              "observations": 464,
+              "mean_before": 0.002825803336432234,
+              "mean_after": 0.002825803336432234,
+              "regression": 0.0
+            },
+            {
+              "tile": 14,
+              "observations": 475,
+              "mean_before": 0.0020558841571078445,
+              "mean_after": 0.0020558841571078445,
+              "regression": 0.0
+            },
+            {
+              "tile": 15,
+              "observations": 225,
+              "mean_before": 0.0023666511636989667,
+              "mean_after": 0.0023666511636989667,
+              "regression": 0.0
+            },
+            {
+              "tile": 18,
+              "observations": 69,
+              "mean_before": 0.0017252813784532253,
+              "mean_after": 0.0017252813784532253,
+              "regression": 0.0
+            },
+            {
+              "tile": 19,
+              "observations": 459,
+              "mean_before": 0.0018730024355083034,
+              "mean_after": 0.0018730024355083034,
+              "regression": 0.0
+            },
+            {
+              "tile": 20,
+              "observations": 487,
+              "mean_before": 0.0019225178928317925,
+              "mean_after": 0.0019225178928317925,
+              "regression": 0.0
+            },
+            {
+              "tile": 21,
+              "observations": 489,
+              "mean_before": 0.002462142958503893,
+              "mean_after": 0.002462142958503893,
+              "regression": 0.0
+            },
+            {
+              "tile": 22,
+              "observations": 454,
+              "mean_before": 0.0018785100529631097,
+              "mean_after": 0.0018785100529631097,
+              "regression": 0.0
+            },
+            {
+              "tile": 23,
+              "observations": 275,
+              "mean_before": 0.0016810333521954425,
+              "mean_after": 0.0016810333521954425,
+              "regression": 0.0
+            },
+            {
+              "tile": 27,
+              "observations": 111,
+              "mean_before": 0.00207940761413891,
+              "mean_after": 0.00207940761413891,
+              "regression": 0.0
+            },
+            {
+              "tile": 28,
+              "observations": 444,
+              "mean_before": 0.0016880195072721239,
+              "mean_after": 0.0016880195072721239,
+              "regression": 0.0
+            },
+            {
+              "tile": 29,
+              "observations": 464,
+              "mean_before": 0.0022537081949557873,
+              "mean_after": 0.0022537081949557873,
+              "regression": 0.0
+            },
+            {
+              "tile": 30,
+              "observations": 427,
+              "mean_before": 0.001827285268319241,
+              "mean_after": 0.001827285268319241,
+              "regression": 0.0
+            },
+            {
+              "tile": 31,
+              "observations": 20,
+              "mean_before": 0.0014948655013851913,
+              "mean_after": 0.0014948655013851913,
+              "regression": 0.0
+            },
+            {
+              "tile": 34,
+              "observations": 63,
+              "mean_before": 0.0058023709866371585,
+              "mean_after": 0.0058023709866371585,
+              "regression": 0.0
+            },
+            {
+              "tile": 35,
+              "observations": 269,
+              "mean_before": 0.0017779253756970397,
+              "mean_after": 0.0017705765149735482,
+              "regression": -7.348860723491357e-06
+            },
+            {
+              "tile": 36,
+              "observations": 442,
+              "mean_before": 0.0014030195142694817,
+              "mean_after": 0.0014030195142694817,
+              "regression": 0.0
+            },
+            {
+              "tile": 37,
+              "observations": 468,
+              "mean_before": 0.0016882133239661406,
+              "mean_after": 0.0016882133239661406,
+              "regression": 0.0
+            },
+            {
+              "tile": 38,
+              "observations": 473,
+              "mean_before": 0.0019919272588812364,
+              "mean_after": 0.0019919272588812364,
+              "regression": 0.0
+            },
+            {
+              "tile": 39,
+              "observations": 21,
+              "mean_before": 0.00191164152244704,
+              "mean_after": 0.00191164152244704,
+              "regression": 0.0
+            },
+            {
+              "tile": 41,
+              "observations": 27,
+              "mean_before": 0.007551864470433095,
+              "mean_after": 0.007551864470433095,
+              "regression": 0.0
+            },
+            {
+              "tile": 42,
+              "observations": 393,
+              "mean_before": 0.005871858615436843,
+              "mean_after": 0.005681304926503161,
+              "regression": -0.00019055368893368182
+            },
+            {
+              "tile": 43,
+              "observations": 449,
+              "mean_before": 0.01276174014196345,
+              "mean_after": 0.011435680674162084,
+              "regression": -0.0013260594678013652
+            },
+            {
+              "tile": 44,
+              "observations": 474,
+              "mean_before": 0.0017074402388902862,
+              "mean_after": 0.0022127720777012382,
+              "regression": 0.0005053318388109524
+            },
+            {
+              "tile": 45,
+              "observations": 377,
+              "mean_before": 0.001813183373478653,
+              "mean_after": 0.0018873787616357565,
+              "regression": 7.419538815710339e-05
+            },
+            {
+              "tile": 46,
+              "observations": 397,
+              "mean_before": 0.0018452983246989925,
+              "mean_after": 0.0018630442829465125,
+              "regression": 1.7745958247519644e-05
+            },
+            {
+              "tile": 48,
+              "observations": 179,
+              "mean_before": 0.005232940195111098,
+              "mean_after": 0.005232940195111098,
+              "regression": 0.0
+            },
+            {
+              "tile": 49,
+              "observations": 389,
+              "mean_before": 0.0034864744572241533,
+              "mean_after": 0.003486494241151452,
+              "regression": 1.9783927298530264e-08
+            },
+            {
+              "tile": 50,
+              "observations": 473,
+              "mean_before": 0.011514888272762303,
+              "mean_after": 0.011476925657198461,
+              "regression": -3.79626155638435e-05
+            },
+            {
+              "tile": 51,
+              "observations": 239,
+              "mean_before": 0.018479535622303925,
+              "mean_after": 0.014791483069625353,
+              "regression": -0.0036880525526785707
+            },
+            {
+              "tile": 52,
+              "observations": 479,
+              "mean_before": 0.0033548092619828094,
+              "mean_after": 0.0034651308130764953,
+              "regression": 0.00011032155109368547
+            },
+            {
+              "tile": 53,
+              "observations": 249,
+              "mean_before": 0.0023193768406389276,
+              "mean_after": 0.002454828643888768,
+              "regression": 0.0001354518032498404
+            },
+            {
+              "tile": 54,
+              "observations": 390,
+              "mean_before": 0.0014594032702889442,
+              "mean_after": 0.0014582216750345146,
+              "regression": -1.1815952544299431e-06
+            },
+            {
+              "tile": 55,
+              "observations": 44,
+              "mean_before": 0.0016395629031474757,
+              "mean_after": 0.0016395629031474757,
+              "regression": 0.0
+            },
+            {
+              "tile": 56,
+              "observations": 332,
+              "mean_before": 0.00533924897762782,
+              "mean_after": 0.00533924897762782,
+              "regression": 0.0
+            },
+            {
+              "tile": 57,
+              "observations": 469,
+              "mean_before": 0.009118309770611469,
+              "mean_after": 0.009081108916443315,
+              "regression": -3.720085416815354e-05
+            },
+            {
+              "tile": 58,
+              "observations": 395,
+              "mean_before": 0.007063116224671128,
+              "mean_after": 0.009707685918808476,
+              "regression": 0.0026445696941373494
+            },
+            {
+              "tile": 59,
+              "observations": 28,
+              "mean_before": 0.00875188418479149,
+              "mean_after": 0.009026565440331738,
+              "regression": 0.0002746812555402489
+            },
+            {
+              "tile": 60,
+              "observations": 382,
+              "mean_before": 0.003341398531849971,
+              "mean_after": 0.004395335497195141,
+              "regression": 0.0010539369653451704
+            },
+            {
+              "tile": 61,
+              "observations": 88,
+              "mean_before": 0.005510200310365156,
+              "mean_after": 0.002818191809139255,
+              "regression": -0.0026920085012259007
+            },
+            {
+              "tile": 62,
+              "observations": 145,
+              "mean_before": 0.0015713139975919712,
+              "mean_after": 0.0015713139975919712,
+              "regression": 0.0
+            },
+            {
+              "tile": 63,
+              "observations": 89,
+              "mean_before": 0.0013686766325542196,
+              "mean_after": 0.0013686766325542196,
+              "regression": 0.0
+            }
+          ],
+          "regressed_fraction": 0.02,
+          "maximum_regression": 0.0026445696941373494,
+          "regional_tolerance": 0.002,
+          "maximum_regressed_fraction": 0.2,
+          "maximum_allowed_regression": 0.006,
+          "no_immobile_part_assumption": true
+        }
+      },
+      "before": {
+        "coverage": [
+          0.9825620253164556,
+          0.9628661682158035,
+          0.9598595730400888,
+          0.9554796554796555,
+          0.9619971752890097,
+          0.9723943661971831
+        ],
+        "depth": [
+          0.038619652427165585,
+          0.05912194278562614,
+          0.03461249719559176,
+          0.05104798082929353,
+          0.04223233788533792,
+          0.04049019462136707
+        ],
+        "partial_to_carrier_p90": 0.008516912101499205,
+        "partial_to_carrier_p99": 0.03167536517796426,
+        "partial_to_carrier_median": 0.001985786615593758
+      },
+      "after": {
+        "coverage": [
+          0.9787746835443037,
+          0.9662977524259709,
+          0.9550323962931413,
+          0.9604692604692605,
+          0.9546215410367735,
+          0.9794929577464788
+        ],
+        "depth": [
+          0.037336454940153765,
+          0.05975955024007195,
+          0.0347645409259715,
+          0.05193158968679396,
+          0.04230267207677334,
+          0.03916767930122292
+        ],
+        "partial_to_carrier_p90": 0.009594033874083606,
+        "partial_to_carrier_p99": 0.025878523078659586,
+        "partial_to_carrier_median": 0.002007318366396003
+      },
+      "local_evidence": {
+        "metric": "observed-to-carrier nearest distance; not semantic correctness",
+        "synthetic_views_are_not_independent_observations": true,
+        "whole_scan_mean_before": 0.0061469263163699845,
+        "whole_scan_mean_after": 0.0061402207753160284,
+        "review_regions": [
+          {
+            "view": 2,
+            "tile": [
+              2,
+              5
+            ],
+            "observed_points": 483,
+            "mean_before": 0.010250101709471661,
+            "mean_after": 0.006858404785260166,
+            "mean_gain": 0.0033916969242114977,
+            "box": [
+              96,
+              288,
+              224,
+              416
+            ],
+            "role": "largest_measured_gain"
+          },
+          {
+            "view": 0,
+            "tile": [
+              3,
+              6
+            ],
+            "observed_points": 279,
+            "mean_before": 0.011073950068039042,
+            "mean_after": 0.017139646867751296,
+            "mean_gain": -0.006065696799712253,
+            "box": [
+              160,
+              352,
+              288,
+              480
+            ],
+            "role": "largest_regression_or_smallest_gain"
+          }
+        ]
+      }
+    },
+    "images": [
+      "workspace/semantic_refinement_astra/custom10/cartoon_fox/local_correspondence_run/round_02/before.png",
+      "workspace/semantic_refinement_astra/custom10/cartoon_fox/local_correspondence_run/round_02/after_0.png",
+      "workspace/semantic_refinement_astra/custom10/cartoon_fox/local_correspondence_run/round_02/local_comparison_0.png"
+    ]
+  },
+  "part_review_prompt_verbatim": {
+    "instructions": "Review a proposed geometric update. Image 1 is BEFORE and image 2 AFTER, identical cameras and depth scales. Each view has blue OBSERVED PARTIAL, red COMPLETE PRIOR, then overlay. Image 3, if present, contains identical local crops: observed / before overlay / after overlay, including the most improved and the most regressed (or least improved) observed regions. Purple is screen overlap only; use 3D residuals for depth agreement. Require semantic correspondence and local alignment improvement while keeping the full object natural and attachments intact. Missing scan geometry is unknown. The integrity_audit directly measures protected slot coordinates against the frozen loop start: exactly_preserved=true and zero maximum_displacement verify those slots. Do not infer that other slots are protected. Cumulative strain uses a fixed rest graph. For small distributed corrections, measured local 3D gains with stable visible structure can support acceptance even when the full-object board change is subtle. Nearest-distance gains alone do not prove a semantic correspondence; reject identifiable wrong associations, stretching, collapse, or detachment. ACCEPT_UPDATE with supported improvement and no demonstrated structural regression; otherwise TRY_NEXT_CANDIDATE or STOP_KEEP_CURRENT with concrete evidence. Never use GT. Stretch percentiles are descriptive only; do not use 1.5 expansion, 0.6 compression, or another invented universal ratio as an acceptance boundary. Substantial proportional correction can be appropriate for a generated prior. Distinguish supported shape correction from visible unnatural distortion, folding, wrong correspondence or collapse. Cite concrete local evidence when rejecting shape changes. The final image compares the named physical part in both selected views, with identical observed/before/after crops. semantic_part_evidence uses only the fixed prior slots within the original paired windows and the observed part within its paired windows, excluding neighbouring surfaces from nearest-point matching. The repeated 3D metric in both views is one measurement, not independent evidence. Windows are semantic hypotheses: verify identity, attachment and natural shape visually. Assess the named part gain alongside the previously recorded regional regression; give concrete evidence for acceptance or remaining correction. No arbitrary edge strain ratios and no GT or offline metrics enter this review.",
+    "payload": {
+      "proposal_action": "DEFORM_REGION",
+      "semantic_plan": {
+        "action": "DEFORM_REGION",
+        "part": "Indicated hind paw and short ankle transition, visible in views 2 and 5",
+        "evidence": [
+          "The circled regions identify the same distal hind paw. Its ankle, projecting toe and lower surface correspond in both views; the other forepaw is a separate, higher structure.",
+          "In view 2 the prior paw extends farther right than the observed paw. View 5 shows the corresponding observed paw lower than the prior, supporting a local ankle bend and paw repositioning rather than global registration.",
+          "The previous proposal failed window validation before deformation. The corrected boundaries include the proximal ankle surface and observed lower paw surface identified by the cross-view reprojections, without extending onto the neighbouring foot or tail.",
+          "Use smooth local bending with an attachment transition, keeping the proximal landmark nearly stationary in view 5. Preserve complete unobserved surfaces and review surrounding regions for regression."
+        ],
+        "uncertainty": "Moderate: the distal paw correspondence is clear in two views, but the partially observed ankle leaves its full attachment uncertain. Bound the correction using both views and inspect the resulting ankle continuity and paw shape.",
+        "windows": [
+          {
+            "view": 2,
+            "polygon": [
+              [
+                53,
+                69
+              ],
+              [
+                59,
+                70
+              ],
+              [
+                57,
+                74
+              ],
+              [
+                60,
+                76
+              ],
+              [
+                60,
+                80
+              ],
+              [
+                55,
+                82
+              ],
+              [
+                51,
+                81
+              ],
+              [
+                49,
+                78
+              ],
+              [
+                49,
+                73
+              ]
+            ]
+          },
+          {
+            "view": 5,
+            "polygon": [
+              [
+                49,
+                69
+              ],
+              [
+                57,
+                70
+              ],
+              [
+                60,
+                74
+              ],
+              [
+                60,
+                77
+              ],
+              [
+                57,
+                80
+              ],
+              [
+                53,
+                80
+              ],
+              [
+                49,
+                78
+              ]
+            ]
+          }
+        ],
+        "target_windows": [
+          {
+            "view": 2,
+            "polygon": [
+              [
+                44,
+                68
+              ],
+              [
+                48,
+                68
+              ],
+              [
+                49,
+                73
+              ],
+              [
+                53,
+                75
+              ],
+              [
+                56,
+                77
+              ],
+              [
+                56,
+                80
+              ],
+              [
+                51,
+                82
+              ],
+              [
+                48,
+                80
+              ],
+              [
+                45,
+                77
+              ],
+              [
+                43,
+                73
+              ]
+            ]
+          },
+          {
+            "view": 5,
+            "polygon": [
+              [
+                48,
+                69
+              ],
+              [
+                52,
+                70
+              ],
+              [
+                53,
+                74
+              ],
+              [
+                57,
+                75
+              ],
+              [
+                60,
+                78
+              ],
+              [
+                57,
+                83
+              ],
+              [
+                53,
+                83
+              ],
+              [
+                49,
+                79
+              ]
+            ]
+          }
+        ],
+        "handles": [
+          {
+            "name": "Proximal ankle surface",
+            "source": {
+              "view": 5,
+              "xy": [
+                49.85,
+                71.0
+              ]
+            },
+            "target": {
+              "view": 5,
+              "xy": [
+                49.98,
+                71.91
+              ]
+            }
+          },
+          {
+            "name": "Distal ankle surface",
+            "source": {
+              "view": 2,
+              "xy": [
+                52.93,
+                75.03
+              ]
+            },
+            "target": {
+              "view": 2,
+              "xy": [
+                47.89,
+                75.14
+              ]
+            }
+          },
+          {
+            "name": "Paw outer tip",
+            "source": {
+              "view": 2,
+              "xy": [
+                58.96,
+                79.23
+              ]
+            },
+            "target": {
+              "view": 2,
+              "xy": [
+                54.71,
+                79.07
+              ]
+            }
+          },
+          {
+            "name": "Paw lower surface",
+            "source": {
+              "view": 5,
+              "xy": [
+                55.05,
+                78.82
+              ]
+            },
+            "target": {
+              "view": 5,
+              "xy": [
+                54.9,
+                81.89
+              ]
+            }
+          }
+        ]
+      },
+      "geometry": {
+        "operator": "semantic_smooth_rbf_with_intrinsic_transition",
+        "source_ids": [
+          79089,
+          27247,
+          88394,
+          98458
+        ],
+        "target_positions": [
+          [
+            0.0631684958934784,
+            -0.2751888632774353,
+            -0.15358471870422363
+          ],
+          [
+            0.0943848192691803,
+            -0.35003963112831116,
+            -0.18151962757110596
+          ],
+          [
+            0.152349054813385,
+            -0.434268057346344,
+            -0.13496136665344238
+          ],
+          [
+            0.11085090041160583,
+            -0.43757760524749756,
+            -0.1940324306488037
+          ]
+        ],
+        "part_points": 3577,
+        "affected_points": 25504,
+        "fraction": 1.0,
+        "strain": {
+          "edge_stretch_p01": 0.6972527838184364,
+          "edge_stretch_p50": 1.0059687935889878,
+          "edge_stretch_p99": 1.3488707786383631,
+          "edge_stretch_p999": 1.4366795173029328
+        },
+        "transition_width_ratio": 0.19736476075782283,
+        "handle_error_before": [
+          0.10764802034230331,
+          0.08186562957501173,
+          0.06959602302633323,
+          0.06945268330766945
+        ],
+        "handle_error_after": [
+          0.0018011086163492985,
+          0.00164599289997162,
+          0.0002996417455563253,
+          0.0007995939718719019
+        ],
+        "maximum_motion_ratio": 0.06578825358594094,
+        "minimum_full_rank_jacobian_determinant": 0.4509718741532652,
+        "full_rank_jacobians_checked": 512,
+        "observation_mean_before": 0.0061469263163699845,
+        "observation_mean_after": 0.0061402207753160284,
+        "connectivity": {
+          "passed": true,
+          "broken_components": 0,
+          "merged_components": 0,
+          "minimum_significant_size": 100,
+          "carrier_slots": 100000
+        },
+        "hard_passed": true,
+        "integrity_audit": {
+          "carrier_slots": 100000,
+          "finite": true,
+          "protected_slots": {
+            "count": 0,
+            "reference": "frozen_loop_initial_carrier",
+            "reference_coordinates_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "candidate_coordinates_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "exactly_preserved": true,
+            "maximum_displacement": 0.0
+          },
+          "cumulative_strain": {
+            "edge_stretch_p01": 0.7843899343914477,
+            "edge_stretch_p50": 1.0,
+            "edge_stretch_p99": 1.266453871506799,
+            "edge_stretch_p999": 1.3939375157991525
+          },
+          "strain_policy": "diagnostic_only_no_absolute_stretch_threshold",
+          "cumulative_reference": "fixed edges and coordinates at start of this loop, not previous round",
+          "maximum_step_displacement": 0.10638927482665048,
+          "passed": true
+        },
+        "current_regional_support": {
+          "passed": true,
+          "normalization": "partial_bbox_diagonal",
+          "camera": "saved_acquisition",
+          "regions": [
+            {
+              "tile": 2,
+              "observations": 34,
+              "mean_before": 0.02441775760457783,
+              "mean_after": 0.02441775760457783,
+              "regression": 0.0
+            },
+            {
+              "tile": 3,
+              "observations": 57,
+              "mean_before": 0.008517582385894304,
+              "mean_after": 0.008517582385894304,
+              "regression": 0.0
+            },
+            {
+              "tile": 5,
+              "observations": 99,
+              "mean_before": 0.002166892501976032,
+              "mean_after": 0.002166892501976032,
+              "regression": 0.0
+            },
+            {
+              "tile": 6,
+              "observations": 393,
+              "mean_before": 0.0041421593114018985,
+              "mean_after": 0.0041421593114018985,
+              "regression": 0.0
+            },
+            {
+              "tile": 7,
+              "observations": 61,
+              "mean_before": 0.0015472886447581947,
+              "mean_after": 0.0015472886447581947,
+              "regression": 0.0
+            },
+            {
+              "tile": 10,
+              "observations": 156,
+              "mean_before": 0.007394056765282791,
+              "mean_after": 0.007394056765282791,
+              "regression": 0.0
+            },
+            {
+              "tile": 11,
+              "observations": 468,
+              "mean_before": 0.002456741513245217,
+              "mean_after": 0.002456741513245217,
+              "regression": 0.0
+            },
+            {
+              "tile": 12,
+              "observations": 442,
+              "mean_before": 0.003811046695014482,
+              "mean_after": 0.003811046695014482,
+              "regression": 0.0
+            },
+            {
+              "tile": 13,
+              "observations": 464,
+              "mean_before": 0.002825803336432234,
+              "mean_after": 0.002825803336432234,
+              "regression": 0.0
+            },
+            {
+              "tile": 14,
+              "observations": 475,
+              "mean_before": 0.0020558841571078445,
+              "mean_after": 0.0020558841571078445,
+              "regression": 0.0
+            },
+            {
+              "tile": 15,
+              "observations": 225,
+              "mean_before": 0.0023666511636989667,
+              "mean_after": 0.0023666511636989667,
+              "regression": 0.0
+            },
+            {
+              "tile": 18,
+              "observations": 69,
+              "mean_before": 0.0017252813784532253,
+              "mean_after": 0.0017252813784532253,
+              "regression": 0.0
+            },
+            {
+              "tile": 19,
+              "observations": 459,
+              "mean_before": 0.0018730024355083034,
+              "mean_after": 0.0018730024355083034,
+              "regression": 0.0
+            },
+            {
+              "tile": 20,
+              "observations": 487,
+              "mean_before": 0.0019225178928317925,
+              "mean_after": 0.0019225178928317925,
+              "regression": 0.0
+            },
+            {
+              "tile": 21,
+              "observations": 489,
+              "mean_before": 0.002462142958503893,
+              "mean_after": 0.002462142958503893,
+              "regression": 0.0
+            },
+            {
+              "tile": 22,
+              "observations": 454,
+              "mean_before": 0.0018785100529631097,
+              "mean_after": 0.0018785100529631097,
+              "regression": 0.0
+            },
+            {
+              "tile": 23,
+              "observations": 275,
+              "mean_before": 0.0016810333521954425,
+              "mean_after": 0.0016810333521954425,
+              "regression": 0.0
+            },
+            {
+              "tile": 27,
+              "observations": 111,
+              "mean_before": 0.00207940761413891,
+              "mean_after": 0.00207940761413891,
+              "regression": 0.0
+            },
+            {
+              "tile": 28,
+              "observations": 444,
+              "mean_before": 0.0016880195072721239,
+              "mean_after": 0.0016880195072721239,
+              "regression": 0.0
+            },
+            {
+              "tile": 29,
+              "observations": 464,
+              "mean_before": 0.0022537081949557873,
+              "mean_after": 0.0022537081949557873,
+              "regression": 0.0
+            },
+            {
+              "tile": 30,
+              "observations": 427,
+              "mean_before": 0.001827285268319241,
+              "mean_after": 0.001827285268319241,
+              "regression": 0.0
+            },
+            {
+              "tile": 31,
+              "observations": 20,
+              "mean_before": 0.0014948655013851913,
+              "mean_after": 0.0014948655013851913,
+              "regression": 0.0
+            },
+            {
+              "tile": 34,
+              "observations": 63,
+              "mean_before": 0.0058023709866371585,
+              "mean_after": 0.0058023709866371585,
+              "regression": 0.0
+            },
+            {
+              "tile": 35,
+              "observations": 269,
+              "mean_before": 0.0017779253756970397,
+              "mean_after": 0.0017705765149735482,
+              "regression": -7.348860723491357e-06
+            },
+            {
+              "tile": 36,
+              "observations": 442,
+              "mean_before": 0.0014030195142694817,
+              "mean_after": 0.0014030195142694817,
+              "regression": 0.0
+            },
+            {
+              "tile": 37,
+              "observations": 468,
+              "mean_before": 0.0016882133239661406,
+              "mean_after": 0.0016882133239661406,
+              "regression": 0.0
+            },
+            {
+              "tile": 38,
+              "observations": 473,
+              "mean_before": 0.0019919272588812364,
+              "mean_after": 0.0019919272588812364,
+              "regression": 0.0
+            },
+            {
+              "tile": 39,
+              "observations": 21,
+              "mean_before": 0.00191164152244704,
+              "mean_after": 0.00191164152244704,
+              "regression": 0.0
+            },
+            {
+              "tile": 41,
+              "observations": 27,
+              "mean_before": 0.007551864470433095,
+              "mean_after": 0.007551864470433095,
+              "regression": 0.0
+            },
+            {
+              "tile": 42,
+              "observations": 393,
+              "mean_before": 0.005871858615436843,
+              "mean_after": 0.005681304926503161,
+              "regression": -0.00019055368893368182
+            },
+            {
+              "tile": 43,
+              "observations": 449,
+              "mean_before": 0.01276174014196345,
+              "mean_after": 0.011435680674162084,
+              "regression": -0.0013260594678013652
+            },
+            {
+              "tile": 44,
+              "observations": 474,
+              "mean_before": 0.0017074402388902862,
+              "mean_after": 0.0022127720777012382,
+              "regression": 0.0005053318388109524
+            },
+            {
+              "tile": 45,
+              "observations": 377,
+              "mean_before": 0.001813183373478653,
+              "mean_after": 0.0018873787616357565,
+              "regression": 7.419538815710339e-05
+            },
+            {
+              "tile": 46,
+              "observations": 397,
+              "mean_before": 0.0018452983246989925,
+              "mean_after": 0.0018630442829465125,
+              "regression": 1.7745958247519644e-05
+            },
+            {
+              "tile": 48,
+              "observations": 179,
+              "mean_before": 0.005232940195111098,
+              "mean_after": 0.005232940195111098,
+              "regression": 0.0
+            },
+            {
+              "tile": 49,
+              "observations": 389,
+              "mean_before": 0.0034864744572241533,
+              "mean_after": 0.003486494241151452,
+              "regression": 1.9783927298530264e-08
+            },
+            {
+              "tile": 50,
+              "observations": 473,
+              "mean_before": 0.011514888272762303,
+              "mean_after": 0.011476925657198461,
+              "regression": -3.79626155638435e-05
+            },
+            {
+              "tile": 51,
+              "observations": 239,
+              "mean_before": 0.018479535622303925,
+              "mean_after": 0.014791483069625353,
+              "regression": -0.0036880525526785707
+            },
+            {
+              "tile": 52,
+              "observations": 479,
+              "mean_before": 0.0033548092619828094,
+              "mean_after": 0.0034651308130764953,
+              "regression": 0.00011032155109368547
+            },
+            {
+              "tile": 53,
+              "observations": 249,
+              "mean_before": 0.0023193768406389276,
+              "mean_after": 0.002454828643888768,
+              "regression": 0.0001354518032498404
+            },
+            {
+              "tile": 54,
+              "observations": 390,
+              "mean_before": 0.0014594032702889442,
+              "mean_after": 0.0014582216750345146,
+              "regression": -1.1815952544299431e-06
+            },
+            {
+              "tile": 55,
+              "observations": 44,
+              "mean_before": 0.0016395629031474757,
+              "mean_after": 0.0016395629031474757,
+              "regression": 0.0
+            },
+            {
+              "tile": 56,
+              "observations": 332,
+              "mean_before": 0.00533924897762782,
+              "mean_after": 0.00533924897762782,
+              "regression": 0.0
+            },
+            {
+              "tile": 57,
+              "observations": 469,
+              "mean_before": 0.009118309770611469,
+              "mean_after": 0.009081108916443315,
+              "regression": -3.720085416815354e-05
+            },
+            {
+              "tile": 58,
+              "observations": 395,
+              "mean_before": 0.007063116224671128,
+              "mean_after": 0.009707685918808476,
+              "regression": 0.0026445696941373494
+            },
+            {
+              "tile": 59,
+              "observations": 28,
+              "mean_before": 0.00875188418479149,
+              "mean_after": 0.009026565440331738,
+              "regression": 0.0002746812555402489
+            },
+            {
+              "tile": 60,
+              "observations": 382,
+              "mean_before": 0.003341398531849971,
+              "mean_after": 0.004395335497195141,
+              "regression": 0.0010539369653451704
+            },
+            {
+              "tile": 61,
+              "observations": 88,
+              "mean_before": 0.005510200310365156,
+              "mean_after": 0.002818191809139255,
+              "regression": -0.0026920085012259007
+            },
+            {
+              "tile": 62,
+              "observations": 145,
+              "mean_before": 0.0015713139975919712,
+              "mean_after": 0.0015713139975919712,
+              "regression": 0.0
+            },
+            {
+              "tile": 63,
+              "observations": 89,
+              "mean_before": 0.0013686766325542196,
+              "mean_after": 0.0013686766325542196,
+              "regression": 0.0
+            }
+          ],
+          "regressed_fraction": 0.02,
+          "maximum_regression": 0.0026445696941373494,
+          "regional_tolerance": 0.002,
+          "maximum_regressed_fraction": 0.2,
+          "maximum_allowed_regression": 0.006,
+          "no_immobile_part_assumption": true
+        },
+        "initial_regional_support": {
+          "passed": true,
+          "normalization": "partial_bbox_diagonal",
+          "camera": "saved_acquisition",
+          "regions": [
+            {
+              "tile": 2,
+              "observations": 34,
+              "mean_before": 0.02441775760457783,
+              "mean_after": 0.02441775760457783,
+              "regression": 0.0
+            },
+            {
+              "tile": 3,
+              "observations": 57,
+              "mean_before": 0.008517582385894304,
+              "mean_after": 0.008517582385894304,
+              "regression": 0.0
+            },
+            {
+              "tile": 5,
+              "observations": 99,
+              "mean_before": 0.002166892501976032,
+              "mean_after": 0.002166892501976032,
+              "regression": 0.0
+            },
+            {
+              "tile": 6,
+              "observations": 393,
+              "mean_before": 0.0041421593114018985,
+              "mean_after": 0.0041421593114018985,
+              "regression": 0.0
+            },
+            {
+              "tile": 7,
+              "observations": 61,
+              "mean_before": 0.0015472886447581947,
+              "mean_after": 0.0015472886447581947,
+              "regression": 0.0
+            },
+            {
+              "tile": 10,
+              "observations": 156,
+              "mean_before": 0.007394056765282791,
+              "mean_after": 0.007394056765282791,
+              "regression": 0.0
+            },
+            {
+              "tile": 11,
+              "observations": 468,
+              "mean_before": 0.002456741513245217,
+              "mean_after": 0.002456741513245217,
+              "regression": 0.0
+            },
+            {
+              "tile": 12,
+              "observations": 442,
+              "mean_before": 0.003811046695014482,
+              "mean_after": 0.003811046695014482,
+              "regression": 0.0
+            },
+            {
+              "tile": 13,
+              "observations": 464,
+              "mean_before": 0.002825803336432234,
+              "mean_after": 0.002825803336432234,
+              "regression": 0.0
+            },
+            {
+              "tile": 14,
+              "observations": 475,
+              "mean_before": 0.0020558841571078445,
+              "mean_after": 0.0020558841571078445,
+              "regression": 0.0
+            },
+            {
+              "tile": 15,
+              "observations": 225,
+              "mean_before": 0.0023666511636989667,
+              "mean_after": 0.0023666511636989667,
+              "regression": 0.0
+            },
+            {
+              "tile": 18,
+              "observations": 69,
+              "mean_before": 0.0017252813784532253,
+              "mean_after": 0.0017252813784532253,
+              "regression": 0.0
+            },
+            {
+              "tile": 19,
+              "observations": 459,
+              "mean_before": 0.0018730024355083034,
+              "mean_after": 0.0018730024355083034,
+              "regression": 0.0
+            },
+            {
+              "tile": 20,
+              "observations": 487,
+              "mean_before": 0.0019225178928317925,
+              "mean_after": 0.0019225178928317925,
+              "regression": 0.0
+            },
+            {
+              "tile": 21,
+              "observations": 489,
+              "mean_before": 0.002462142958503893,
+              "mean_after": 0.002462142958503893,
+              "regression": 0.0
+            },
+            {
+              "tile": 22,
+              "observations": 454,
+              "mean_before": 0.0018785100529631097,
+              "mean_after": 0.0018785100529631097,
+              "regression": 0.0
+            },
+            {
+              "tile": 23,
+              "observations": 275,
+              "mean_before": 0.0016810333521954425,
+              "mean_after": 0.0016810333521954425,
+              "regression": 0.0
+            },
+            {
+              "tile": 27,
+              "observations": 111,
+              "mean_before": 0.00207940761413891,
+              "mean_after": 0.00207940761413891,
+              "regression": 0.0
+            },
+            {
+              "tile": 28,
+              "observations": 444,
+              "mean_before": 0.0016880195072721239,
+              "mean_after": 0.0016880195072721239,
+              "regression": 0.0
+            },
+            {
+              "tile": 29,
+              "observations": 464,
+              "mean_before": 0.0022537081949557873,
+              "mean_after": 0.0022537081949557873,
+              "regression": 0.0
+            },
+            {
+              "tile": 30,
+              "observations": 427,
+              "mean_before": 0.001827285268319241,
+              "mean_after": 0.001827285268319241,
+              "regression": 0.0
+            },
+            {
+              "tile": 31,
+              "observations": 20,
+              "mean_before": 0.0014948655013851913,
+              "mean_after": 0.0014948655013851913,
+              "regression": 0.0
+            },
+            {
+              "tile": 34,
+              "observations": 63,
+              "mean_before": 0.0058023709866371585,
+              "mean_after": 0.0058023709866371585,
+              "regression": 0.0
+            },
+            {
+              "tile": 35,
+              "observations": 269,
+              "mean_before": 0.0017779253756970397,
+              "mean_after": 0.0017705765149735482,
+              "regression": -7.348860723491357e-06
+            },
+            {
+              "tile": 36,
+              "observations": 442,
+              "mean_before": 0.0014030195142694817,
+              "mean_after": 0.0014030195142694817,
+              "regression": 0.0
+            },
+            {
+              "tile": 37,
+              "observations": 468,
+              "mean_before": 0.0016882133239661406,
+              "mean_after": 0.0016882133239661406,
+              "regression": 0.0
+            },
+            {
+              "tile": 38,
+              "observations": 473,
+              "mean_before": 0.0019919272588812364,
+              "mean_after": 0.0019919272588812364,
+              "regression": 0.0
+            },
+            {
+              "tile": 39,
+              "observations": 21,
+              "mean_before": 0.00191164152244704,
+              "mean_after": 0.00191164152244704,
+              "regression": 0.0
+            },
+            {
+              "tile": 41,
+              "observations": 27,
+              "mean_before": 0.007551864470433095,
+              "mean_after": 0.007551864470433095,
+              "regression": 0.0
+            },
+            {
+              "tile": 42,
+              "observations": 393,
+              "mean_before": 0.005871858615436843,
+              "mean_after": 0.005681304926503161,
+              "regression": -0.00019055368893368182
+            },
+            {
+              "tile": 43,
+              "observations": 449,
+              "mean_before": 0.01276174014196345,
+              "mean_after": 0.011435680674162084,
+              "regression": -0.0013260594678013652
+            },
+            {
+              "tile": 44,
+              "observations": 474,
+              "mean_before": 0.0017074402388902862,
+              "mean_after": 0.0022127720777012382,
+              "regression": 0.0005053318388109524
+            },
+            {
+              "tile": 45,
+              "observations": 377,
+              "mean_before": 0.001813183373478653,
+              "mean_after": 0.0018873787616357565,
+              "regression": 7.419538815710339e-05
+            },
+            {
+              "tile": 46,
+              "observations": 397,
+              "mean_before": 0.0018452983246989925,
+              "mean_after": 0.0018630442829465125,
+              "regression": 1.7745958247519644e-05
+            },
+            {
+              "tile": 48,
+              "observations": 179,
+              "mean_before": 0.005232940195111098,
+              "mean_after": 0.005232940195111098,
+              "regression": 0.0
+            },
+            {
+              "tile": 49,
+              "observations": 389,
+              "mean_before": 0.0034864744572241533,
+              "mean_after": 0.003486494241151452,
+              "regression": 1.9783927298530264e-08
+            },
+            {
+              "tile": 50,
+              "observations": 473,
+              "mean_before": 0.011514888272762303,
+              "mean_after": 0.011476925657198461,
+              "regression": -3.79626155638435e-05
+            },
+            {
+              "tile": 51,
+              "observations": 239,
+              "mean_before": 0.018479535622303925,
+              "mean_after": 0.014791483069625353,
+              "regression": -0.0036880525526785707
+            },
+            {
+              "tile": 52,
+              "observations": 479,
+              "mean_before": 0.0033548092619828094,
+              "mean_after": 0.0034651308130764953,
+              "regression": 0.00011032155109368547
+            },
+            {
+              "tile": 53,
+              "observations": 249,
+              "mean_before": 0.0023193768406389276,
+              "mean_after": 0.002454828643888768,
+              "regression": 0.0001354518032498404
+            },
+            {
+              "tile": 54,
+              "observations": 390,
+              "mean_before": 0.0014594032702889442,
+              "mean_after": 0.0014582216750345146,
+              "regression": -1.1815952544299431e-06
+            },
+            {
+              "tile": 55,
+              "observations": 44,
+              "mean_before": 0.0016395629031474757,
+              "mean_after": 0.0016395629031474757,
+              "regression": 0.0
+            },
+            {
+              "tile": 56,
+              "observations": 332,
+              "mean_before": 0.00533924897762782,
+              "mean_after": 0.00533924897762782,
+              "regression": 0.0
+            },
+            {
+              "tile": 57,
+              "observations": 469,
+              "mean_before": 0.009118309770611469,
+              "mean_after": 0.009081108916443315,
+              "regression": -3.720085416815354e-05
+            },
+            {
+              "tile": 58,
+              "observations": 395,
+              "mean_before": 0.007063116224671128,
+              "mean_after": 0.009707685918808476,
+              "regression": 0.0026445696941373494
+            },
+            {
+              "tile": 59,
+              "observations": 28,
+              "mean_before": 0.00875188418479149,
+              "mean_after": 0.009026565440331738,
+              "regression": 0.0002746812555402489
+            },
+            {
+              "tile": 60,
+              "observations": 382,
+              "mean_before": 0.003341398531849971,
+              "mean_after": 0.004395335497195141,
+              "regression": 0.0010539369653451704
+            },
+            {
+              "tile": 61,
+              "observations": 88,
+              "mean_before": 0.005510200310365156,
+              "mean_after": 0.002818191809139255,
+              "regression": -0.0026920085012259007
+            },
+            {
+              "tile": 62,
+              "observations": 145,
+              "mean_before": 0.0015713139975919712,
+              "mean_after": 0.0015713139975919712,
+              "regression": 0.0
+            },
+            {
+              "tile": 63,
+              "observations": 89,
+              "mean_before": 0.0013686766325542196,
+              "mean_after": 0.0013686766325542196,
+              "regression": 0.0
+            }
+          ],
+          "regressed_fraction": 0.02,
+          "maximum_regression": 0.0026445696941373494,
+          "regional_tolerance": 0.002,
+          "maximum_regressed_fraction": 0.2,
+          "maximum_allowed_regression": 0.006,
+          "no_immobile_part_assumption": true
+        }
+      },
+      "before": {
+        "coverage": [
+          0.9825620253164556,
+          0.9628661682158035,
+          0.9598595730400888,
+          0.9554796554796555,
+          0.9619971752890097,
+          0.9723943661971831
+        ],
+        "depth": [
+          0.038619652427165585,
+          0.05912194278562614,
+          0.03461249719559176,
+          0.05104798082929353,
+          0.04223233788533792,
+          0.04049019462136707
+        ],
+        "partial_to_carrier_p90": 0.008516912101499205,
+        "partial_to_carrier_p99": 0.03167536517796426,
+        "partial_to_carrier_median": 0.001985786615593758
+      },
+      "after": {
+        "coverage": [
+          0.9787746835443037,
+          0.9662977524259709,
+          0.9550323962931413,
+          0.9604692604692605,
+          0.9546215410367735,
+          0.9794929577464788
+        ],
+        "depth": [
+          0.037336454940153765,
+          0.05975955024007195,
+          0.0347645409259715,
+          0.05193158968679396,
+          0.04230267207677334,
+          0.03916767930122292
+        ],
+        "partial_to_carrier_p90": 0.009594033874083606,
+        "partial_to_carrier_p99": 0.025878523078659586,
+        "partial_to_carrier_median": 0.002007318366396003
+      },
+      "local_evidence": {
+        "metric": "observed-to-carrier nearest distance; not semantic correctness",
+        "synthetic_views_are_not_independent_observations": true,
+        "whole_scan_mean_before": 0.0061469263163699845,
+        "whole_scan_mean_after": 0.0061402207753160284,
+        "review_regions": [
+          {
+            "view": 2,
+            "tile": [
+              2,
+              5
+            ],
+            "observed_points": 483,
+            "mean_before": 0.010250101709471661,
+            "mean_after": 0.006858404785260166,
+            "mean_gain": 0.0033916969242114977,
+            "box": [
+              96,
+              288,
+              224,
+              416
+            ],
+            "role": "largest_measured_gain"
+          },
+          {
+            "view": 0,
+            "tile": [
+              3,
+              6
+            ],
+            "observed_points": 279,
+            "mean_before": 0.011073950068039042,
+            "mean_after": 0.017139646867751296,
+            "mean_gain": -0.006065696799712253,
+            "box": [
+              160,
+              352,
+              288,
+              480
+            ],
+            "role": "largest_regression_or_smallest_gain"
+          }
+        ]
+      },
+      "semantic_part_evidence": {
+        "part": "Indicated hind paw and short ankle transition, visible in views 2 and 5",
+        "source_slots": 3577,
+        "observed_points": 551,
+        "metric": "observed part to fixed corresponding prior slots, 3D distance",
+        "semantic_identity_is_hypothesis": true,
+        "synthetic_views_are_not_independent_observations": true,
+        "review_regions": [
+          {
+            "view": 2,
+            "role": "same_part_fixed_slots_3D",
+            "box": [
+              208,
+              336,
+              320,
+              432
+            ],
+            "mean_before": 0.02772718943670764,
+            "mean_after": 0.007575177532071497
+          },
+          {
+            "view": 5,
+            "role": "same_part_fixed_slots_3D",
+            "box": [
+              233,
+              341,
+              320,
+              437
+            ],
+            "mean_before": 0.02772718943670764,
+            "mean_after": 0.007575177532071497
+          }
+        ],
+        "available": true,
+        "mean_before": 0.02772718943670764,
+        "mean_after": 0.007575177532071497,
+        "p90_before": 0.0680056772706769,
+        "p90_after": 0.014427459245627952
+      }
+    },
+    "images": [
+      "workspace/semantic_refinement_astra/custom10/cartoon_fox/local_correspondence_run/round_02/before.png",
+      "workspace/semantic_refinement_astra/custom10/cartoon_fox/local_correspondence_run/round_02/after_0.png",
+      "workspace/semantic_refinement_astra/custom10/cartoon_fox/local_correspondence_run/round_02/local_comparison_0.png",
+      "/data/project/cr/CompAgent/workspace/semantic_refinement_astra/custom10/cartoon_fox/local_correspondence_run/round_02/posthoc_part_audit/comparison.png"
+    ],
+    "phase": "posthoc_frozen_candidate_review_with_part_specific_evidence",
+    "candidate_sha256": "647f485061039f0a3f2443cd4c608ee773d05178cb3e822013e1413712f9fd95"
+  },
+  "parameters": {
+    "operator": "semantic_smooth_rbf_with_intrinsic_transition",
+    "source_ids": [
+      79089,
+      27247,
+      88394,
+      98458
+    ],
+    "target_positions": [
+      [
+        0.0631684958934784,
+        -0.2751888632774353,
+        -0.15358471870422363
+      ],
+      [
+        0.0943848192691803,
+        -0.35003963112831116,
+        -0.18151962757110596
+      ],
+      [
+        0.152349054813385,
+        -0.434268057346344,
+        -0.13496136665344238
+      ],
+      [
+        0.11085090041160583,
+        -0.43757760524749756,
+        -0.1940324306488037
+      ]
+    ],
+    "part_points": 3577,
+    "affected_points": 25504,
+    "fraction": 1.0,
+    "strain": {
+      "edge_stretch_p01": 0.6972527838184364,
+      "edge_stretch_p50": 1.0059687935889878,
+      "edge_stretch_p99": 1.3488707786383631,
+      "edge_stretch_p999": 1.4366795173029328
+    },
+    "transition_width_ratio": 0.19736476075782283,
+    "handle_error_before": [
+      0.10764802034230331,
+      0.08186562957501173,
+      0.06959602302633323,
+      0.06945268330766945
+    ],
+    "handle_error_after": [
+      0.0018011086163492985,
+      0.00164599289997162,
+      0.0002996417455563253,
+      0.0007995939718719019
+    ],
+    "maximum_motion_ratio": 0.06578825358594094,
+    "minimum_full_rank_jacobian_determinant": 0.4509718741532652,
+    "full_rank_jacobians_checked": 512,
+    "observation_mean_before": 0.0061469263163699845,
+    "observation_mean_after": 0.0061402207753160284,
+    "connectivity": {
+      "passed": true,
+      "broken_components": 0,
+      "merged_components": 0,
+      "minimum_significant_size": 100,
+      "carrier_slots": 100000
+    },
+    "hard_passed": true,
+    "integrity_audit": {
+      "carrier_slots": 100000,
+      "finite": true,
+      "protected_slots": {
+        "count": 0,
+        "reference": "frozen_loop_initial_carrier",
+        "reference_coordinates_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "candidate_coordinates_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exactly_preserved": true,
+        "maximum_displacement": 0.0
+      },
+      "cumulative_strain": {
+        "edge_stretch_p01": 0.7843899343914477,
+        "edge_stretch_p50": 1.0,
+        "edge_stretch_p99": 1.266453871506799,
+        "edge_stretch_p999": 1.3939375157991525
+      },
+      "strain_policy": "diagnostic_only_no_absolute_stretch_threshold",
+      "cumulative_reference": "fixed edges and coordinates at start of this loop, not previous round",
+      "maximum_step_displacement": 0.10638927482665048,
+      "passed": true
+    },
+    "current_regional_support": {
+      "passed": true,
+      "normalization": "partial_bbox_diagonal",
+      "camera": "saved_acquisition",
+      "regions": [
+        {
+          "tile": 2,
+          "observations": 34,
+          "mean_before": 0.02441775760457783,
+          "mean_after": 0.02441775760457783,
+          "regression": 0.0
+        },
+        {
+          "tile": 3,
+          "observations": 57,
+          "mean_before": 0.008517582385894304,
+          "mean_after": 0.008517582385894304,
+          "regression": 0.0
+        },
+        {
+          "tile": 5,
+          "observations": 99,
+          "mean_before": 0.002166892501976032,
+          "mean_after": 0.002166892501976032,
+          "regression": 0.0
+        },
+        {
+          "tile": 6,
+          "observations": 393,
+          "mean_before": 0.0041421593114018985,
+          "mean_after": 0.0041421593114018985,
+          "regression": 0.0
+        },
+        {
+          "tile": 7,
+          "observations": 61,
+          "mean_before": 0.0015472886447581947,
+          "mean_after": 0.0015472886447581947,
+          "regression": 0.0
+        },
+        {
+          "tile": 10,
+          "observations": 156,
+          "mean_before": 0.007394056765282791,
+          "mean_after": 0.007394056765282791,
+          "regression": 0.0
+        },
+        {
+          "tile": 11,
+          "observations": 468,
+          "mean_before": 0.002456741513245217,
+          "mean_after": 0.002456741513245217,
+          "regression": 0.0
+        },
+        {
+          "tile": 12,
+          "observations": 442,
+          "mean_before": 0.003811046695014482,
+          "mean_after": 0.003811046695014482,
+          "regression": 0.0
+        },
+        {
+          "tile": 13,
+          "observations": 464,
+          "mean_before": 0.002825803336432234,
+          "mean_after": 0.002825803336432234,
+          "regression": 0.0
+        },
+        {
+          "tile": 14,
+          "observations": 475,
+          "mean_before": 0.0020558841571078445,
+          "mean_after": 0.0020558841571078445,
+          "regression": 0.0
+        },
+        {
+          "tile": 15,
+          "observations": 225,
+          "mean_before": 0.0023666511636989667,
+          "mean_after": 0.0023666511636989667,
+          "regression": 0.0
+        },
+        {
+          "tile": 18,
+          "observations": 69,
+          "mean_before": 0.0017252813784532253,
+          "mean_after": 0.0017252813784532253,
+          "regression": 0.0
+        },
+        {
+          "tile": 19,
+          "observations": 459,
+          "mean_before": 0.0018730024355083034,
+          "mean_after": 0.0018730024355083034,
+          "regression": 0.0
+        },
+        {
+          "tile": 20,
+          "observations": 487,
+          "mean_before": 0.0019225178928317925,
+          "mean_after": 0.0019225178928317925,
+          "regression": 0.0
+        },
+        {
+          "tile": 21,
+          "observations": 489,
+          "mean_before": 0.002462142958503893,
+          "mean_after": 0.002462142958503893,
+          "regression": 0.0
+        },
+        {
+          "tile": 22,
+          "observations": 454,
+          "mean_before": 0.0018785100529631097,
+          "mean_after": 0.0018785100529631097,
+          "regression": 0.0
+        },
+        {
+          "tile": 23,
+          "observations": 275,
+          "mean_before": 0.0016810333521954425,
+          "mean_after": 0.0016810333521954425,
+          "regression": 0.0
+        },
+        {
+          "tile": 27,
+          "observations": 111,
+          "mean_before": 0.00207940761413891,
+          "mean_after": 0.00207940761413891,
+          "regression": 0.0
+        },
+        {
+          "tile": 28,
+          "observations": 444,
+          "mean_before": 0.0016880195072721239,
+          "mean_after": 0.0016880195072721239,
+          "regression": 0.0
+        },
+        {
+          "tile": 29,
+          "observations": 464,
+          "mean_before": 0.0022537081949557873,
+          "mean_after": 0.0022537081949557873,
+          "regression": 0.0
+        },
+        {
+          "tile": 30,
+          "observations": 427,
+          "mean_before": 0.001827285268319241,
+          "mean_after": 0.001827285268319241,
+          "regression": 0.0
+        },
+        {
+          "tile": 31,
+          "observations": 20,
+          "mean_before": 0.0014948655013851913,
+          "mean_after": 0.0014948655013851913,
+          "regression": 0.0
+        },
+        {
+          "tile": 34,
+          "observations": 63,
+          "mean_before": 0.0058023709866371585,
+          "mean_after": 0.0058023709866371585,
+          "regression": 0.0
+        },
+        {
+          "tile": 35,
+          "observations": 269,
+          "mean_before": 0.0017779253756970397,
+          "mean_after": 0.0017705765149735482,
+          "regression": -7.348860723491357e-06
+        },
+        {
+          "tile": 36,
+          "observations": 442,
+          "mean_before": 0.0014030195142694817,
+          "mean_after": 0.0014030195142694817,
+          "regression": 0.0
+        },
+        {
+          "tile": 37,
+          "observations": 468,
+          "mean_before": 0.0016882133239661406,
+          "mean_after": 0.0016882133239661406,
+          "regression": 0.0
+        },
+        {
+          "tile": 38,
+          "observations": 473,
+          "mean_before": 0.0019919272588812364,
+          "mean_after": 0.0019919272588812364,
+          "regression": 0.0
+        },
+        {
+          "tile": 39,
+          "observations": 21,
+          "mean_before": 0.00191164152244704,
+          "mean_after": 0.00191164152244704,
+          "regression": 0.0
+        },
+        {
+          "tile": 41,
+          "observations": 27,
+          "mean_before": 0.007551864470433095,
+          "mean_after": 0.007551864470433095,
+          "regression": 0.0
+        },
+        {
+          "tile": 42,
+          "observations": 393,
+          "mean_before": 0.005871858615436843,
+          "mean_after": 0.005681304926503161,
+          "regression": -0.00019055368893368182
+        },
+        {
+          "tile": 43,
+          "observations": 449,
+          "mean_before": 0.01276174014196345,
+          "mean_after": 0.011435680674162084,
+          "regression": -0.0013260594678013652
+        },
+        {
+          "tile": 44,
+          "observations": 474,
+          "mean_before": 0.0017074402388902862,
+          "mean_after": 0.0022127720777012382,
+          "regression": 0.0005053318388109524
+        },
+        {
+          "tile": 45,
+          "observations": 377,
+          "mean_before": 0.001813183373478653,
+          "mean_after": 0.0018873787616357565,
+          "regression": 7.419538815710339e-05
+        },
+        {
+          "tile": 46,
+          "observations": 397,
+          "mean_before": 0.0018452983246989925,
+          "mean_after": 0.0018630442829465125,
+          "regression": 1.7745958247519644e-05
+        },
+        {
+          "tile": 48,
+          "observations": 179,
+          "mean_before": 0.005232940195111098,
+          "mean_after": 0.005232940195111098,
+          "regression": 0.0
+        },
+        {
+          "tile": 49,
+          "observations": 389,
+          "mean_before": 0.0034864744572241533,
+          "mean_after": 0.003486494241151452,
+          "regression": 1.9783927298530264e-08
+        },
+        {
+          "tile": 50,
+          "observations": 473,
+          "mean_before": 0.011514888272762303,
+          "mean_after": 0.011476925657198461,
+          "regression": -3.79626155638435e-05
+        },
+        {
+          "tile": 51,
+          "observations": 239,
+          "mean_before": 0.018479535622303925,
+          "mean_after": 0.014791483069625353,
+          "regression": -0.0036880525526785707
+        },
+        {
+          "tile": 52,
+          "observations": 479,
+          "mean_before": 0.0033548092619828094,
+          "mean_after": 0.0034651308130764953,
+          "regression": 0.00011032155109368547
+        },
+        {
+          "tile": 53,
+          "observations": 249,
+          "mean_before": 0.0023193768406389276,
+          "mean_after": 0.002454828643888768,
+          "regression": 0.0001354518032498404
+        },
+        {
+          "tile": 54,
+          "observations": 390,
+          "mean_before": 0.0014594032702889442,
+          "mean_after": 0.0014582216750345146,
+          "regression": -1.1815952544299431e-06
+        },
+        {
+          "tile": 55,
+          "observations": 44,
+          "mean_before": 0.0016395629031474757,
+          "mean_after": 0.0016395629031474757,
+          "regression": 0.0
+        },
+        {
+          "tile": 56,
+          "observations": 332,
+          "mean_before": 0.00533924897762782,
+          "mean_after": 0.00533924897762782,
+          "regression": 0.0
+        },
+        {
+          "tile": 57,
+          "observations": 469,
+          "mean_before": 0.009118309770611469,
+          "mean_after": 0.009081108916443315,
+          "regression": -3.720085416815354e-05
+        },
+        {
+          "tile": 58,
+          "observations": 395,
+          "mean_before": 0.007063116224671128,
+          "mean_after": 0.009707685918808476,
+          "regression": 0.0026445696941373494
+        },
+        {
+          "tile": 59,
+          "observations": 28,
+          "mean_before": 0.00875188418479149,
+          "mean_after": 0.009026565440331738,
+          "regression": 0.0002746812555402489
+        },
+        {
+          "tile": 60,
+          "observations": 382,
+          "mean_before": 0.003341398531849971,
+          "mean_after": 0.004395335497195141,
+          "regression": 0.0010539369653451704
+        },
+        {
+          "tile": 61,
+          "observations": 88,
+          "mean_before": 0.005510200310365156,
+          "mean_after": 0.002818191809139255,
+          "regression": -0.0026920085012259007
+        },
+        {
+          "tile": 62,
+          "observations": 145,
+          "mean_before": 0.0015713139975919712,
+          "mean_after": 0.0015713139975919712,
+          "regression": 0.0
+        },
+        {
+          "tile": 63,
+          "observations": 89,
+          "mean_before": 0.0013686766325542196,
+          "mean_after": 0.0013686766325542196,
+          "regression": 0.0
+        }
+      ],
+      "regressed_fraction": 0.02,
+      "maximum_regression": 0.0026445696941373494,
+      "regional_tolerance": 0.002,
+      "maximum_regressed_fraction": 0.2,
+      "maximum_allowed_regression": 0.006,
+      "no_immobile_part_assumption": true
+    },
+    "initial_regional_support": {
+      "passed": true,
+      "normalization": "partial_bbox_diagonal",
+      "camera": "saved_acquisition",
+      "regions": [
+        {
+          "tile": 2,
+          "observations": 34,
+          "mean_before": 0.02441775760457783,
+          "mean_after": 0.02441775760457783,
+          "regression": 0.0
+        },
+        {
+          "tile": 3,
+          "observations": 57,
+          "mean_before": 0.008517582385894304,
+          "mean_after": 0.008517582385894304,
+          "regression": 0.0
+        },
+        {
+          "tile": 5,
+          "observations": 99,
+          "mean_before": 0.002166892501976032,
+          "mean_after": 0.002166892501976032,
+          "regression": 0.0
+        },
+        {
+          "tile": 6,
+          "observations": 393,
+          "mean_before": 0.0041421593114018985,
+          "mean_after": 0.0041421593114018985,
+          "regression": 0.0
+        },
+        {
+          "tile": 7,
+          "observations": 61,
+          "mean_before": 0.0015472886447581947,
+          "mean_after": 0.0015472886447581947,
+          "regression": 0.0
+        },
+        {
+          "tile": 10,
+          "observations": 156,
+          "mean_before": 0.007394056765282791,
+          "mean_after": 0.007394056765282791,
+          "regression": 0.0
+        },
+        {
+          "tile": 11,
+          "observations": 468,
+          "mean_before": 0.002456741513245217,
+          "mean_after": 0.002456741513245217,
+          "regression": 0.0
+        },
+        {
+          "tile": 12,
+          "observations": 442,
+          "mean_before": 0.003811046695014482,
+          "mean_after": 0.003811046695014482,
+          "regression": 0.0
+        },
+        {
+          "tile": 13,
+          "observations": 464,
+          "mean_before": 0.002825803336432234,
+          "mean_after": 0.002825803336432234,
+          "regression": 0.0
+        },
+        {
+          "tile": 14,
+          "observations": 475,
+          "mean_before": 0.0020558841571078445,
+          "mean_after": 0.0020558841571078445,
+          "regression": 0.0
+        },
+        {
+          "tile": 15,
+          "observations": 225,
+          "mean_before": 0.0023666511636989667,
+          "mean_after": 0.0023666511636989667,
+          "regression": 0.0
+        },
+        {
+          "tile": 18,
+          "observations": 69,
+          "mean_before": 0.0017252813784532253,
+          "mean_after": 0.0017252813784532253,
+          "regression": 0.0
+        },
+        {
+          "tile": 19,
+          "observations": 459,
+          "mean_before": 0.0018730024355083034,
+          "mean_after": 0.0018730024355083034,
+          "regression": 0.0
+        },
+        {
+          "tile": 20,
+          "observations": 487,
+          "mean_before": 0.0019225178928317925,
+          "mean_after": 0.0019225178928317925,
+          "regression": 0.0
+        },
+        {
+          "tile": 21,
+          "observations": 489,
+          "mean_before": 0.002462142958503893,
+          "mean_after": 0.002462142958503893,
+          "regression": 0.0
+        },
+        {
+          "tile": 22,
+          "observations": 454,
+          "mean_before": 0.0018785100529631097,
+          "mean_after": 0.0018785100529631097,
+          "regression": 0.0
+        },
+        {
+          "tile": 23,
+          "observations": 275,
+          "mean_before": 0.0016810333521954425,
+          "mean_after": 0.0016810333521954425,
+          "regression": 0.0
+        },
+        {
+          "tile": 27,
+          "observations": 111,
+          "mean_before": 0.00207940761413891,
+          "mean_after": 0.00207940761413891,
+          "regression": 0.0
+        },
+        {
+          "tile": 28,
+          "observations": 444,
+          "mean_before": 0.0016880195072721239,
+          "mean_after": 0.0016880195072721239,
+          "regression": 0.0
+        },
+        {
+          "tile": 29,
+          "observations": 464,
+          "mean_before": 0.0022537081949557873,
+          "mean_after": 0.0022537081949557873,
+          "regression": 0.0
+        },
+        {
+          "tile": 30,
+          "observations": 427,
+          "mean_before": 0.001827285268319241,
+          "mean_after": 0.001827285268319241,
+          "regression": 0.0
+        },
+        {
+          "tile": 31,
+          "observations": 20,
+          "mean_before": 0.0014948655013851913,
+          "mean_after": 0.0014948655013851913,
+          "regression": 0.0
+        },
+        {
+          "tile": 34,
+          "observations": 63,
+          "mean_before": 0.0058023709866371585,
+          "mean_after": 0.0058023709866371585,
+          "regression": 0.0
+        },
+        {
+          "tile": 35,
+          "observations": 269,
+          "mean_before": 0.0017779253756970397,
+          "mean_after": 0.0017705765149735482,
+          "regression": -7.348860723491357e-06
+        },
+        {
+          "tile": 36,
+          "observations": 442,
+          "mean_before": 0.0014030195142694817,
+          "mean_after": 0.0014030195142694817,
+          "regression": 0.0
+        },
+        {
+          "tile": 37,
+          "observations": 468,
+          "mean_before": 0.0016882133239661406,
+          "mean_after": 0.0016882133239661406,
+          "regression": 0.0
+        },
+        {
+          "tile": 38,
+          "observations": 473,
+          "mean_before": 0.0019919272588812364,
+          "mean_after": 0.0019919272588812364,
+          "regression": 0.0
+        },
+        {
+          "tile": 39,
+          "observations": 21,
+          "mean_before": 0.00191164152244704,
+          "mean_after": 0.00191164152244704,
+          "regression": 0.0
+        },
+        {
+          "tile": 41,
+          "observations": 27,
+          "mean_before": 0.007551864470433095,
+          "mean_after": 0.007551864470433095,
+          "regression": 0.0
+        },
+        {
+          "tile": 42,
+          "observations": 393,
+          "mean_before": 0.005871858615436843,
+          "mean_after": 0.005681304926503161,
+          "regression": -0.00019055368893368182
+        },
+        {
+          "tile": 43,
+          "observations": 449,
+          "mean_before": 0.01276174014196345,
+          "mean_after": 0.011435680674162084,
+          "regression": -0.0013260594678013652
+        },
+        {
+          "tile": 44,
+          "observations": 474,
+          "mean_before": 0.0017074402388902862,
+          "mean_after": 0.0022127720777012382,
+          "regression": 0.0005053318388109524
+        },
+        {
+          "tile": 45,
+          "observations": 377,
+          "mean_before": 0.001813183373478653,
+          "mean_after": 0.0018873787616357565,
+          "regression": 7.419538815710339e-05
+        },
+        {
+          "tile": 46,
+          "observations": 397,
+          "mean_before": 0.0018452983246989925,
+          "mean_after": 0.0018630442829465125,
+          "regression": 1.7745958247519644e-05
+        },
+        {
+          "tile": 48,
+          "observations": 179,
+          "mean_before": 0.005232940195111098,
+          "mean_after": 0.005232940195111098,
+          "regression": 0.0
+        },
+        {
+          "tile": 49,
+          "observations": 389,
+          "mean_before": 0.0034864744572241533,
+          "mean_after": 0.003486494241151452,
+          "regression": 1.9783927298530264e-08
+        },
+        {
+          "tile": 50,
+          "observations": 473,
+          "mean_before": 0.011514888272762303,
+          "mean_after": 0.011476925657198461,
+          "regression": -3.79626155638435e-05
+        },
+        {
+          "tile": 51,
+          "observations": 239,
+          "mean_before": 0.018479535622303925,
+          "mean_after": 0.014791483069625353,
+          "regression": -0.0036880525526785707
+        },
+        {
+          "tile": 52,
+          "observations": 479,
+          "mean_before": 0.0033548092619828094,
+          "mean_after": 0.0034651308130764953,
+          "regression": 0.00011032155109368547
+        },
+        {
+          "tile": 53,
+          "observations": 249,
+          "mean_before": 0.0023193768406389276,
+          "mean_after": 0.002454828643888768,
+          "regression": 0.0001354518032498404
+        },
+        {
+          "tile": 54,
+          "observations": 390,
+          "mean_before": 0.0014594032702889442,
+          "mean_after": 0.0014582216750345146,
+          "regression": -1.1815952544299431e-06
+        },
+        {
+          "tile": 55,
+          "observations": 44,
+          "mean_before": 0.0016395629031474757,
+          "mean_after": 0.0016395629031474757,
+          "regression": 0.0
+        },
+        {
+          "tile": 56,
+          "observations": 332,
+          "mean_before": 0.00533924897762782,
+          "mean_after": 0.00533924897762782,
+          "regression": 0.0
+        },
+        {
+          "tile": 57,
+          "observations": 469,
+          "mean_before": 0.009118309770611469,
+          "mean_after": 0.009081108916443315,
+          "regression": -3.720085416815354e-05
+        },
+        {
+          "tile": 58,
+          "observations": 395,
+          "mean_before": 0.007063116224671128,
+          "mean_after": 0.009707685918808476,
+          "regression": 0.0026445696941373494
+        },
+        {
+          "tile": 59,
+          "observations": 28,
+          "mean_before": 0.00875188418479149,
+          "mean_after": 0.009026565440331738,
+          "regression": 0.0002746812555402489
+        },
+        {
+          "tile": 60,
+          "observations": 382,
+          "mean_before": 0.003341398531849971,
+          "mean_after": 0.004395335497195141,
+          "regression": 0.0010539369653451704
+        },
+        {
+          "tile": 61,
+          "observations": 88,
+          "mean_before": 0.005510200310365156,
+          "mean_after": 0.002818191809139255,
+          "regression": -0.0026920085012259007
+        },
+        {
+          "tile": 62,
+          "observations": 145,
+          "mean_before": 0.0015713139975919712,
+          "mean_after": 0.0015713139975919712,
+          "regression": 0.0
+        },
+        {
+          "tile": 63,
+          "observations": 89,
+          "mean_before": 0.0013686766325542196,
+          "mean_after": 0.0013686766325542196,
+          "regression": 0.0
+        }
+      ],
+      "regressed_fraction": 0.02,
+      "maximum_regression": 0.0026445696941373494,
+      "regional_tolerance": 0.002,
+      "maximum_regressed_fraction": 0.2,
+      "maximum_allowed_regression": 0.006,
+      "no_immobile_part_assumption": true
+    }
+  },
+  "rendering": {
+    "paired_panels": "512x512; same camera/canvas; no resizing of geometry",
+    "diagnostic_views": 6,
+    "point_count": 100000,
+    "backend": "regularized linear RBF with intrinsic attachment transition"
+  },
+  "postprocessing": "No new generation, RMBG, MoGe, Pixal, global registration or fusion at this step. RBF displacement applied to ordered prior; red/blue overlay concatenates unchanged partial coordinates. Earlier steps are recorded in parent_provenance.",
+  "preservation": "Keep this approved artifact unchanged. Approval does not freeze coordinates in new experiments.",
+  "reproducibility": "Frozen artifacts and numerical trace retained; hosted MLLM not exactly reproducible (checkpoint/seed/temperature UNKNOWN)."
+}
+```

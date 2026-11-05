@@ -41,6 +41,46 @@ def test_codex_refinement_retries_transient_error_event(monkeypatch):
     assert len(calls) == 2
 
 
+def test_codex_timeout_discards_partial_answer_and_retries(monkeypatch):
+    calls = []
+
+    def fake_run(command, **kwargs):
+        calls.append(kwargs)
+        answer = Path(command[command.index("--output-last-message") + 1])
+        assert not answer.exists(), "a stale partial answer must not survive retry"
+        if len(calls) == 1:
+            answer.write_text('{"action": "UNFINISHED"}')
+            raise refine_module.subprocess.TimeoutExpired(command, kwargs['timeout'],
+                                                          output=b'{"type":"thread.started"}\n')
+        answer.write_text('{"action": "STOP"}')
+        return SimpleNamespace(returncode=0, stderr='', stdout='{"type":"turn.completed"}\n')
+
+    monkeypatch.setenv('COMPAGENT_CODEX_TIMEOUT_SECONDS', '610')
+    monkeypatch.setattr(refine_module.subprocess, 'run', fake_run)
+    monkeypatch.setattr(refine_module.time, 'sleep', lambda _: None)
+    agent = object.__new__(GPTRefineAgent); agent.model = 'test'
+    result = agent._request_codex({}, {}, [])
+    assert json.loads(result['text']) == {'action': 'STOP'}
+    assert result['transport'] == {'attempts': 2, 'timeouts': 1, 'timeout_seconds': 610}
+    assert calls[0]['input'] == calls[1]['input']
+
+
+def test_codex_timeouts_are_bounded_and_never_accept_partial_answer(monkeypatch):
+    calls = []
+
+    def fake_run(command, **kwargs):
+        calls.append(command)
+        Path(command[command.index('--output-last-message') + 1]).write_text('{"action":"STOP"}')
+        raise refine_module.subprocess.TimeoutExpired(command, kwargs['timeout'])
+
+    monkeypatch.setattr(refine_module.subprocess, 'run', fake_run)
+    monkeypatch.setattr(refine_module.time, 'sleep', lambda _: None)
+    agent = object.__new__(GPTRefineAgent); agent.model = 'test'
+    with pytest.raises(RuntimeError, match='timed out'):
+        agent._request_codex({}, {}, [])
+    assert len(calls) == 3
+
+
 class FakeProjector:
     image_shape = (32, 32)
 
@@ -57,6 +97,23 @@ class FakeResponses:
         self.calls.append(kwargs)
         return SimpleNamespace(status="completed", output_text=json.dumps(next(self.answers)),
                                id=f"mock-{len(self.calls)}", model=kwargs["model"])
+
+
+def test_local_review_cannot_accept_an_unverified_attachment(tmp_path):
+    path=tmp_path/'board.png'
+    Image.new('RGB',(64,64),'white').save(path)
+    responses=FakeResponses([{'action':'ACCEPT_UPDATE','reason':'fit improved','evidence':[],
+        'local_structure':{'correspondence_supported':True,'core_shape_preserved':True,
+            'attachment_preserved':False,'unaffected_parts_preserved':True,
+            'observed_region_description':'thin observed extension',
+            'prior_region_description':'nearby thin extension',
+            'motion_direction_evidence':'toward blue support','uncertainty':'attachment unclear'}}])
+    agent=GPTRefineAgent('test',client=SimpleNamespace(responses=responses))
+    result=agent.review(_observation(),_observation(),before_board=path,after_board=path,
+        profile='LOCAL_RIGID_TRANSLATION',transport='COHERENT_PARTIAL_RESIDUAL',
+        integrity={'passed':True},local_boards=(path,path),local_diagnostics={})
+    assert result['decision']['action']=='STOP_KEEP_CURRENT'
+    assert result['model_decision']['action']=='ACCEPT_UPDATE'
 
 
 def _observation():

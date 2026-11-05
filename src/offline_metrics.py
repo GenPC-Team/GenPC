@@ -31,6 +31,24 @@ def evaluate_cd_emd(
     seed: int = 6_145,
 ) -> tuple[float, float]:
     """Measure a frozen completion with deterministic FPS sampling."""
+    return evaluate_cd_emd_repeated(prediction, ground_truth, count=count, seed=seed, repeats=1)[0]
+
+
+def evaluate_cd_emd_repeated(
+    prediction: Path,
+    ground_truth: Path,
+    *,
+    count: int = 16_384,
+    seed: int = 6_145,
+    repeats: int = 3,
+) -> list[tuple[float, float]]:
+    """Repeat approximate EMD on the exact same deterministic FPS samples.
+
+    Sampling and the metric definitions match ``evaluate_cd_emd``. Only
+    repeated CPU sampling work is avoided; each EMD auction still runs anew.
+    """
+    if repeats < 1:
+        raise ValueError("repeats must be positive")
     pred, gt = _points(prediction), _points(ground_truth)
     count = min(int(count), len(pred), len(gt))
     if count <= 0:
@@ -40,6 +58,9 @@ def evaluate_cd_emd(
     gt_ids = fps_sampling(gt, count, start_idx=int(rng.integers(0, len(gt))))
     pred_tensor = torch.from_numpy(pred[pred_ids]).unsqueeze(0).float().cuda()
     gt_tensor = torch.from_numpy(gt[gt_ids]).unsqueeze(0).float().cuda()
-    cd = Completionloss(loss_func="cd_l1").get_loss(gen=pred_tensor, gt=gt_tensor)
-    emd = Completionloss(loss_func="emd").get_loss(gen=pred_tensor, gt=gt_tensor)
-    return float(cd.item()), float(emd.item())
+    measurements = []
+    for _ in range(repeats):
+        cd = Completionloss(loss_func="cd_l1").get_loss(gen=pred_tensor, gt=gt_tensor)
+        emd = Completionloss(loss_func="emd").get_loss(gen=pred_tensor, gt=gt_tensor)
+        measurements.append((float(cd.item()), float(emd.item())))
+    return measurements

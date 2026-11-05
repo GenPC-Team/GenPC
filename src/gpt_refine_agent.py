@@ -148,17 +148,20 @@ def visible_partial_fraction(partial: np.ndarray, projectors, *, resolution: int
 
 def render_diagnostic_board(
     partial: np.ndarray, carrier: np.ndarray, projectors, path: Path,
+    *, focus_points: np.ndarray | None = None,
+    depth_reference_points: np.ndarray | None = None,
 ) -> Path:
     """Show partial, complete prior, and overlay separately under identical cameras."""
-    if len(projectors) != 4:
-        raise ValueError("a GPT diagnostic board requires four saved cameras")
+    if len(projectors) not in (4, 6):
+        raise ValueError("a GPT diagnostic board requires four or six cameras")
+    rows = (len(projectors) + 1) // 2
     size = 320
     header = 58
     footer = 26
     font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
     font = ImageFont.truetype(font_path, 17) if Path(font_path).is_file() else ImageFont.load_default()
     small_font = ImageFont.truetype(font_path, 14) if Path(font_path).is_file() else ImageFont.load_default()
-    board = Image.new("RGB", (size * 6, (size + header) * 2 + footer), "white")
+    board = Image.new("RGB", (size * 6, (size + header) * rows + footer), "white")
     draw = ImageDraw.Draw(board)
     for view, projector in enumerate(projectors, start=1):
         observed = _mask(partial, projector)
@@ -167,6 +170,18 @@ def render_diagnostic_board(
         for mask, color in ((observed, (38, 103, 224)), (predicted, (224, 51, 47))):
             pixels = np.full((*projector.image_shape, 3), 248, dtype=np.uint8)
             pixels[mask] = color
+            if depth_reference_points is not None:
+                _, reference_depth = projector.project(depth_reference_points)
+                valid = reference_depth[np.isfinite(reference_depth) & (reference_depth > 0)]
+                if len(valid):
+                    low,high = np.quantile(valid,[.01,.99])
+                    uv,z = projector.project(partial if len(separate)==0 else carrier)
+                    zbuffer,valid_mask,_ = zbuffer_depth_with_indices(uv,z,projector.image_shape,splat_radius=1)
+                    shade = np.clip((zbuffer[valid_mask]-low)/max(high-low,1e-9),0,1)
+                    # Shared before/after near-light, far-dark depth shading.
+                    base = np.asarray(color,dtype=float)
+                    pixels[valid_mask] = (base[None,:]*(.45+.55*shade[:,None])
+                                         + 230.*(.55-.55*shade[:,None])).astype(np.uint8)
             separate.append(pixels)
         overlay = separate[1].copy()
         overlay[observed] = (38, 103, 224)
@@ -174,7 +189,7 @@ def render_diagnostic_board(
         base_x = ((view - 1) % 2) * 3 * size
         base_y = ((view - 1) // 2) * (size + header)
         draw.text((base_x + 8, base_y + 3),
-                  "CAMERA-1 (acquisition)" if view == 1 else f"AUXILIARY VIEW {view - 1}",
+                  "REFERENCE VIEW (0)" if view == 1 else f"AUXILIARY VIEW {view - 1}",
                   font=font, fill=(20, 20, 20))
         for col, (pixels, label) in enumerate(zip(
             (*separate, overlay),
@@ -182,10 +197,24 @@ def render_diagnostic_board(
         )):
             x = base_x + col * size
             draw.text((x + 8, base_y + 30), label, font=small_font, fill=(20, 20, 20))
-            tile = Image.fromarray(pixels).resize((size, size), Image.Resampling.NEAREST)
+            tile = Image.fromarray(pixels)
+            if focus_points is not None:
+                uv, _ = projector.project(focus_points)
+                uv = uv[np.isfinite(uv).all(axis=1)]
+                if len(uv):
+                    centre = .5*(uv.min(axis=0)+uv.max(axis=0))
+                    radius = max(32., .7*float(np.ptp(uv, axis=0).max()))
+                    height, width = projector.image_shape
+                    box = (max(0, int(centre[0]-radius)), max(0, int(centre[1]-radius)),
+                           min(width, int(centre[0]+radius)+1), min(height, int(centre[1]+radius)+1))
+                    if box[2] > box[0] and box[3] > box[1]:
+                        tile = tile.crop(box)
+            tile = tile.resize((size, size), Image.Resampling.NEAREST)
             board.paste(tile, (x, base_y + header))
-    draw.text((10, (size + header) * 2 + 4),
-              "Blue only: observed but not explained   |   Red only: unobserved, do not delete   |   Purple: 2D overlap",
+    draw.text((10, (size + header) * rows + 4),
+              "Blue only: observed   |   Red only: unknown   |   Purple: 2D overlap" + (
+                  "   |   Separate columns: near is light, far is dark (shared depth scale)"
+                  if depth_reference_points is not None else ""),
               font=small_font, fill=(20, 20, 20))
     path.parent.mkdir(parents=True, exist_ok=True)
     board.save(path)
@@ -221,7 +250,8 @@ class GPTRefineAgent:
         else:
             self.client = client
 
-    def _request_codex(self, schema: dict, payload: dict, images: list[Path]) -> dict:
+    def _request_codex(self, schema: dict, payload: dict, images: list[Path], *,
+                       instructions: str | None = None) -> dict:
         """Use the logged-in Codex model in an isolated read-only directory.
 
         Any tool call invalidates the decision, so the model cannot quietly
@@ -243,16 +273,30 @@ class GPTRefineAgent:
                 command.extend(("--image", str(path.resolve())))
             command.append("-")
             prompt = (
-                INSTRUCTIONS + "\nDo not call any tool or inspect any local file. "
+                (instructions or INSTRUCTIONS) + "\nDo not call any tool or inspect any local file. "
                 "Use only the attached images and the JSON observation below. "
                 "Return exactly one JSON object matching the supplied schema.\n"
                 + json.dumps(payload, sort_keys=True)
             )
             failure = ""
+            timeout = float(os.environ.get("COMPAGENT_CODEX_TIMEOUT_SECONDS", "600"))
+            if not np.isfinite(timeout) or timeout <= 0:
+                raise ValueError("COMPAGENT_CODEX_TIMEOUT_SECONDS must be finite and positive")
+            timeouts = 0
             for attempt in range(3):
                 answer_path.unlink(missing_ok=True)
-                result = subprocess.run(command, input=prompt, cwd=root, text=True,
-                                        capture_output=True, timeout=300, check=False)
+                try:
+                    result = subprocess.run(command, input=prompt, cwd=root, text=True,
+                                            capture_output=True, timeout=timeout, check=False)
+                except subprocess.TimeoutExpired as exc:
+                    # A partial answer is never a decision. Still inspect emitted
+                    # events so forbidden tool use cannot be hidden by a timeout.
+                    timeouts += 1
+                    stdout = exc.stdout or ""
+                    if isinstance(stdout, bytes):
+                        stdout = stdout.decode("utf-8", errors="replace")
+                    result = subprocess.CompletedProcess(command, -1, stdout,
+                        f"request timed out after {timeout:g} seconds")
                 events = []
                 for line in result.stdout.splitlines():
                     try:
@@ -284,18 +328,23 @@ class GPTRefineAgent:
             usage = next((e.get("usage") for e in events
                           if e.get("type") == "turn.completed"), None)
             return {"text": answer_path.read_text(encoding="utf-8"),
-                    "response_id": thread, "usage": usage}
+                    "response_id": thread, "usage": usage,
+                    "transport": {"attempts": attempt + 1, "timeouts": timeouts,
+                                  "timeout_seconds": timeout}}
 
-    def _request(self, *, schema: dict, name: str, payload: dict, images: list[Path]) -> dict:
+    def _request(self, *, schema: dict, name: str, payload: dict, images: list[Path],
+                 instructions: str | None = None) -> dict:
         if self.provider == "codex":
-            raw = self._request_codex(schema, payload, images)
+            raw = (self._request_codex(schema, payload, images, instructions=instructions)
+                   if instructions is not None else self._request_codex(schema, payload, images))
         else:
             content = [{"type": "input_text", "text": json.dumps(payload, sort_keys=True)}]
             content.extend({"type": "input_image", "image_url": _data_uri(path), "detail": "high"}
                            for path in images)
             response = self.client.responses.create(
                 model=self.model,
-                instructions=INSTRUCTIONS,
+                reasoning={"effort": "medium"},
+                instructions=instructions or INSTRUCTIONS,
                 input=[{"role": "user", "content": content}],
                 text={"format": {"type": "json_schema", "name": name,
                                  "strict": True, "schema": schema}},
@@ -316,7 +365,8 @@ class GPTRefineAgent:
         ):
             raise ValueError("GPT evidence must be a list of strings")
         return {"decision": decision, "response_id": raw["response_id"],
-                "model": self.model, "provider": self.provider, "usage": raw["usage"],
+                "model": self.model, "reasoning_effort": "medium", "provider": self.provider, "usage": raw["usage"],
+                "transport": raw.get("transport"),
                 "prompt_version": PROMPT_VERSION}
 
     def plan(self, current: Observation, previous: Observation | None,
@@ -373,7 +423,9 @@ class GPTRefineAgent:
                before_board: Path, after_board: Path, profile: str,
                transport: str, integrity: dict,
                remaining_candidates: int = 0,
-               previous_candidate_results: list[dict] | None = None) -> dict:
+               previous_candidate_results: list[dict] | None = None,
+               local_boards: tuple[Path, Path] | None = None,
+               local_diagnostics: dict | None = None) -> dict:
         if remaining_candidates < 0:
             raise ValueError("remaining_candidates must be nonnegative")
         allowed_actions = ["ACCEPT_UPDATE", "STOP_KEEP_CURRENT"]
@@ -386,7 +438,35 @@ class GPTRefineAgent:
                 "action": {"type": "string", "enum": allowed_actions},
             },
         }
-        return self._request(
+        if local_boards is not None:
+            fields = {key:{"type":"boolean"} for key in (
+                "correspondence_supported", "core_shape_preserved",
+                "attachment_preserved", "unaffected_parts_preserved")}
+            fields.update({key:{"type":"string"} for key in (
+                "observed_region_description", "prior_region_description",
+                "motion_direction_evidence", "uncertainty")})
+            schema = {**schema, "properties": {**schema["properties"],
+                "local_structure": {"type":"object", "properties":fields,
+                                    "required":list(fields), "additionalProperties":False}},
+                "required":[*schema["required"],"local_structure"]}
+        local_payload = ({
+            "local_geometry": local_diagnostics,
+            "local_review_contract": (
+                "This is a local rigid translation candidate: its core retains exact shape; "
+                "a geodesic transition connects it to the unchanged complete carrier. "
+                "Two extra boards show the SAME cropped camera window before/after. "
+                "Separate columns use a shared depth scale: nearer is lighter. "
+                "Describe the observed and prior structures visually rather than guessing "
+                "segmentation labels. State the supported direction of movement. "
+                "Check that moved prior geometry is the SAME physical part supported by "
+                "the blue scan, that attachment and overall structure remain natural, "
+                "and that nearby parts are not dragged along. A nearest-neighbour residual "
+                "reduction alone does not establish part identity. Reject invented bumps, "
+                "stretched attachments or a surface patch moved to explain a different part. "
+                "Use the full boards to check the complete structure and the crops for detail."
+            ),
+        } if local_boards is not None else {})
+        result = self._request(
             schema=schema, name="posterior_refine_review",
             payload={"task": "review_solver_proposal",
                      "allowed_review_actions": {
@@ -401,6 +481,17 @@ class GPTRefineAgent:
                      "after_observation": asdict(after),
                      "profile": profile, "transport": transport,
                      "hard_integrity_passed": bool(integrity.get("passed", False)),
-                     "images_order": ["before", "proposal"]},
-            images=[before_board, after_board],
+                     "images_order": ["before", "proposal"] + (
+                         ["local_before", "local_proposal"] if local_boards else []),
+                     **local_payload},
+            images=[before_board, after_board] + (list(local_boards) if local_boards else []),
         )
+        if local_boards is not None and result["decision"]["action"] == "ACCEPT_UPDATE":
+            checks = result["decision"]["local_structure"]
+            if not all(checks[key] for key in ("correspondence_supported", "core_shape_preserved",
+                                              "attachment_preserved", "unaffected_parts_preserved")):
+                result["model_decision"] = dict(result["decision"])
+                result["decision"] = {**result["decision"],
+                    "action":"TRY_NEXT_CANDIDATE" if remaining_candidates else "STOP_KEEP_CURRENT",
+                    "reason":"local_structure_check_failed"}
+        return result

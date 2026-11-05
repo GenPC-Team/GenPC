@@ -88,10 +88,17 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-root", type=Path, required=True)
     parser.add_argument("--models-root", type=Path, default=ROOT / "models")
-    parser.add_argument("--gpt-model", default="gpt-6-sol")
+    parser.add_argument("--gpt-model", default="gpt-6-astra")
     parser.add_argument("--maximum-rounds", type=int, default=6)
     parser.add_argument("--structural-proposal-config", type=Path,
                         help="Optional saved residual-proximal proposal config")
+    local_policy = parser.add_mutually_exclusive_group()
+    local_policy.add_argument("--planned-local-motion", action="store_true",
+                        help="Experimental GPT region planning with up to three guarded local moves")
+    local_policy.add_argument("--coherent-local-motion", action="store_true",
+                        help="Enable the reviewed local rigid proposal within refinement")
+    parser.add_argument("--residual-registration", action="store_true",
+                        help="Experimental bounded differentiable Sim(3) after fixed registration")
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
@@ -132,15 +139,22 @@ def main() -> None:
         # RGB semantic input and let Pixal run its own RMBG preprocessing.
         raise ValueError("legacy Pixal input differs from the accepted semantic image")
     fingerprints = {str(path): _sha256(path) for path in required}
+    options = {"coherent_local_motion": args.coherent_local_motion,
+               "residual_registration": args.residual_registration}
+    # Omit the disabled new option to preserve existing single-step resumes.
+    if args.planned_local_motion:
+        options["planned_local_motion"] = True
     state_path = root / "four_stage_pipeline.json"
     if state_path.is_file():
         state = json.loads(state_path.read_text(encoding="utf-8"))
         if state["input_fingerprints"] != fingerprints or state["gpt_model"] != args.gpt_model:
             raise ValueError("pipeline inputs/model changed; use a new output root")
+        if state.get("options", {key: False for key in options}) != options:
+            raise ValueError("pipeline options changed; use a new output root")
     else:
         state = {"schema": "compagent.four_stage_pipeline.v1", "sample": sample,
                  "ground_truth_used": False, "gpt_model": args.gpt_model,
-                 "input_fingerprints": fingerprints, "stages": {}}
+                 "input_fingerprints": fingerprints, "options": options, "stages": {}}
         if not args.dry_run:
             _save(state_path, state)
     env = os.environ.copy()
@@ -178,6 +192,20 @@ def main() -> None:
            "--camera", str(camera / "camera.pth"),
            "--output-dir", str(root / "residuals" / sample)], [manifest],
            state, state_path, dry_run=args.dry_run, env=env)
+    if args.residual_registration:
+        residual_dir = root / "registration" / sample / "differentiable_residual"
+        residual = residual_dir / "registered_100k.ply"
+        _stage("registration_residual", [
+            python, str(ROOT / "scripts" / "probe_differentiable_registration.py"),
+            "--prior", str(registration), "--partial", str(partial),
+            "--camera", str(camera / "camera.pth"),
+            "--multiview-manifest", str(manifest), "--output-dir", str(residual_dir),
+            "--device", args.device], [residual, residual_dir / "registration_report.json"],
+            state, state_path, dry_run=args.dry_run, env=env)
+        registration = residual
+        # Keep exactly the same four saved audit cameras across this update.
+        # The residual tool writes before/after boards in those cameras;
+        # refinement and fusion load the new carrier explicitly.
     refined = root / "refinement" / sample / "agent_selected_posterior_100k.ply"
     refine_command = [python, str(ROOT / "scripts" / "run_agentic_posterior.py"),
                       "--prior", str(registration), "--partial", str(partial),
@@ -194,6 +222,10 @@ def main() -> None:
             raise FileNotFoundError(args.structural_proposal_config)
         refine_command.extend(("--structural-proposal-config",
                                str(args.structural_proposal_config.resolve())))
+    if args.coherent_local_motion:
+        refine_command.append("--coherent-local-motion")
+    if args.planned_local_motion:
+        refine_command.append("--planned-local-motion")
     _stage("refinement", refine_command,
            [refined, root / "refinement" / sample / "agent_trace.json"],
            state, state_path, dry_run=args.dry_run, env=env)

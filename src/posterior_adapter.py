@@ -135,6 +135,7 @@ class PosteriorAdapter:
                 minimum_improvement=float(self.config.minimum_observed_improvement),
                 minimum_edge_compression=float(self.config.minimum_edge_compression),
                 maximum_edge_stretch=float(self.config.maximum_edge_stretch),
+                enforce_edge_strain_limits=bool(self.config.enforce_edge_strain_limits),
                 minimum_hidden_coverage=float(self.config.minimum_hidden_coverage),
                 coverage_resolution=int(self.config.coverage_resolution),
             )
@@ -256,6 +257,7 @@ class PosteriorAdapter:
                         ),
                         minimum_edge_compression=float(self.config.minimum_edge_compression),
                         maximum_edge_stretch=float(self.config.maximum_edge_stretch),
+                        enforce_edge_strain_limits=bool(self.config.enforce_edge_strain_limits),
                         minimum_hidden_coverage=float(self.config.minimum_hidden_coverage),
                         coverage_resolution=int(self.config.coverage_resolution),
                         coherent_component_targets=bool(

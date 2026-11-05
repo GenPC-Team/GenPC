@@ -58,6 +58,7 @@ class PosteriorAdapterConfig:
     # remains the hard topology constraint; this robust tail bound prevents a
     # vanishing number of sampling edges from stopping a coherent update.
     maximum_edge_stretch: float = 2.80
+    enforce_edge_strain_limits: bool = True
     minimum_hidden_coverage: float = .95
     coverage_resolution: int = 160
     integrated_observation_fusion: bool = False

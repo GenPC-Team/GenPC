@@ -61,6 +61,7 @@ class ContinuousObservationFusionConfig:
     minimum_improvement: float = 0.01
     minimum_edge_compression: float = 0.70
     maximum_edge_stretch: float = 1.80
+    enforce_edge_strain_limits: bool = True
     minimum_hidden_coverage: float = 0.98
     coverage_resolution: int = 160
 
@@ -422,6 +423,7 @@ def fuse_continuous_observation_field(
         minimum_improvement=float(config.minimum_improvement),
         minimum_edge_compression=float(config.minimum_edge_compression),
         maximum_edge_stretch=float(config.maximum_edge_stretch),
+        enforce_edge_strain_limits=bool(config.enforce_edge_strain_limits),
         minimum_hidden_coverage=float(config.minimum_hidden_coverage),
         coverage_resolution=int(config.coverage_resolution),
         coherent_component_targets=False,

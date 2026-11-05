@@ -286,6 +286,7 @@ def _soft_full_surface_arap(
     coherent_component_targets: bool,
     bending_regularization: float = 0.0,
     hard_target_constraints: bool = False,
+    enforce_edge_strain_limits: bool = True,
 ) -> tuple[np.ndarray, dict, np.ndarray]:
     """Fit soft observations while ARAP propagates motion over complete support."""
     prior = np.asarray(prior, dtype=np.float64)
@@ -438,9 +439,15 @@ def _soft_full_surface_arap(
         edge_ratio_now = np.linalg.norm(candidate[rows] - candidate[cols], axis=1) / np.maximum(
             np.linalg.norm(prior[rows] - prior[cols], axis=1), 1e-12,
         )
-        broken = edge_ratio_now > float(maximum_edge_stretch)
-        if np.any(broken):
-            effective_graph[rows[broken], cols[broken]] = 0.; effective_graph[cols[broken], rows[broken]] = 0.
+        if enforce_edge_strain_limits:
+            broken = edge_ratio_now > float(maximum_edge_stretch)
+            if np.any(broken):
+                effective_graph[rows[broken], cols[broken]] = 0.; effective_graph[cols[broken], rows[broken]] = 0.
+        else:
+            # Diagnose actual neighbourhood connectivity; do not define a
+            # stretched rest edge as a disconnected surface by assumption.
+            effective_graph, candidate_metric, _ = local_surface_graph(candidate, neighbours=int(neighbours), edge_ratio=float(edge_ratio))
+            effective_graph, _, _ = _augment_attachment_edges(effective_graph,candidate_metric,candidate,edge_ratio=float(attachment_edge_ratio))
         candidate_components, candidate_labels = csgraph.connected_components(effective_graph.tocsr(), directed=False)
         original_components, original_labels = csgraph.connected_components(graph, directed=False)
         significant_size = max(32, int(math.ceil(.001 * len(prior))))
@@ -459,13 +466,15 @@ def _soft_full_surface_arap(
             "original_significant_components": original_significant,
             "candidate_significant_components": candidate_significant,
             "candidate_small_component_mass": candidate_small_mass,
+            "edge_strain_limits_enforced": bool(enforce_edge_strain_limits),
         }
         trace.append(last)
         best_improvement = max(best_improvement, float(improvement))
         if (
             improvement >= float(minimum_improvement)
-            and strain["edge_stretch_p01"] >= float(minimum_edge_compression)
-            and strain["edge_stretch_p999"] <= float(maximum_edge_stretch)
+            and (not enforce_edge_strain_limits or (
+                strain["edge_stretch_p01"] >= float(minimum_edge_compression)
+                and strain["edge_stretch_p999"] <= float(maximum_edge_stretch)))
             and coverage >= float(minimum_hidden_coverage)
             and candidate_significant <= original_significant
         ):
@@ -523,6 +532,7 @@ def _embedded_arap_posterior(
     preserve_target_amplitude: bool = False,
     hard_target_constraints: bool = False,
     node_minimum_edge_compression: float | None = None,
+    enforce_edge_strain_limits: bool = True,
 ) -> tuple[np.ndarray, dict, np.ndarray]:
     """Deform the full carrier with a sparse, rotation-aware ARAP graph.
 
@@ -600,6 +610,7 @@ def _embedded_arap_posterior(
         coverage_resolution=max(48, int(coverage_resolution) // 2),
         coherent_component_targets=False,
         hard_target_constraints=bool(hard_target_constraints),
+        enforce_edge_strain_limits=bool(enforce_edge_strain_limits),
     )
     if not node_info.get("active"):
         return prior.copy(), {
@@ -689,10 +700,14 @@ def _embedded_arap_posterior(
             np.linalg.norm(prior[carrier_rows] - prior[carrier_cols], axis=1), 1e-12,
         )
         effective_graph = carrier_graph.copy().tolil()
-        broken = edge_ratio_now > float(maximum_edge_stretch)
-        if np.any(broken):
-            effective_graph[carrier_rows[broken], carrier_cols[broken]] = 0.
-            effective_graph[carrier_cols[broken], carrier_rows[broken]] = 0.
+        if enforce_edge_strain_limits:
+            broken = edge_ratio_now > float(maximum_edge_stretch)
+            if np.any(broken):
+                effective_graph[carrier_rows[broken], carrier_cols[broken]] = 0.
+                effective_graph[carrier_cols[broken], carrier_rows[broken]] = 0.
+        else:
+            effective_graph, candidate_metric, _ = local_surface_graph(candidate, neighbours=int(neighbours), edge_ratio=float(edge_ratio))
+            effective_graph, _, _ = _augment_attachment_edges(effective_graph,candidate_metric,candidate,edge_ratio=float(attachment_edge_ratio))
         candidate_components, candidate_labels = csgraph.connected_components(
             effective_graph.tocsr(), directed=False,
         )
@@ -710,13 +725,15 @@ def _embedded_arap_posterior(
             "candidate_significant_components": candidate_significant,
             "candidate_small_component_mass": candidate_small_mass,
             "robust_edge_quantile": .99,
+            "edge_strain_limits_enforced": bool(enforce_edge_strain_limits),
             **strain,
         }
         trace.append(record)
         if (
             improvement >= float(minimum_improvement)
-            and strain["edge_stretch_p01"] >= float(minimum_edge_compression)
-            and strain["edge_stretch_p99"] <= float(maximum_edge_stretch)
+            and (not enforce_edge_strain_limits or (
+                strain["edge_stretch_p01"] >= float(minimum_edge_compression)
+                and strain["edge_stretch_p99"] <= float(maximum_edge_stretch)))
             and coverage >= float(minimum_hidden_coverage)
             and candidate_significant <= original_significant
         ):

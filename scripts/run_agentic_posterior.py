@@ -91,6 +91,11 @@ def main() -> None:
     parser.add_argument("--config-json", type=Path, required=True)
     parser.add_argument("--structural-proposal-config", type=Path,
                         help="Opt-in residual-proximal graph proposal; requires --semantic")
+    local_policy = parser.add_mutually_exclusive_group()
+    local_policy.add_argument("--planned-local-motion", action="store_true",
+                        help="Experimental GPT region planning with up to three guarded local moves")
+    local_policy.add_argument("--coherent-local-motion", action="store_true",
+                        help="Review a bounded rigid local move after the standard refinement rounds")
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--maximum-rounds", type=int, default=3)
     parser.add_argument("--decision-backend", choices=("deterministic", "gpt"),
@@ -114,6 +119,8 @@ def main() -> None:
         raise ValueError("minimum reference coverage must lie in (0, 1]")
     if args.decision_backend == "gpt" and not args.gpt_model:
         raise ValueError("--gpt-model is required for the GPT decision backend")
+    if (args.coherent_local_motion or args.planned_local_motion) and (args.decision_backend != "gpt" or args.gpt_provider != "codex"):
+        raise ValueError("coherent local motion requires GPT review through Codex")
     if args.structural_proposal_config is not None and (
         not args.structural_proposal_config.is_file() or args.semantic is None
     ):
@@ -338,6 +345,19 @@ def main() -> None:
             stop_reason = "observed_gain_plateau"
             break
 
+    local_review = None
+    if args.coherent_local_motion or args.planned_local_motion:
+        if args.planned_local_motion:
+            from src.planned_refinement_stage import run_planned_review as run_local_review
+        else:
+            from src.local_refinement_stage import run_local_review
+        before_local = output / "before_local_motion_100k.ply"
+        write_points(before_local, current)
+        current, local_review = run_local_review(
+            before_local, args.partial, args.multiview_manifest,
+            output / "local_motion", model=args.gpt_model,
+        )
+        evidence, _ = observe(partial, current, audit_views, caches=caches)
     final_path = output / "agent_selected_posterior_100k.ply"
     write_points(final_path, current)
     write_compare(output / "after_partial_gray_posterior_red.ply", partial, current)
@@ -354,6 +374,7 @@ def main() -> None:
         "maximum_active_views": args.maximum_active_views,
         "minimum_reference_coverage": args.minimum_reference_coverage,
         "maximum_rounds": args.maximum_rounds,
+        "local_motion": local_review,
         "stop_reason": stop_reason,
         "plateau_patience": PLATEAU_PATIENCE if gpt_agent is not None else None,
         "ground_truth_used": False,
