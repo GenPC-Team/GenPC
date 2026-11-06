@@ -7,6 +7,8 @@ and reviews saved candidates; geometry and framing gates stay deterministic.
 from __future__ import annotations
 
 import json
+import math
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -14,7 +16,7 @@ from tempfile import TemporaryDirectory
 import time
 
 
-PROMPT_VERSION = "prior_mining_v23_sparse_part_uncertainty"
+PROMPT_VERSION = "prior_mining_v24_image_plane_orientation"
 
 
 def compose_depth_edit_prompt(*, object_description: str,
@@ -52,6 +54,7 @@ DEPTH_INTERPRETATION_SCHEMA = {
         "observed_geometry": {"type": "string"},
         "near_far_relation": {"type": "string"},
         "front_rear_orientation": {"type": "string"},
+        "image_plane_orientation": {"type": "string"},
         "facing_visual_cue": {"type": "string"},
         "semantic_structure": {"type": "string"},
         "part_identity_and_count": {"type": "string"},
@@ -64,7 +67,7 @@ DEPTH_INTERPRETATION_SCHEMA = {
         "imagegen_hint": {"type": "string"},
     },
     "required": ["observed_geometry", "near_far_relation",
-                 "front_rear_orientation", "facing_visual_cue",
+                 "front_rear_orientation", "image_plane_orientation", "facing_visual_cue",
                  "semantic_structure",
                  "part_identity_and_count", "count_guard", "visible_part_layout",
                  "part_connections",
@@ -91,6 +94,8 @@ REVIEW_SCHEMA = {
         "reason": {"type": "string"},
         "next_prompt": {"type": "string"},
         "pose_and_orientation_match": {"type": "boolean"},
+        "image_plane_orientation_match": {"type": "boolean"},
+        "orientation_evidence": {"type": "string"},
         "front_rear_axis_match": {"type": "boolean"},
         "natural_construction": {"type": "boolean"},
         "visible_structure_match": {"type": "boolean"},
@@ -101,7 +106,7 @@ REVIEW_SCHEMA = {
         "complete_object": {"type": "boolean"},
     },
     "required": ["action", "reason", "next_prompt", "pose_and_orientation_match",
-                 "front_rear_axis_match",
+                 "front_rear_axis_match", "image_plane_orientation_match", "orientation_evidence",
                  "natural_construction", "visible_structure_match",
                  "category_identity_match", "depth_order_match",
                  "projected_envelope_match", "functional_form_match", "complete_object"],
@@ -116,6 +121,19 @@ INSTRUCTIONS = (
     "that best reveals the observed object's parts and their layout; avoid "
     "the reversed back or inside of a hollow object. Do not choose a new view "
     "when the camera is fixed. "
+    "Inspect image-plane orientation explicitly: canvas x increases rightward "
+    "and y downward. Identify two or more supported semantic landmarks and "
+    "describe their top/bottom and left/right ordering in the DEPTH image, "
+    "before inspecting their ordering in RGB. A natural upright catalog image "
+    "is wrong if the supplied depth depicts the object tilted or inverted. "
+    "Do not mentally rotate, vertically flip or mirror either image to match. "
+    "Distinguish actual camera roll from top/bottom part reversal. If supported "
+    "landmarks cannot establish the sign, report uncertainty rather than "
+    "inventing gravity from the image edge. A stored world-up axis may help "
+    "only when its convention is documented. For unknown-camera selection, "
+    "prefer an informative exterior view with clear supported part order and "
+    "limited foreshortening over an ambiguous axial/underside view, while "
+    "retaining coverage. A front view is not always the most informative. "
     "For depth interpretation before generation, read only the supplied depth "
     "and category, plus saved camera orientation when supplied. Brighter valid pixels are nearer and darker valid pixels "
     "are farther; black is unobserved. First map the whole object's image-plane "
@@ -146,6 +164,8 @@ INSTRUCTIONS = (
     "return an empty string there. "
     "Check that the hint preserves each confidently visible terminal direction "
     "and connection, as well as category-defining structure. Explicitly state "
+    "any confident image-plane tilt or inverted part order in the short hint; "
+    "image_plane_orientation must record the supporting landmark order. "
     "the count of salient parts in the hint when it prevents a plausible "
     "identity error (such as one head versus several heads). "
     "Use a supplied camera-above/below relation to identify whether the visible "
@@ -175,6 +195,11 @@ INSTRUCTIONS = (
     "Independently verify front/rear facing direction, especially head gaze "
     "against the tail/back axis; set front_rear_axis_match false when the "
     "candidate reverses it even if the head and tail locations match. "
+    "Also set image_plane_orientation_match false for an upside-down, mirrored "
+    "or materially rotated RGB relative to the depth. In orientation_evidence, "
+    "name corresponding landmarks and their image positions in each image; "
+    "mask overlap alone cannot establish orientation. Do not penalize small "
+    "pose offsets or plausible unobserved completion. "
     "The three supplied images use the same full-frame pixel canvas: "
     "the generated RGB was resized to the saved depth dimensions without crop "
     "or translation before comparison. Compare corresponding pixel locations. "
@@ -242,7 +267,7 @@ class PriorGenerationAgent:
             command = [
                 "codex", "exec", "--model", self.model, "--sandbox", "read-only",
                 "--ephemeral", "--skip-git-repo-check", "--ignore-user-config",
-                "--json", "--config", "model_reasoning_effort=medium",
+                "--json", "--config", "model_reasoning_effort=low",
                 "--output-schema", str(schema_path),
                 "--output-last-message", str(answer_path), "-C", str(root),
             ]
@@ -250,14 +275,26 @@ class PriorGenerationAgent:
                 command.extend(("--image", str(path.resolve())))
             command.append("-")
             failure = ""
+            timeout = float(os.environ.get('COMPAGENT_CODEX_TIMEOUT_SECONDS', '600'))
+            if not math.isfinite(timeout) or timeout <= 0:
+                raise ValueError('COMPAGENT_CODEX_TIMEOUT_SECONDS must be finite and positive')
+            timeouts = 0
             for attempt in range(3):
                 answer_path.unlink(missing_ok=True)
-                result = subprocess.run(
-                    command,
-                    input=INSTRUCTIONS + "\nReturn one JSON object matching the schema.\n"
-                          + json.dumps(payload, ensure_ascii=False, sort_keys=True),
-                    text=True, capture_output=True, cwd=root, timeout=300, check=False,
-                )
+                try:
+                    result = subprocess.run(
+                        command,
+                        input=INSTRUCTIONS + "\nReturn one JSON object matching the schema.\n"
+                              + json.dumps(payload, ensure_ascii=False, sort_keys=True),
+                        text=True, capture_output=True, cwd=root, timeout=timeout, check=False,
+                    )
+                except subprocess.TimeoutExpired as exc:
+                    timeouts += 1
+                    stdout = exc.stdout or ''
+                    if isinstance(stdout, bytes):
+                        stdout = stdout.decode('utf-8', errors='replace')
+                    result = subprocess.CompletedProcess(command, -1, stdout,
+                              f'request timed out after {timeout:g} seconds')
                 events = []
                 for line in result.stdout.splitlines():
                     try:
@@ -294,44 +331,106 @@ class PriorGenerationAgent:
             thread = next((e.get("thread_id") for e in events
                            if e.get("type") == "thread.started"), None)
             return {"decision": decision, "model": self.model,
-                    "reasoning_effort": "medium",
+                    "reasoning_effort": "low",
                     "provider": "codex", "thread_id": thread,
+                    "transport": {"attempts": attempt + 1, "timeouts": timeouts,
+                                  "timeout_seconds": timeout},
                     "prompt_version": PROMPT_VERSION}
 
     def select_view(self, *, board: Path | list[Path], view_ids: list[str],
-                    object_description: str, base_prompt: str = "") -> dict:
+                    object_description: str, base_prompt: str = "",
+                    camera_geometry: dict | None = None,
+                    previous_attempt_feedback: str = "") -> dict:
         schema = {**VIEW_SCHEMA, "properties": {**VIEW_SCHEMA["properties"],
                   "view_id": {"type": "string", "enum": view_ids}}}
         result = self._decide(schema, {
             "task": "select_front_side_partial_depth_view",
             "view_ids": view_ids,
             "object_description": object_description,
+            "candidate_camera_geometry": camera_geometry or {},
+            "previous_attempt_feedback": previous_attempt_feedback,
             "selection_policy": (
                 "The views were already ranked by partial-only visible point count "
                 "and separated angularly. Choose the depth view whose visible "
                 "part layout most resembles the known object category, with a "
                 "plausible exterior/front orientation and informative part "
-                "connections. Avoid reversed, back-inside or misleading views."
+                "connections. Avoid reversed, back-inside or misleading views. "
+                "When a physical up axis is explicitly documented, use each camera's "
+                "signed elevation to distinguish upper surfaces from undersides. "
+                "Prefer an informative natural exterior view over an ambiguous underside "
+                "even if the latter has more observed points. Elevation alone does not "
+                "determine quality: explain the visible part and occlusion evidence. "
+                "An unknown world-up is not evidence of physical gravity."
             ),
         }, [board] if isinstance(board, Path) else board)
         return result
 
+    def audit_existing_prior(self, *, images: list[Path], current_view: str,
+                             view_ids: list[str], object_description: str) -> dict:
+        """Reassess an archived prior without trusting its historical approval."""
+        properties = {
+            'action': {'type':'string','enum':['KEEP_PRIOR','REGENERATE','RESELECT_VIEW','UNCERTAIN']},
+            'selected_view': {'type':'string','enum':view_ids},
+            **{key:{'type':'boolean'} for key in ['current_view_suitable',
+                'image_plane_orientation_match','near_far_match','natural_complete_object',
+                'visible_part_layout_match']},
+            **{key:{'type':'string'} for key in ['depth_landmark_order','rgb_landmark_order',
+                'view_quality_evidence','near_far_evidence','reason','repair_hint','uncertainty']},
+        }
+        schema = {'type':'object','properties':properties,'required':list(properties),
+                  'additionalProperties':False}
+        payload = {'task':'independent_saved_prior_view_and_orientation_audit',
+                   'object_description':object_description,'current_view':current_view,
+                   'available_view_ids':view_ids,
+                   'image_order':['current_depth','current_semantic_same_canvas','same_canvas_overlay',
+                                  'remaining images: labeled saved candidate depth boards'],
+                   'policy': 'First read the current depth and record supported top/bottom and left/right landmark order. '
+                             'Then compare the RGB in exactly the same canvas; do not rotate either mentally. '
+                             'Audit visible near/far ordering, natural full structure and current view ambiguity. '
+                             'Inspect the alternative depth boards independently of the current generated RGB. '
+                             'KEEP_PRIOR only if current view and RGB are suitable. REGENERATE if current view '
+                             'is suitable but RGB disagrees. RESELECT_VIEW only for concrete poor view evidence '
+                             'and a clearer saved alternative; do not churn an adequate view just for variety. '
+                             'UNCERTAIN for insufficient evidence. selected_view stays current except RESELECT_VIEW. '
+                             'Describe a short grounded correction in repair_hint, not invented unseen anatomy. '
+                             'Historical acceptance, image beauty and coverage alone are not correctness evidence.'}
+        result = self._decide(schema, payload, images)
+        decision = result['decision']
+        checks = ['current_view_suitable','image_plane_orientation_match','near_far_match',
+                  'natural_complete_object','visible_part_layout_match']
+        if decision['action']=='KEEP_PRIOR' and not all(decision[k] for k in checks):
+            decision['action'] = 'REGENERATE' if decision['current_view_suitable'] else 'UNCERTAIN'
+        if decision['action']!='RESELECT_VIEW' and decision['selected_view']!=current_view:
+            raise ValueError('only RESELECT_VIEW may change the selected camera')
+        if decision['action']=='RESELECT_VIEW' and decision['selected_view']==current_view:
+            raise ValueError('reselection must identify a different saved view')
+        result['audit_payload'] = payload
+        return result
+
     def interpret_depth(self, *, depth: Path, object_description: str,
-                        feedback: str = "", camera_context: str = "") -> dict:
+                        feedback: str = "", camera_context: str = "",
+                        review_context: dict | None = None) -> dict:
         """Extract one grounded near/far instruction before Image Gen."""
         return self._decide(DEPTH_INTERPRETATION_SCHEMA, {
             "task": "interpret_fixed_partial_depth_before_image_generation",
             "object_description": object_description,
             "user_feedback": feedback,
+            "same_view_machine_review": review_context or {},
             "saved_camera_context": camera_context,
             "base_imagegen_prompt": compose_depth_edit_prompt(
                 object_description=object_description,
             ),
             "image_order": ["saved_partial_depth"],
             "hint_policy": (
-                "One or two concise added sentences covering supported whole-object "
+                "Write imagegen_hint as one or two COMPLETE concise Chinese sentences, "
+                "at most 180 Chinese characters. Keep count_guard and facing_visual_cue "
+                "concise Chinese too. Cover supported whole-object "
                 "pose, near/far order, semantic front/rear facing direction, "
                 "part identity/count, axis directions, "
+                "If same_view_machine_review is present, recheck its suspected "
+                "mismatch against this depth and include a concrete correction "
+                "only where visible evidence supports it. This is fallible "
+                "model feedback, not a human instruction or ground truth. "
                 "separate terminal-part directions and attachments. Do not repeat "
                 "the base sentence, change camera, add arbitrary parts, or "
                 "treat the partial mask as a rigid complete boundary."
@@ -366,6 +465,7 @@ class PriorGenerationAgent:
         decision = result["decision"]
         if decision["action"] == "ACCEPT" and not (
             decision["pose_and_orientation_match"] and decision["front_rear_axis_match"]
+            and decision["image_plane_orientation_match"]
             and decision["natural_construction"]
             and decision["visible_structure_match"]
             and decision["category_identity_match"]

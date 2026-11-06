@@ -7,7 +7,7 @@ registration, refinement, or fusion.
 
 ## Current MLLM configuration
 
-New runs use `gpt-6-astra` with reasoning effort `medium` for prior generation
+New runs use `gpt-6-astra` with reasoning effort `low` (Light) for prior generation
 interpretation/review and refinement planning/review, as requested on 2026-11-05.
 Existing validated experiments retain their recorded GPT-6 Sol provenance.
 
@@ -25,10 +25,26 @@ For KITTI, Waymo and ScanNet runs without a saved acquisition camera,
 `prepare --view-candidates 20` uses the configured 256-point Fibonacci sphere.
 It ranks the views by hidden-point visible count on a partial-only FPS sample,
 greedily retains the first 20 at least 25° apart, and renders those depths.
-Four five-view boards go to `gpt-6-sol`, which chooses the exterior view whose
+Four five-view boards go to `gpt-6-astra`, which chooses the exterior view whose
 visible part layout most resembles the known object class. The complete
 ranking, counts, viewpoints, boards, choice and camera are saved. Ground
 truth and completion metrics do not enter view selection.
+
+New synthetic 20-view runs center the orbit on the observed partial's bounding
+box center. The orbit distance is `r / sin(fovy/2)`, where `r` is half the box
+diagonal. Thus the observed bounding sphere fits the square depth canvas and
+the cameras remain outside it across metric scales and translations. The
+depth rasterizer still applies its existing partial-derived normalized UV
+crop; the framing rule determines physical perspective, not a new raster crop.
+The diversity calculation uses directions relative to this center. This changes
+neither the point coordinates nor saved acquisition cameras. An explicitly
+documented physical up axis is carried through camera construction; KITTI's
+rectified-camera object coordinates use `[0,-1,0]`. Unknown axes are not
+guessed. Astra receives candidate camera geometry, including signed elevation
+when up is known, alongside depth boards, to distinguish informative exterior
+views from misleading underside views. Failed, unaccepted synthetic priors can
+use `refresh-views`; previous camera, prompt and review evidence is archived
+under the same sample before regenerating depth, UV and camera together.
 
 Image Gen receives the chosen **depth image**, not a previous generated image,
 and this category-filled instruction:
@@ -36,7 +52,7 @@ and this category-filled instruction:
 > 这是一个{物体}扫描出来的深度图。用 Image Gen 将图1补全成一张完整的{物体}图，遵循深度图可见部分的深度、轮廓约束，背景为纯白色。
 
 For ambiguous partial scans, `run_prior_generation_agent.py enrich` asks
-`gpt-6-sol` to interpret the saved depth before image generation. The agent
+`gpt-6-astra` to interpret the saved depth before image generation. The agent
 records whole-object pose, visible part identity and count, part locations,
 attachments, each part's base-to-end axis, its separate terminal direction,
 near/far order, and semantic front/rear facing direction. When the saved camera
@@ -53,8 +69,15 @@ appended to the unchanged base prompt. The interpretation and exact resulting
 prompt are saved beside the candidate. User observations about a part can be
 passed as `--feedback`; the code contains no per-category prompt templates.
 When the additional cue exceeds the short-prompt budget, the builder first
-removes redundant part-count prose, then shortens the image hint while keeping
-the facing and canvas cues; it records whether trimming occurred.
+removes redundant part-count prose, then asks the same model to express the
+grounded relations as complete concise Chinese sentences. It does not slice
+directional sentences by character count. Raw interpretation and any semantic
+compaction request/result are retained beside the exact final prompt.
+For regeneration from an unchanged audited view, interpretation also receives
+the previous machine audit's suspected mismatch and uncertainty. It must
+recheck those claims against depth before turning them into a correction;
+machine feedback is separate from human instructions. A newly selected or
+refreshed camera does not inherit old-view directional claims.
 For a distant object that Image Gen tends to enlarge, `enrich
 --include-depth-framing` appends the partial-only observed bounding box as
 approximate canvas percentages. It keeps those visible parts in place while
@@ -77,7 +100,7 @@ rejected. RMBG-2.0 provides the foreground mask. A tolerant
 positive-support gate tests whether the generated foreground covers observed
 depth pixels approximately (default floor 0.65 for the partial-scan review);
 image center, box size and IoU are diagnostics.
-The GPT-6 Sol reviewer separately checks front/back orientation, visible
+The GPT-6 Astra reviewer separately checks front/back orientation, visible
 structure, depth ordering, category identity and natural completeness. It
 has a separate front/rear-axis check that rejects a reversed head, lens or
 nose direction even when those parts occupy the right locations. It
@@ -108,11 +131,16 @@ an exact wheel center unless a distinct wheel or arch is visible. The reviewer
 checks approximate support for confidently observed wheels and permits a
 plausible wheel location within an ambiguous lower-body region.
 If repeated candidate reviews for an unknown-camera scan expose a persistent
-viewpoint ambiguity, `run_prior_generation_agent.py reselect` asks GPT-6 Sol
+viewpoint ambiguity, `run_prior_generation_agent.py reselect` asks GPT-6 Astra
 to choose another member of the already ranked 20 partial-only views. It
-excludes previously failed views, records the no-GT reason and new selection,
-reinstalls that camera, and clears failed candidate rounds before generating
-a new depth interpretation. Accepted fixed-camera samples cannot be reselected.
+excludes previously failed views, receives their failure explanation and camera
+geometry, and records the no-GT reason and new selection. The old selected camera,
+prompts and reviewed candidates are archived before installing the new camera
+and generating a fresh depth interpretation. A repeated visible-support failure
+can also justify exploring another view even when the generated object looks
+coherent overall. `audit_saved_priors.py --latest-review` provides an independent
+check against candidate depth boards; a favorable whole-object audit does not
+override a failed regional review. Accepted fixed-camera samples cannot be reselected.
 MoGe-2 ordinal depth agreement on observed pixels is supporting evidence,
 not a hard threshold because monocular depth is uncertain. A failed depth
 order judgment requires a visible part, occlusion or shape contradiction,
@@ -172,7 +200,7 @@ carrier's point order.
 The registered prior and partial are rendered in the acquisition camera and
 three auxiliary views. Only visible partial samples are positive evidence;
 missing projected pixels are unknown. The views show prior-to-partial
-residuals and support for the GPT-6 Sol refinement controller. It chooses
+residuals and support for the GPT-6 Astra refinement controller. It chooses
 among bounded geometric proposals from the deterministic Partial OT and
 deformation solver, verifies integrity and no-GT residuals, and accepts or
 continues. Stable observed support is anchored; reliable residuals drive a
@@ -195,7 +223,7 @@ on those same slots.
 ## Validated local planning within refinement
 
 The recommended runner invocation adds `--planned-local-motion`. After the
-standard refinement rounds, GPT-6 Sol chooses among numbered observed/prior
+standard refinement rounds, GPT-6 Astra chooses among numbered observed/prior
 region hypotheses or stops. Matching numbers are hypotheses, not asserted
 part identities. Labels use visible region points. Fixed square local crops
 include the prior core and observed target, preserve off-canvas padding and
@@ -241,20 +269,17 @@ and records exact stage commands and logs in one run directory. Qwen-Image-
 Edit-2511 with Nunchaku remains an optional local semantic-completion
 alternative; it was not used in the accepted Redwood10 result.
 
-The local accepted package is `workspace/redwood10_final/`, with ten complete
-sample chains, fused PLYs, prompt and review evidence, stage manifests,
-`metrics.csv`, `copy_manifest.json`, and `SHA256SUMS`. The copied manifests
-still contain original absolute run paths, which were removed during workspace
-cleanup; package-relative paths are in `copy_manifest.json`. The package is
-not checked into Git. Ground truth was used only for frozen offline
-16,384-point FPS, seed-6145 evaluation. Redwood10 mean CD-L1 ×100 is
-`1.537036` and mean EMD ×100 is `2.472180`; the ten individual rows are in
-`workspace/redwood10_final/metrics.csv`.
+The current accepted package is `workspace/astra_final/`, containing all
+156 sample chains across Redwood, Custom, KITTI, Waymo and Aircraft. Full
+stage evidence, prompts, metrics and hashes are local assets, not Git source.
+Its `copy_manifest.json` maps historical paths to archived files. GT remains
+restricted to offline evaluation. See the package's `RESULTS.md` for current
+metrics, per-sample regressions and mixed-effort comparison limitations.
 
 ## Experimental agent-controlled alignment and semantic handles
 
 `run_semantic_refinement_probe.py` starts at the existing fixed registration.
-GPT-6 Astra (medium) can choose `REFINE_ALIGNMENT`, `DEFORM_REGION`, or
+GPT-6 Astra (low / Light) can choose `REFINE_ALIGNMENT`, `DEFORM_REGION`, or
 `KEEP_CURRENT`; actions are not forced to alternate. Alignment uses a proper
 Sim(3) with visible camera/3D correspondence and region-balanced validation.
 For deformation the agent proposes corresponding visible surface landmarks
@@ -344,7 +369,7 @@ performance claims still require a matched end-to-end experiment.
 the case's archived fixed-registration output. It rejects feedback text/images,
 cached plans, externally supplied initial carriers and protected-slot hints.
 The shared category-independent planning contract is in
-`src/semantic_refinement_policy.py`. It uses GPT-6 Astra at medium reasoning.
+`src/semantic_refinement_policy.py`. It uses GPT-6 Astra at low (Light) reasoning.
 
 Each round inspects all six views and lists a whole-object mismatch inventory.
 Automatically chosen positive-support residual crops provide attention cues;
@@ -355,27 +380,42 @@ windows and visible surface landmarks itself. A common global offset can select
 proper Sim(3); local pose/shape differences select semantic deformation; broad
 surface residuals can select PosteriorAdapter or the narrow observation field.
 Tool availability is not evidence of utility: selection and acceptance are logged.
+Numerical rejections include the failed checks, measured before/after distances,
+connectivity and applicable criteria in the agent's history. Passing regional
+support and carrier-integrity audits alone does not imply that a proposal
+passed every gate. The `numerical_rejection_v1` evidence revision records its
+starting round; it exposes existing checks without changing their thresholds.
 
 Qualified local candidates retain weaker steps for review backtracking if the
 stronger proposals from both operators are rejected. A proposed stop with no
 actionable inventory entries is checked by a separate review call to the same
 model. It can request reassessment with concrete part/view evidence. Exhausting
 the iteration budget is recorded separately from adequate fit or uncertain
-residuals. The current four-case pilot has a shared 32-round ceiling, extended
-from eight rounds without adding human hints or GT feedback. Resuming retains
+residuals. The current Custom, KITTI, Waymo and Aircraft suite has a shared
+32-round ceiling, extended from eight rounds without adding human hints or
+GT feedback. Resuming retains
 the original fixed reference and its own decision history; `--rounds` counts
 total rounds across continuations. The process exports a red refinement / blue partial PLY overlay
 alongside full views, local crops, prompts, controls, candidates and reviews.
+The current experiment queues budget-exhausted runs for a second tranche up
+to 64 total rounds, preserving the initial checkpoint, fusion, method snapshot
+and offline metrics under `budget_tranches/`. Early evidence-based stops are
+unchanged. The continuation rule never uses GT or scores; any remaining budget
+stop is still reported as unresolved rather than converged.
+The stage runner can reuse complete cached assets after a scheduling GPU-index
+change; it preserves the original stage command and runtime provenance. This
+does not rerun inference. Changed backends/source paths or missing outputs do
+not receive this exception.
 Part size and affected-point fraction are reported rather than capped at a
 universal percentage: a natural component can occupy most of an object.
 The selection must contain supported surface points and leave an external
 carrier; attachment transitions, observation checks and structural review
 assess the resulting change. This removes the earlier 40%/45% point quotas.
 
-The accepted fox result under `workspace/semantic_refinement_astra/` remains a
-human-assisted reference. Autonomous transfer tests are under
-`workspace/autonomous_refinement/custom10/`; this mode concerns refinement
-from fixed registration, not autonomous upstream image-prior generation.
+The current accepted autonomous results are under `workspace/astra_final/`;
+this mode refines fixed registration. The earlier human-assisted fox trace is
+historical provenance, and its separate experiment directory was removed at
+the user’s request after accepting the five-dataset run.
 Semantic window/landmark errors and cumulative deformation remain risks.
 Codex requests allow 600 seconds per attempt and at most three attempts;
 `COMPAGENT_CODEX_TIMEOUT_SECONDS` overrides the per-attempt timeout. Partial
@@ -383,3 +423,43 @@ responses from timed-out attempts cannot accept an update. Successful decisions
 record attempt/timeout counts, separately from geometric iteration history.
 Cross-case results must be assessed before promoting this experiment to the
 validated mainline. No GT enters inference or candidate selection.
+
+### LiDAR prior orientation audit
+
+New prior calls use Astra low (Light). Policy `prior_mining_v24_image_plane_orientation`
+requires separate depth and RGB landmark ordering on the identical canvas
+(x right, y down). It checks top/bottom inversion, mirroring and material roll
+changes independently of silhouette coverage, front/rear facing and near/far
+order. A plausible upright RGB cannot pass if it contradicts the observed
+orientation. Sparse or missing landmarks remain uncertain.
+
+`scripts/audit_saved_priors.py` reviews archived KITTI/Waymo depth/RGB pairs
+alongside their saved candidate-view boards, without historical acceptance or
+GT as evidence. It returns keep, regenerate, reselect a concrete saved view,
+or uncertain. Reselection requires a clearer informative exterior view; an
+adequate current view is retained. A changed image or camera requires a fresh
+transparent Pixal input, Pixal/MoGe assets and registration before refinement.
+Existing accepted artifacts remain preserved with their original metadata.
+
+Synthetic camera creation accepts an explicit dataset `--world-up` vector.
+It changes the actual look-at camera and re-rasterizes depth, UVs and masks
+together; an optional `camera.json` records the axis and camera up vector.
+Fixed acquisition cameras reject this override. The historical +Y convention
+is preserved when no metadata is supplied. KITTI's local crop exporter retains
+rectified-camera Y downward (it only removes yaw), so its declared physical up
+is `[0, -1, 0]`. This is input-coordinate metadata, not a semantic/GT estimate.
+Other datasets must provide evidence for their own axis rather than borrowing
+the KITTI convention.
+
+## Accepted five-dataset archive (2026-11-06)
+
+The 156 accepted autonomous results and every saved intermediate are packaged
+under `workspace/astra_final/{redwood,custom,kitti,waymo,aircraft}/<sample>/`.
+New requests use Astra low; historical medium/low decisions stay unchanged.
+Per-case inputs, prompts, cameras, Pixal/MoGe assets, registration, diagnostics,
+refinement iterations, fusion and metrics remain together. Global execution
+records and prior rebuild audits are under `experiment/`.
+The copy manifest maps historical absolute-path provenance to archived files.
+The source archive is immutable; use the suite runner with `--source-root`
+and a fresh `--output-root` for new experiments. Original baseline point
+clouds were removed at user request; comparison metrics are retained.

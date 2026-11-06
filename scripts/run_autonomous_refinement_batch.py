@@ -38,7 +38,7 @@ def main():
                ROOT/'src/semantic_refinement_policy.py', ROOT/'src/refinement_evidence.py',
                ROOT/'src/semantic_handle_refinement.py']
     manifest = {'started': datetime.now(timezone.utc).isoformat(), 'samples': names,
-                'round_budget': args.rounds, 'model': 'gpt-6-astra', 'reasoning_effort': 'medium',
+                'round_budget': args.rounds, 'model': 'gpt-6-astra', 'reasoning_effort': 'low',
                 'autonomous_refinement': True, 'human_feedback': False, 'ground_truth_used': False,
                 'starting_stage': 'archived_fixed_registration',
                 'scope': 'Refinement autonomy only; upstream archived priors retain their original provenance.',

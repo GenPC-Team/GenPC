@@ -179,6 +179,8 @@ def _view_boards(candidates: Path, ids: list[str], counts: dict[str, int],
 def prepare(args: argparse.Namespace) -> None:
     root = args.output_root.resolve()
     partial = args.partial.resolve()
+    if getattr(args, 'world_up', None) is not None and args.camera_source is not None:
+        raise ValueError('a fixed saved camera cannot be overridden by world_up')
     if not partial.is_file():
         raise FileNotFoundError(partial)
     agent_dir = root / "prior_agent"
@@ -208,12 +210,16 @@ def prepare(args: argparse.Namespace) -> None:
     else:
         candidates = agent_dir / "candidates"
         cfg = Munch.fromDict(yaml.safe_load(args.config.read_text(encoding="utf-8")))
+        if getattr(args, 'world_up', None) is not None:
+            cfg.camera_world_up = list(args.world_up)
         cfg.paths.output_dir = str(candidates)
         cfg.paths.data_dir = str(partial.parent)
         cfg.paths.models_dir = str(args.models_root.resolve())
+        camera_geometry = {}
         if args.view_candidates == 20:
             editor = DepthPrompting(cfg)
             points, colors = load_partial(partial)
+            framing = editor.frame_observed_bounds(points)
             xyz = torch.from_numpy(points).to(editor.device)
             rgb = torch.from_numpy(colors).to(editor.device)
             try:
@@ -226,7 +232,7 @@ def prepare(args: argparse.Namespace) -> None:
                     sample, viewpoints, float(cfg.removal_radius),
                 ).sum(dim=1).cpu().numpy()
                 chosen_indices = select_diverse_view_indices(
-                    viewpoints, visible_counts, count=20,
+                    viewpoints - np.asarray(framing['target']), visible_counts, count=20,
                     minimum_angle_deg=args.minimum_view_angle,
                 )
                 view_ids = [f"view_{index:03d}" for index in chosen_indices]
@@ -238,6 +244,15 @@ def prepare(args: argparse.Namespace) -> None:
                         viewpoint_override=viewpoints[index],
                         viewpoint_is_source_camera=False,
                     )
+                    geometry = {'eye': viewpoints[index].tolist(), **framing}
+                    if getattr(args, 'world_up', None) is not None:
+                        up = np.asarray(args.world_up, dtype=float)
+                        up /= np.linalg.norm(up)
+                        direction = viewpoints[index] - np.asarray(framing['target'])
+                        geometry['world_up'] = up.tolist()
+                        geometry['elevation_degrees'] = float(np.degrees(np.arcsin(np.clip(
+                            direction @ up / np.linalg.norm(direction), -1, 1))))
+                    camera_geometry[view_id] = geometry
             finally:
                 editor.close()
             _write(agent_dir / "view_ranking.json", {
@@ -250,6 +265,7 @@ def prepare(args: argparse.Namespace) -> None:
                 "visible_counts": counts,
                 "all_visible_counts": visible_counts.tolist(),
                 "all_viewpoints": viewpoints.tolist(),
+                "camera_geometry": camera_geometry,
             })
             board = _view_boards(candidates, view_ids, counts, agent_dir)
         else:
@@ -278,6 +294,7 @@ def prepare(args: argparse.Namespace) -> None:
         result = PriorGenerationAgent(args.model).select_view(
             board=board, view_ids=view_ids, object_description=args.object_description,
             base_prompt=base_prompt,
+            camera_geometry=camera_geometry,
         )
         selected = result["decision"]["view_id"]
         _camera_files(candidates / selected, camera)
@@ -290,7 +307,8 @@ def prepare(args: argparse.Namespace) -> None:
     decision["prompt"] = compose_depth_edit_prompt(object_description=args.object_description)
     partial_input = root / "inputs" / "partial" / f"{args.sample}.ply"
     partial_input.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(partial, partial_input)
+    if partial != partial_input.resolve():
+        shutil.copy2(partial, partial_input)
     prompt_file = agent_dir / "round_00_prompt.txt"
     prompt_file.write_text(result["decision"]["prompt"].strip() + "\n", encoding="utf-8")
     state = {
@@ -406,6 +424,7 @@ def review(args: argparse.Namespace) -> None:
     decision = result["decision"]
     accepted = bool(audit["passed"] and decision["action"] == "ACCEPT"
                     and decision["pose_and_orientation_match"]
+                    and decision["image_plane_orientation_match"]
                     and decision["front_rear_axis_match"]
                     and decision["natural_construction"]
                     and decision["visible_structure_match"]
@@ -489,12 +508,35 @@ def enrich(args: argparse.Namespace) -> None:
                 camera_context = (f"The saved acquisition camera is {side} the object "
                                   f"relative to its recorded world-up axis "
                                   f"(signed elevation {elevation:.1f} degrees).")
-    result = PriorGenerationAgent(args.model).interpret_depth(
-        depth=Path(state["selected_depth"]),
-        object_description=state["object_description"],
-        feedback=args.feedback,
-        camera_context=camera_context,
-    )
+    interpretation_path = root / 'prior_agent' / 'depth_interpretation_raw.json'
+    review_context = {}
+    source_audit = root / 'source_audit.json'
+    if source_audit.exists():
+        prior_audit = json.loads(source_audit.read_text())
+        audit_decision = prior_audit['decision']
+        if (audit_decision['action'] == 'REGENERATE'
+                and audit_decision['selected_view'] == state['selected_view']
+                and not state.get('view_refresh_provenance')):
+            review_context = {key: audit_decision[key] for key in
+                              ('depth_landmark_order', 'reason', 'repair_hint', 'uncertainty')}
+            review_context['source_audit_sha256'] = _hash(source_audit)
+    interpretation_inputs = {'depth_sha256': _hash(Path(state['selected_depth'])),
+                             'model': args.model, 'prompt_version': PROMPT_VERSION,
+                             'feedback': args.feedback, 'camera_context': camera_context,
+                             'same_view_machine_review': review_context,
+                             'object_description': state['object_description']}
+    cached = json.loads(interpretation_path.read_text()) if interpretation_path.exists() else {}
+    if cached.get('inputs') == interpretation_inputs:
+        result = cached['result']
+    else:
+        result = PriorGenerationAgent(args.model).interpret_depth(
+            depth=Path(state["selected_depth"]),
+            object_description=state["object_description"],
+            feedback=args.feedback,
+            camera_context=camera_context,
+            review_context=review_context,
+        )
+        _write(interpretation_path, {'inputs': interpretation_inputs, 'result': result})
     hint = result["decision"]["imagegen_hint"].strip()
     count_guard = result["decision"]["count_guard"].strip()
     facing_cue = result["decision"]["facing_visual_cue"].strip()
@@ -505,8 +547,6 @@ def enrich(args: argparse.Namespace) -> None:
         # The semantic hint already carries the salient part counts. An
         # overlong extra guard adds prose without new evidence.
         count_guard = ""
-    if len(facing_cue) > 160:
-        raise ValueError("depth interpretation facing_visual_cue is too long")
     framing_hint = ""
     if getattr(args, "include_depth_framing", False):
         with Image.open(state["selected_depth"]) as source_depth:
@@ -540,18 +580,21 @@ def enrich(args: argparse.Namespace) -> None:
                                                             framing_hint) if part),
         )
     if len(prompt) - len(base) > 480:
-        remaining = 480 - len(" ".join(part for part in (facing_cue, framing_hint) if part)) - 2
-        shortened = hint[:max(0, remaining)].rstrip("，,;； ")
-        if "。" in shortened:
-            shortened = shortened.rsplit("。", 1)[0] + "。"
-        else:
-            shortened += "。"
-        hint = shortened
-        hint_truncated = True
+        # Never cut a semantic direction halfway through a sentence. Ask the
+        # same model for a compact expression grounded in the original depth.
+        compact_schema = {'type':'object','properties':{'hint':{'type':'string'}},
+                          'required':['hint'],'additionalProperties':False}
+        compact_payload = {'task':'express_supported_depth_constraints_concisely',
+                           'depth_interpretation':result['decision'],
+                           'policy':'Write one or two complete Chinese sentences, at most 200 characters. Preserve supported image-plane orientation, near/far order, salient part directions and connections. Omit uncertain identities. Do not repeat the base prompt or canvas framing; do not invent new constraints.'}
+        compact = PriorGenerationAgent(args.model)._decide(compact_schema,compact_payload,[Path(state['selected_depth'])])
+        _write(root/'prior_agent/depth_hint_compaction.json',{'payload':compact_payload,'result':compact})
+        hint = compact['decision']['hint'].strip()
+        if not hint:
+            raise ValueError('empty compact depth hint')
         prompt = compose_depth_edit_prompt(
             object_description=state["object_description"],
-            depth_relation_hint=" ".join(part for part in (hint, facing_cue,
-                                                            framing_hint) if part),
+            depth_relation_hint=" ".join(part for part in (hint, framing_hint) if part),
         )
     if len(prompt) - len(base) > 480:
         raise ValueError("depth interpretation hint remains too long")
@@ -585,9 +628,14 @@ def reselect(args: argparse.Namespace) -> None:
     if not view_ids:
         raise ValueError("no untried saved view remains")
     board = state["view_board"]
+    ranking_path = agent_dir / 'view_ranking.json'
+    camera_geometry = (json.loads(ranking_path.read_text()).get('camera_geometry', {})
+                       if ranking_path.exists() else {})
     result = PriorGenerationAgent(args.model).select_view(
         board=[Path(path) for path in board] if isinstance(board, list) else Path(board),
         view_ids=view_ids, object_description=state["object_description"],
+        camera_geometry={key: value for key, value in camera_geometry.items() if key in view_ids},
+        previous_attempt_feedback=args.reason.strip(),
     )
     selected = result["decision"]["view_id"]
     history = state.setdefault("selection_history", [])
@@ -595,30 +643,80 @@ def reselect(args: argparse.Namespace) -> None:
                     "reason": args.reason.strip(), "review_count": len(state["reviews"]),
                     "previous_selection": state["selection"],
                     "new_selection": result})
+    archive = agent_dir / 'selection_revisions' / f'attempt_{len(history):02d}'
+    archive.mkdir(parents=True, exist_ok=False)
+    _write(archive / 'prior_state.json', state)
+    shutil.copytree(Path(state['camera_dir']), archive / 'selected_camera')
     _camera_files(Path(state["view_candidates"][selected]).parent,
                   Path(state["camera_dir"]))
     for path in agent_dir.glob("round_[0-9][0-9]"):
         if path.is_dir():
-            shutil.rmtree(path)
+            shutil.move(str(path), str(archive / path.name))
     for path in agent_dir.glob("review_*_next_prompt.txt"):
-        path.unlink()
+        shutil.move(str(path), str(archive / path.name))
     for name in ("depth_relation_prompt.txt",):
-        (agent_dir / name).unlink(missing_ok=True)
-    shutil.rmtree(agent_dir / "generations", ignore_errors=True)
+        if (agent_dir / name).exists():
+            shutil.move(str(agent_dir / name), str(archive / name))
+    if (agent_dir / 'generations').exists():
+        shutil.move(str(agent_dir / 'generations'), str(archive / 'generations'))
     for name in ("semantic.png", "generation.json"):
-        (root / name).unlink(missing_ok=True)
+        if (root / name).exists():
+            shutil.move(str(root / name), str(archive / name))
     state["selection"] = result
     state["selected_view"] = selected
     state["reviews"] = []
     state["current_prompt_file"] = str(agent_dir / "round_00_prompt.txt")
+    (agent_dir / 'round_00_prompt.txt').write_text(
+        compose_depth_edit_prompt(object_description=state['object_description']) + '\n')
     for key in ("depth_interpretation", "depth_interpretation_feedback",
                 "depth_interpretation_camera_context", "depth_interpretation_framing_hint",
                 "count_guard_omitted_for_length", "hint_truncated_for_length"):
         state.pop(key, None)
     _write(state_path, state)
+    coordinate_path = root / 'coordinate_refresh.json'
+    if coordinate_path.exists():
+        coordinate = json.loads(coordinate_path.read_text())
+        coordinate.update(new_view=selected, new_depth_sha256=_hash(Path(state['selected_depth'])))
+        _write(coordinate_path, coordinate)
     print(json.dumps({"selected_view": selected, "failed_view": history[-1]["failed_view"],
                       "reason": args.reason, "selected_depth": state["selected_depth"]},
                      ensure_ascii=False))
+
+
+def refresh_views(args: argparse.Namespace) -> None:
+    """Rebuild unaccepted synthetic views from observed bounds, preserving provenance."""
+    root = args.output_root.resolve()
+    state_path = root / 'prior_agent/prior_agent_manifest.json'
+    state = json.loads(state_path.read_text())
+    if state.get('accepted') or state.get('camera_source'):
+        raise ValueError('refresh requires an unaccepted synthetic-camera prior')
+    if not args.reason.strip():
+        raise ValueError('a no-GT refresh reason is required')
+    camera = Path(state['camera_dir'])
+    metadata_path = camera / 'camera.json'
+    metadata = json.loads(metadata_path.read_text()) if metadata_path.exists() else {}
+    revisions = root / 'view_revisions'
+    index = len(list(revisions.glob('revision_*'))) + 1
+    archive = revisions / f'revision_{index:02d}'
+    archive.mkdir(parents=True)
+    _write(archive / 'refresh_reason.json', {'reason': args.reason, 'ground_truth_used': False,
+           'old_selected_view': state['selected_view'], 'new_rule': 'observed_bounds_fov'})
+    for source in (root / 'prior_agent', camera, root / 'semantic.png', root / 'generation.json'):
+        if source.exists():
+            shutil.move(str(source), str(archive / ('camera' if source == camera else source.name)))
+    prepare(argparse.Namespace(output_root=root, partial=Path(state['input_partial']),
+        sample=state['sample'], object_description=state['object_description'], constraint=[],
+        camera_source=None, world_up=metadata.get('world_up'), config=args.config,
+        models_root=args.models_root, model=args.model, view_candidates=20, minimum_view_angle=25.0))
+    updated = json.loads(state_path.read_text())
+    updated['view_refresh_provenance'] = str(archive / 'refresh_reason.json')
+    _write(state_path, updated)
+    coordinate_path = root / 'coordinate_refresh.json'
+    if coordinate_path.exists():
+        coordinate = json.loads(coordinate_path.read_text())
+        coordinate.update(new_view=updated['selected_view'],
+                          new_depth_sha256=_hash(Path(updated['selected_depth'])))
+        _write(coordinate_path, coordinate)
 
 
 def main() -> None:
@@ -635,6 +733,8 @@ def main() -> None:
     prep.add_argument("--camera-source", type=Path,
                       help="Existing saved camera directory; skip view selection")
     prep.add_argument("--model", default="gpt-6-astra")
+    prep.add_argument("--world-up", nargs=3, type=float,
+                      help="Declared physical up in input coordinates for synthetic candidate cameras; never infer from GT.")
     prep.add_argument("--view-candidates", type=int, choices=(4, 20), default=4,
                       help="Use 20 diverse high-coverage Fibonacci views for unknown cameras")
     prep.add_argument("--minimum-view-angle", type=float, default=25.0)
@@ -659,9 +759,15 @@ def main() -> None:
     retry_view.add_argument("--reason", required=True)
     retry_view.add_argument("--exclude-view", action="append", default=[])
     retry_view.add_argument("--model", default="gpt-6-astra")
+    refresh = commands.add_parser('refresh-views')
+    refresh.add_argument('--output-root', type=Path, required=True)
+    refresh.add_argument('--reason', required=True)
+    refresh.add_argument('--config', type=Path, default=ROOT / 'configs/mainline_redwood.yaml')
+    refresh.add_argument('--models-root', type=Path, default=ROOT / 'models')
+    refresh.add_argument('--model', default='gpt-6-astra')
     args = parser.parse_args()
     {"prepare": prepare, "review": review, "enrich": enrich,
-     "reselect": reselect}[args.command](args)
+     "reselect": reselect, 'refresh-views': refresh_views}[args.command](args)
 
 
 if __name__ == "__main__":

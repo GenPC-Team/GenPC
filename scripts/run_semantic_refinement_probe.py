@@ -29,7 +29,7 @@ def main():
     partial=load_points(out/'inputs/partial'/f'{sid}.ply');initial=load_points(prior_path);current=initial.copy()
     views=load_manifest_projectors(out/'render_manifest.json');camera=SavedCameraProjector.from_partial(partial,out/'inputs/camera'/sid/'camera.pth',padding=.15,image_shape=(512,512),device='cpu')
     agent=GPTRefineAgent(a.gpt_model,provider='codex');history=[]
-    report={'model':a.gpt_model,'reasoning_effort':'medium','ground_truth_used':False,'feedback':a.feedback,'initial_path':str(prior_path.resolve()),'initial_sha256':hashlib.sha256(prior_path.read_bytes()).hexdigest(),'trace':history,'status':'running','instructions':INSTRUCTIONS}
+    report={'model':a.gpt_model,'reasoning_effort':'low','ground_truth_used':False,'feedback':a.feedback,'initial_path':str(prior_path.resolve()),'initial_sha256':hashlib.sha256(prior_path.read_bytes()).hexdigest(),'trace':history,'status':'running','instructions':INSTRUCTIONS}
     def save():
         write_points(out/'selected_100k.ply',current);(out/'report.json').write_text(json.dumps(report,indent=2)+'\n')
     for i in range(a.rounds):

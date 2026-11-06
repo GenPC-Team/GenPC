@@ -11887,3 +11887,42 @@ Exact artifact copies and complete acceptance record: `/data/project/cr/CompAgen
   "reproducibility": "Frozen artifacts and numerical trace retained; hosted MLLM not exactly reproducible (checkpoint/seed/temperature UNKNOWN)."
 }
 ```
+
+## 2026-11-06 — five-dataset experiment complete (verified, not user-approved)
+
+All 156 fresh runs and offline evaluations are complete under
+workspace/refinement_updated/. Exact case inputs, prompts, prior checkpoints,
+method snapshots, decisions and models remain in each dataset/sample package.
+See RESULTS.md and completion_audit.json there for full metrics and limitations.
+Historical accepted outputs were not overwritten; Redwood archive hashes match.
+This completion record does not declare the new results user-approved.
+
+## 2026-11-06T14:35:11.033620+08:00 — user accepted all five Astra datasets
+
+User: “非常好 我非常满意了”. Accepted all 156 results and intermediate artifacts
+under /data/project/cr/CompAgent/workspace/refinement_updated/{redwood,custom,kitti,waymo,aircraft}/.
+Authorized packaging into workspace/astra_final and code cleanup/remote push.
+Preserve accepted geometry and exact historical prompts/metadata while packaging.
+Inputs: each case inputs/; final: fusion/observation_anchored_fused_100k.ply;
+colored overlay: fusion/final_red_partial_blue.ply. Exact per-case model, prompt
+and parameter records will be collected in astra_final/accepted_results.json.
+MLLM: gpt-6-astra, historical medium/low as recorded per decision. Hosted
+checkpoint, generation seed, negative prompt and unrecorded settings: UNKNOWN;
+not exactly reproducible. All saved settings override these unknown placeholders.
+Postprocessing: saved prior/RMBG transparent Pixal input, Pixal/MoGe registration,
+six-view autonomous refinement, continuous fusion; GT only for offline metrics.
+Do not overwrite these approved outputs in future experiments without asking.
+
+## 2026-11-06 — accepted archive relocated and old experiments removed
+
+Canonical accepted paths: /data/project/cr/CompAgent/workspace/astra_final/
+{redwood,custom,kitti,waymo,aircraft}/<sample>/. All 156 samples and all
+141,796 saved source files were copied and SHA-256 verified. Full verbatim
+prompt texts and per-case input/output references are in accepted_results.json.
+Model/checkpoint parameters retain their saved provenance; unrecorded hosted
+settings are UNKNOWN and results are not exactly reproducible.
+The user explicitly requested deletion of all other workspace experiments
+and declined old baseline point clouds. Thirteen directories were removed;
+cleanup_manifest.json records exact targets. Original prior approval entries
+above are historical and do not imply those old paths still exist.
+Current Astra outputs must be preserved unchanged without further approval.

@@ -15,7 +15,7 @@ from src.balanced_registration import refine_balanced_sim3
 from src.posterior_agent import observe
 from src.local_refinement_stage import connectivity_audit
 from src.deformation_graph import local_surface_graph,edge_strain
-from src.refinement_evidence import candidate_audit,carrier_digest,residual_regions,render_residual_comparison,observed_support_audit,semantic_part_evidence,discover_residual_windows
+from src.refinement_evidence import candidate_audit,carrier_digest,residual_regions,render_residual_comparison,observed_support_audit,semantic_part_evidence,discover_residual_windows,rejection_evidence
 from src.semantic_refinement_policy import planning_contract,COMPLETION_SCHEMA,COMPLETION_INSTRUCTIONS
 
 POLICY_VERSION='autonomous_inventory_v10'
@@ -72,17 +72,36 @@ def main():
     last_region=json.loads(a.previous_plan.read_text())['decision'] if a.previous_plan else {}
     instructions,plan_schema=planning_contract(observation_field=a.allow_observation_field,posterior=a.allow_posterior,autonomous=a.autonomous)
     stalled=0
-    report={'model':a.gpt_model,'reasoning_effort':'medium','ground_truth_used':False,'feedback':a.feedback,'initial_path':str(prior_path.resolve()),'initial_sha256':hashlib.sha256(prior_path.read_bytes()).hexdigest(),'trace':history,'status':'running','instructions':instructions,'view_count':a.views,'protected_indices':str(a.protected_indices) if a.protected_indices else None,'evidence_policy':POLICY_VERSION,'autonomous':a.autonomous}
+    report={'model':a.gpt_model,'reasoning_effort':'low','ground_truth_used':False,'feedback':a.feedback,'initial_path':str(prior_path.resolve()),'initial_sha256':hashlib.sha256(prior_path.read_bytes()).hexdigest(),'trace':history,'status':'running','instructions':instructions,'view_count':a.views,'protected_indices':str(a.protected_indices) if a.protected_indices else None,'evidence_policy':POLICY_VERSION,'autonomous':a.autonomous}
     if a.resume and (out/'report.json').exists():
         report=json.loads((out/'report.json').read_text());history=report['trace'];current=load_points(out/'selected_100k.ply')
         if a.autonomous and not report.get('autonomous',False):raise ValueError('cannot label an assisted history autonomous')
         if report['initial_sha256']!=hashlib.sha256(prior_path.read_bytes()).hexdigest():
             raise ValueError('resume must preserve the original loop rest carrier')
         report['status']='running';report.pop('stop_reason',None)
+        report.setdefault('reasoning_revisions', []).append({
+            'from_round': len(history)+1, 'model': a.gpt_model,
+            'reasoning_effort': 'low', 'previous_report_effort': report['reasoning_effort']})
+        report['current_reasoning_effort']='low'
         report.setdefault('policy_revisions',[]).append({'from_round':len(history)+1,'change':'fixed-rest audit, repeat detection, and available-action update','available_actions':plan_schema['properties']['action']['enum'],'instructions':instructions,'feedback':a.feedback})
         for t in reversed(history):
             if t.get('plan',{}).get('decision',{}).get('windows'):
                 last_region=t['plan']['decision'];break
+        # Recover omitted numerical fields from this run's own saved solver
+        # records. Accepted decisions and coordinates remain unchanged.
+        for t in history:
+            rejected=t.get('geometric_rejections',[])
+            if not rejected:continue
+            saved={}
+            for path in (out/f"round_{t['round']:02d}").glob('*.json'):
+                value=json.loads(path.read_text())
+                if isinstance(value,dict) and 'operator' in value and 'fraction' in value:
+                    saved[(value['operator'],value['fraction'])]=(path,value)
+            for entry in rejected:
+                found=saved.get((entry.get('operator'),entry.get('fraction')))
+                if found:
+                    path,value=found
+                    entry.update(rejection_evidence(value));entry['evidence_source']=str(path)
     failed_images=[]
     reviewed={c['candidate_digest']:c['review']['decision'] for t in history for c in t.get('candidates',[]) if 'candidate_digest' in c}
     exhausted_observation_states={t['input_carrier_digest'] for t in history if t.get('exhausted_observation_field') and t.get('policy_version')==POLICY_VERSION}
@@ -97,9 +116,10 @@ def main():
                                      and geometry['current_regional_support']['passed']
                                      and geometry['initial_regional_support']['passed'])
         return geometry['hard_passed']
-    def rejection_evidence(geometry):
-        return {k:({kk:vv for kk,vv in v.items() if kk!='regions'} if k.endswith('regional_support') else v)
-                for k,v in geometry.items() if k in ('operator','fraction','strain','integrity_audit','current_regional_support','initial_regional_support','solver_integrity_passed')}
+    report['rejection_evidence_revision']='numerical_rejection_v1'
+    report.setdefault('rejection_evidence_revisions',[]).append({
+        'from_round':len(history)+1,'revision':'numerical_rejection_v1',
+        'change':'Expose existing numerical gate criteria and failed checks; geometry rules unchanged.'})
     def save():
         write_points(out/'selected_100k.ply',current);(out/'report.json').write_text(json.dumps(report,indent=2)+'\n')
     save()
@@ -119,6 +139,10 @@ def main():
         if input_digest in exhausted_posterior_states:
             round_schema['properties']['action']['enum']=[x for x in round_schema['properties']['action']['enum'] if x!='UPDATE_POSTERIOR']
         payload={'available_actions':round_schema['properties']['action']['enum'],'view_count':len(views),'protected_surface_slots':len(protected),'round':i+1,'remaining_rounds':a.rounds-i,'observation':asdict(observation),'user_feedback':a.feedback,'residual_discovery':discovery,'history':[{'action':t.get('plan',{}).get('decision',{}).get('action'),'part':t.get('plan',{}).get('decision',{}).get('part'),'mismatch_inventory':t.get('plan',{}).get('decision',{}).get('mismatch_inventory'),'accepted':t.get('accepted'), 'review':t.get('review'),'error':t.get('error'),'geometric_rejections':t.get('geometric_rejections'),'correspondence_validation':t.get('correspondence_validation'),'repeated_candidates':t.get('repeated_candidates')} for t in history]}
+        payload['numerical_gate_policy']={
+            'distributed_fields':'Require more than 1% reduction in observed mean nearest distance, solver integrity, connectivity, and regional/carrier audits.',
+            'semantic_deformation':'Allow at most 2% observed mean-distance regression, require positive Jacobian, connectivity, and regional/carrier audits.',
+            'interpretation':'These are numerical candidate gates, not semantic correspondence evidence; inspect the reported failed checks and measurements.'}
         (rd/'plan_prompt.json').write_text(json.dumps({'instructions':instructions,'payload':payload},indent=2))
         if i==0 and a.initial_plan:
             original_report=json.loads((a.initial_plan.parent.parent/'report.json').read_text())
@@ -175,13 +199,18 @@ def main():
                 after=cKDTree(candidate).query(partial)[0];strain=edge_strain(current,candidate,graph)
                 geometry={'operator':operator_name,'fraction':fraction,'field':field_info,'strain':strain,'mean_before':float(before.mean()),'mean_after':float(after.mean()),'connectivity':connectivity_audit(current,candidate)}
                 geometry['solver_integrity_passed']=solver_passed
-                geometry['hard_passed']=bool(solver_passed and after.mean()<before.mean()*.99 and geometry['connectivity']['passed'])
+                geometry['criteria']={'required_relative_mean_improvement':.01}
+                geometry['gate_checks']={'solver_integrity':bool(solver_passed),
+                    'observed_mean_improvement':bool(after.mean()<before.mean()*.99),
+                    'connectivity':bool(geometry['connectivity']['passed'])}
+                geometry['hard_passed']=all(geometry['gate_checks'].values())
                 passed=qualify(candidate,geometry)
                 write_points(rd/f'{artifact_stem}_{fraction}.ply',candidate);(rd/f'{artifact_stem}_{fraction}.json').write_text(json.dumps(geometry,indent=2))
                 if passed:variants.append((candidate,geometry))
                 else:record.setdefault('geometric_rejections',[]).append(rejection_evidence(geometry))
         elif decision['action']=='REFINE_ALIGNMENT':
             candidate,geometry=refine_balanced_sim3(current,partial,camera)
+            geometry['gate_checks']={'balanced_alignment_accepted':bool(geometry['accepted'])}
             geometry['hard_passed']=geometry['accepted']
             variants=[(candidate,geometry)] if qualify(candidate,geometry) else []
             if not variants:
@@ -200,7 +229,11 @@ def main():
                     strain=geometry['strain'];before=cKDTree(current).query(partial)[0];after=cKDTree(candidate).query(partial)[0]
                     geometry['observation_mean_before']=float(before.mean());geometry['observation_mean_after']=float(after.mean())
                     geometry['connectivity']=connectivity_audit(current,candidate)
-                    passed=(after.mean()<=before.mean()*1.02 and geometry['connectivity']['passed'] and geometry.get('minimum_full_rank_jacobian_determinant',1)>0)
+                    geometry['criteria']={'maximum_relative_mean_regression':.02,'jacobian_must_be_positive':True}
+                    geometry['gate_checks']={'observed_mean_regression':bool(after.mean()<=before.mean()*1.02),
+                        'connectivity':bool(geometry['connectivity']['passed']),
+                        'positive_jacobian':bool(geometry.get('minimum_full_rank_jacobian_determinant',1)>0)}
+                    passed=all(geometry['gate_checks'].values())
                     geometry['hard_passed']=bool(passed);passed=qualify(candidate,geometry)
                     write_points(rd/f'{operator_name}_{fraction}.ply',candidate);(rd/f'{operator_name}_{fraction}.json').write_text(json.dumps(geometry,indent=2))
                     if passed:eligible.append((candidate,geometry))

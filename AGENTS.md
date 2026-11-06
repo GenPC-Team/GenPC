@@ -24,9 +24,9 @@
   See `README.md` for exact arguments.
 - Keep the prompt, selected depth/camera, same-canvas audit, transparent Pixal
   input, Pixal/MoGe assets, registration, diagnostics, refinement, fusion,
-  manifests and logs together for paper experiments. The accepted ten-case
-  archive is `workspace/redwood10_final/`; no other workspace directory is
-  currently retained.
+  manifests and logs together for paper experiments. The accepted five-dataset
+  archive is `workspace/astra_final/` (156 cases). Historical experiment
+  directories were removed after verified packaging at user request.
 - Current Qwen ControlNet/Nunchaku test pins are `diffusers==0.36.0` and
   `transformers==4.57.6`.
 
@@ -69,8 +69,8 @@
   in code and add tests for prompt text when feasible.
 
 ## Model Download Notes
-- New MLLM runs use `gpt-6-astra` with reasoning effort `medium` (user
-  preference, 2026-11-05). This applies to prior interpretation/review and
+- New MLLM runs use `gpt-6-astra` with reasoning effort `low` (Light; user
+  preference, 2026-11-06). This applies to prior interpretation/review and
   refinement planning/review. Preserve historical GPT-6 Sol run metadata.
 - The current validated route is saved-camera depth → Codex Image Gen semantic
   completion → GPT-6 Sol prior review → RMBG transparent Pixal3D input →

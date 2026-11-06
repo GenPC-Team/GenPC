@@ -54,9 +54,18 @@ def _stage(name: str, command: list[str], outputs: list[Path], state: dict,
                     "PIXAL3D_SOURCE", "PYOPENGL_PLATFORM")}
     if prior and prior["command"] != command:
         raise ValueError(f"{name} command changed; use a new run directory")
+    reusable = bool(prior and prior["status"] == "complete"
+                    and all(path.is_file() and path.stat().st_size for path in outputs))
     if prior and prior["status"] == "complete" and prior.get("runtime_env") != runtime_env:
-        raise ValueError(f"{name} runtime environment changed; use a new run directory")
-    if prior and prior["status"] == "complete" and all(path.is_file() for path in outputs):
+        # Reusing completed files performs no GPU computation. Keep their
+        # original device provenance while allowing a queue to use another
+        # GPU for later stages. Backend/source changes still invalidate reuse.
+        previous_env = prior.get("runtime_env")
+        changed = {key for key in runtime_env
+                   if previous_env is None or previous_env.get(key) != runtime_env[key]}
+        if not reusable or changed != {"CUDA_VISIBLE_DEVICES"}:
+            raise ValueError(f"{name} runtime environment changed; use a new run directory")
+    if reusable:
         for path in outputs:
             if path.suffix == ".ply" and _vertices(path) != 100_000:
                 raise ValueError(f"{name} has a non-100k carrier: {path}")
@@ -101,6 +110,8 @@ def main() -> None:
                         help="Experimental bounded differentiable Sim(3) after fixed registration")
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--stop-after", choices=("diagnostics", "fusion"), default="fusion",
+                        help="Stop after fixed registration diagnostics when a separate refinement runner follows.")
     args = parser.parse_args()
     root = args.output_root.resolve()
     model_root = args.models_root.resolve()
@@ -192,6 +203,11 @@ def main() -> None:
            "--camera", str(camera / "camera.pth"),
            "--output-dir", str(root / "residuals" / sample)], [manifest],
            state, state_path, dry_run=args.dry_run, env=env)
+    if args.stop_after == "diagnostics":
+        print(json.dumps({"sample": sample, "stopped_after": "diagnostics",
+                          "registration": str(registration), "diagnostics": str(manifest),
+                          "dry_run": args.dry_run}, indent=2), flush=True)
+        return
     if args.residual_registration:
         residual_dir = root / "registration" / sample / "differentiable_residual"
         residual = residual_dir / "registered_100k.ply"

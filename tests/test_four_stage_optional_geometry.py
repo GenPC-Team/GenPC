@@ -9,6 +9,38 @@ import pytest
 from scripts import run_four_stage_pipeline as pipeline
 
 
+@pytest.mark.parametrize("change,missing,allowed", [
+    ({"CUDA_VISIBLE_DEVICES": "3"}, False, True),
+    ({"CUDA_VISIBLE_DEVICES": "3"}, True, False),
+    ({"ATTN_BACKEND": "xformers"}, False, False),
+])
+def test_completed_stage_reuse_preserves_device_provenance(tmp_path, monkeypatch,
+                                                          change, missing, allowed):
+    output = tmp_path / "asset.bin"
+    if not missing:
+        output.write_bytes(b"completed asset")
+    original = {"CUDA_VISIBLE_DEVICES": "1", "ATTN_BACKEND": "sdpa",
+                "SPARSE_ATTN_BACKEND": "sdpa", "PIXAL3D_SOURCE": "/models/Pixal3D",
+                "PYOPENGL_PLATFORM": "egl"}
+    state = {"stages": {"pixal3d": {"command": ["generate"], "status": "complete",
+                                    "runtime_env": original.copy()}}}
+
+    def unexpected_run(*args, **kwargs):
+        raise AssertionError("completed stage must not be recomputed")
+
+    monkeypatch.setattr(pipeline.subprocess, "run", unexpected_run)
+    kwargs = dict(dry_run=False, env={**original, **change})
+    if allowed:
+        pipeline._stage("pixal3d", ["generate"], [output], state,
+                        tmp_path / "state.json", **kwargs)
+        assert state["stages"]["pixal3d"]["runtime_env"] == original
+        assert output.read_bytes() == b"completed asset"
+    else:
+        with pytest.raises(ValueError, match="runtime environment changed"):
+            pipeline._stage("pixal3d", ["generate"], [output], state,
+                            tmp_path / "state.json", **kwargs)
+
+
 @pytest.mark.parametrize("local_flag", ["--coherent-local-motion", "--planned-local-motion"])
 def test_optional_geometry_flows_through_refinement_and_fusion(tmp_path, monkeypatch, local_flag):
     sample = "object"

@@ -24,6 +24,7 @@ def test_codex_refinement_retries_transient_error_event(monkeypatch):
 
     def fake_run(command, **kwargs):
         calls.append(command)
+        assert "model_reasoning_effort=low" in command
         answer = Path(command[command.index("--output-last-message") + 1])
         answer.write_text('{"action": "STOP"}')
         events = [{"type": "thread.started", "thread_id": "test"}]

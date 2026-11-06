@@ -126,6 +126,13 @@ def main() -> None:
     comparison = output / "partial_gray_fused_red.ply"
     overlay = output / "fused_four_view_projection.png"
     write_points(prediction, fused)
+    colored_overlay = output / "final_red_partial_blue.ply"
+    overlay_points = np.concatenate([fused, partial])
+    overlay_colors = np.concatenate([
+        np.tile(np.array([230, 80, 80]) / 255, (len(fused), 1)),
+        np.tile(np.array([45, 105, 230]) / 255, (len(partial), 1)),
+    ])
+    write_points(colored_overlay, overlay_points, overlay_colors)
     textured_prediction = None
     if args.carrier_colors_from is not None:
         color_cloud = o3d.io.read_point_cloud(str(args.carrier_colors_from))
@@ -149,6 +156,7 @@ def main() -> None:
         "fusion": info,
         "outputs": {
             "prediction": str(prediction.resolve()),
+            "colored_overlay": str(colored_overlay.resolve()),
             "comparison": str(comparison.resolve()),
             "four_view_projection": str(overlay.resolve()),
             "anchors": str((output / "fusion_anchor_pairs.npy").resolve()),

@@ -1,5 +1,329 @@
 # Active plan
 
+## 2026-11-06 — accepted Astra archive and source push (archive verified; push pending)
+
+- Completed: packaged all 156 accepted cases and intermediate evidence in workspace/astra_final.
+  141,796 copied files (49,297,122,787 bytes) passed independent SHA-256 checks.
+  Removed the other 13 workspace experiment directories only after verification;
+  no old baseline archive was retained, as requested. Cleanup manifest is in the archive.
+  50 targeted tests and post-cleanup archive-only preparation passed.
+- Preserve historical absolute-path provenance and verify file hashes.
+- Review source changes, update usage documentation, test relevant paths,
+  commit source/docs/tests and push the current branch. Large artifacts remain local.
+
+
+## 2026-11-06 — five-dataset goal complete
+
+- All 156 requested cases finalized, verified and evaluated: Redwood10,
+  Custom10, KITTI20, Waymo76, Aircraft40. All ten budget continuations completed.
+- Final report: workspace/refinement_updated/RESULTS.md.
+- Completion evidence: workspace/refinement_updated/completion_audit.json and
+  artifact_verification.json (full --require-complete passed).
+- All stage outputs and per-case metrics are grouped under each dataset.
+- Current defaults are Astra low; historical medium records are preserved.
+  Mixed settings and combined method changes prevent an Astra-only claim.
+- KITTI/Waymo lack matched complete GT; their reported scores are observed
+  support only. Individual regressions and unresolved residuals are retained.
+
+
+## 2026-11-06 — goal extended to Redwood
+
+- Add a fresh autonomous Astra-low Redwood run without modifying accepted
+  Redwood10 outputs. User confirmed the ten packaged baselines; exclude the
+  three additional raw partials. Total scope is 156 cases across five datasets.
+- Use the same 64-round maximum and GT-only offline evaluation.
+- Outputs: workspace/refinement_updated/redwood/<sample>/.
+- Scheduling: rebalance_redwood.py waits for Aircraft GPU 1/2/3 workers
+  to finish, drains the current Redwood child, then runs remaining cases on
+  GPU 1/2/3/4. It checks ownership and finalized reports before handoff.
+- All ten baselines prepared; suite_redwood.json launched on GPU 4 with
+  64 rounds and Astra low. Log: /tmp/updated_redwood.log.
+
+
+## 2026-11-06 — requested reasoning setting change
+
+- New prior/refinement processes use gpt-6-astra with low effort (Codex
+  Light tier). Both Codex transport and direct refinement API are updated.
+- Already running Python workers retain medium until their current case ends;
+  subsequent workers and budget continuations load low. Historical decision
+  metadata is preserved. Dataset summaries derive efforts from saved decisions.
+- Validation: prior/refinement transport tests passed (23 tests); CLI calls
+  explicitly request model_reasoning_effort=low and API requests effort=low.
+- First new Waymo worker has saved a low-effort plan for
+  PEDESTRIAN_1002394760240072_1552440207862641_A4kzX4tBck4XcFuUOPA6Lg;
+  live transition is verified in refinement/round_01/plan.json.
+- The dataset experiment therefore spans medium and low settings; it is not
+  a controlled effort ablation. Accepted prior audits remain valid.
+
+
+## Full updated-route run: Custom, KITTI, Waymo, Aircraft (2026-11-06, active)
+
+- User set the explicit goal to finish all four datasets with the updated
+  method: Custom 10, KITTI 20, Waymo 76, Aircraft 40 (146 current inputs).
+  Custom/Aircraft reuse saved upstream assets with original provenance.
+- Updated scope: KITTI/Waymo require a fresh Astra-medium prior audit because
+  some selected views are poor and some RGB/depth pairs are vertically
+  reversed. Improve shared view/orientation verification, audit all 96 cases,
+  regenerate/reselect failed cases, then rerun downstream geometry wherever
+  prior/camera changed. Do not launch their refinement from stale priors.
+- Apply the shared autonomous refinement policy with Astra medium and up to
+  32 total rounds, then the continuous observation fusion stage. Retain all
+  per-stage outputs grouped by dataset and sample, including colored overlays.
+- Custom and Aircraft have matched GT for frozen offline evaluation. KITTI and
+  Waymo have no matched complete object GT here: report no-GT diagnostics and
+  completion counts without inventing CD/EMD. GT must not affect decisions.
+- Visual inference resumed successfully after transport recovery; the full
+  dataset queues are active. Dataset completion and final metrics are pending.
+- Queue and consolidated outputs: `workspace/refinement_updated/{custom,kitti,waymo,aircraft}/<sample>/`.
+  `scripts/run_updated_dataset_suite.py` copies upstream stages, resumes the
+  shared refinement, executes the existing four-view continuous fusion and
+  verifies 100,000-point outputs. Fox's finished autonomous trace and fusion
+  have been imported; the Custom/Aircraft queue handles the other 49 cases.
+- `prior_mining_v24_image_plane_orientation` adds explicit signed image-plane
+  landmark ordering to interpretation/review and independently checks saved
+  priors against alternative depth boards. Prior tests: 11 passed, including
+  rejection of upside-down RGB despite perfect mask coverage. Astra audits of
+  all 20 KITTI and 76 Waymo cases are running in `*_prior_audit/`. Geometry
+  dispatch requires a fresh keep verdict or a newly accepted repaired prior.
+- KITTI exporter verification found that its local clouds retain camera Y
+  downward while synthetic camera rendering assumed +Y up. Added a general
+  explicit `--world-up` camera option; KITTI uses documented `[0,-1,0]`, with
+  depth/UV/mask/camera regenerated together. Default and fixed cameras retain
+  their conventions. All 20 KITTI priors will be regenerated/reviewed with this
+  corrected camera policy; Waymo's unknown coordinate convention is not guessed.
+  Camera-axis + prior tests: 14 passed. Original KITTI audit finished: 15 keep,
+  4 regenerate, 1 uncertain; one explicit top/bottom reversal was identified.
+- First corrected KITTI prior (`frame_000153_pedestrian_0`) passed Astra review;
+  Pixal/MoGe/registration is running. First Waymo repair was rejected for
+  near/far reversal, then its second generated candidate passed. A legacy
+  prompt-length truncation could cut English directional phrases mid-sentence;
+  removed character slicing in favor of concise Chinese hints and same-model
+  semantic compaction when necessary. Raw interpretations are retained before
+  formatting, so failed formatting no longer loses the model result.
+- Fox autonomous run stopped at round 22 with explicitly unresolved tail/rear
+  correspondence, then completed continuous fusion. Consolidated case:
+  `workspace/refinement_updated/custom/cartoon_fox/`. Frozen offline CD-L1 x100 /
+  EMD x100 (three repeats): old fusion 2.336866 / 2.465049; new refinement
+  1.917369 / 2.779507; new fusion 1.913367 / 2.751561. CD improved, EMD regressed;
+  do not claim uniform gains. This offline result is not fed to active agents.
+
+- Synthetic candidate cameras now use the observed bounding center and FOV-derived
+  distance instead of a fixed metric distance around the coordinate origin.
+  Angular diversity is center-relative. Astra receives signed camera elevation
+  when physical up is documented. Fifteen prior/camera tests passed, including
+  scale/translation equivariance and upside-down prior rejection. Unaccepted
+  poor-camera cases are being refreshed with archived provenance; accepted
+  priors remain unchanged. Dataset-wide results remain pending.
+- Same-view prior repair now carries the independent machine audit's suspected
+  mismatch and uncertainty into depth interpretation for rechecking. It is
+  explicitly separated from human feedback and never reused after a camera
+  change. Existing generated prompts retain their exact provenance.
+
+- Waymo independent audit finished all 76: 65 retained and 11 regenerate.
+  Failed priors are being rebuilt; none is dispatched using its rejected RGB.
+  KITTI has 20 new camera tasks, with 14 semantic priors accepted so far.
+- Custom domestic_pig (23 rounds) and dragon_character (26 rounds) completed
+  refinement and 100k fusion. Both explicitly retain unresolved appendage
+  correspondence issues; they are finalized runs, not claims of perfect fit.
+  Offline frozen evaluation is running separately. Shared prior/camera tests
+  now pass 16 tests, including machine-versus-human feedback separation.
+
+- Frozen offline results for the next two Custom cases are mixed: pig old/new
+  final CD/EMD x100 = 2.749922/2.956048 -> 2.708269/2.979379; dragon =
+  2.429804/3.825285 -> 2.926682/4.392943. These scores are recorded only in
+  offline evaluation and never sent to inference/checkpoint selection.
+
+- All 11 Waymo replacement priors passed review; all 65 retained cases have
+  been dispatched exactly once across three manifests. KITTI has 19 accepted
+  priors. One candidate repeatedly failed regional support despite an independent
+  whole-object keep verdict: preserve that disagreement and explore another
+  ranked view through Astra, without overriding the failed regional gate.
+  `reselect` now archives previous camera/prompts/reviews and receives camera
+  geometry plus the reason for the failed attempt.
+- 2026-11-05 20:49 UTC: verified 5 Custom, 1 KITTI and 4 Waymo completion
+  receipts; remaining queues use the same 32-round ceiling. Dependency
+  receipts `queue_geometry.json` and `queue_remaining.json` defer remaining
+  KITTI geometry and the 29 rebuilt-prior cases until prerequisites finish.
+  Five-case frozen Custom mean old/new final CD/EMD x100 is
+  2.135925/3.039933 -> 2.097145/3.181095. This partial report is offline only,
+  with mixed per-case effects; full-dataset conclusions remain pending.
+- All 20 refreshed KITTI priors and all 11 Waymo replacements now pass Astra
+  medium review. `workspace/refinement_updated/validated_rebuilt_priors.json`
+  verifies acceptance, orientation, source/installed/Pixal hashes, transparent
+  RGBA input and equal depth/RGB canvas sizes for all 31. The final KITTI case
+  passed after autonomous view reselection and two feedback revisions; no
+  failed regional gate was overridden. Remaining geometry/refinement is pending.
+- Remaining KITTI geometry now runs on free GPU 0 while Waymo geometry uses
+  GPU 1. Found and fixed a resume-only issue: completed stage caches can be
+  reused when only the dispatch GPU index changes, retaining their original
+  recorded device. Backend/source changes or missing outputs still reject
+  reuse. Five focused stage tests pass. The dependency queue retries the first
+  already-complete KITTI stage rejected before this fix; inference outputs
+  are unchanged and all receipts must succeed before remaining dispatch.
+- The real completed KITTI stage successfully reused all three geometry
+  stages on GPU 0 after the cache fix. `verify_artifacts.py` in the experiment
+  root independently checked 6 Custom, 2 KITTI and 5 Waymo completed cases:
+  finite 100k carriers, frozen hashes, exact red-carrier/blue-partial overlay
+  coordinates and colors, original registration/partial, six-view autonomous
+  Astra-medium decision provenance, stage directories and LiDAR prior gates.
+  `artifact_verification.json` lists all 146 expected inputs and marks the
+  others pending. Remaining dispatch now starts already-verified geometry
+  cases on GPUs 1/4 before waiting for the last KITTI rebuilds, with disjoint
+  ready/deferred sample lists and unchanged inference settings.
+- All 11 Waymo repaired-prior geometry chains completed. The ready refinement
+  batch is live on GPUs 1/4 with 7 KITTI + 11 Waymo cases; 11 KITTI cases remain
+  in its disjoint deferred list. Main manifests account for the other 117
+  cases, giving the full 146-input scope without duplicate dispatch.
+- Offline evaluation now also writes `observed_support.{json,csv}` for
+  KITTI/Waymo: mean and 95th-percentile one-way observed-to-carrier distance,
+  normalized by the observed bounding-box diagonal, with old/new stage hashes.
+  This is explicitly not full-shape CD/EMD or unobserved-quality evidence.
+  The first 2 KITTI and 6 Waymo completed cases evaluated successfully; no
+  inference prompt or selection uses these offline reports.
+- The seventh completed Custom case, mirrorless_camera, regressed offline:
+  old/new fused CD/EMD x100 = 3.464327/3.679289 -> 4.511006/4.316076.
+  Seven-case means are now 2.329605/3.082755 -> 2.262056/3.131537.
+  Keep the full frozen cohort, including regressions; do not use these scores
+  to select inference checkpoints or change the in-progress method.
+- Runtime trace inspection found one 32-round Waymo budget stop with an
+  actionable roof residual and a completion-audit REASSESS verdict. Its agent
+  could not see the actual numerical rejection reason: the compact summary
+  omitted mean-distance improvement and connectivity fields. Expose existing
+  gate checks, criteria and numeric evidence in new requests, recording
+  `numerical_rejection_v1` and its starting round. This changes feedback
+  serialization, not solver thresholds or acceptance rules. Earlier histories
+  keep their original metadata. Arrange a common 64-total-round continuation
+  for budget-stopped runs, preserving their 32-round checkpoint and offline
+  evaluation, without using GT to decide eligibility. This continuation is
+  pending dispatch after geometry frees GPU 0.
+- Nine evidence tests pass. The first budget-stop case has 46 historical
+  numerical rejections recoverable from its saved solver JSON; resume restores
+  these omitted measurements without changing past decisions or geometry.
+  `workspace/refinement_updated/run_budget_continuations.py` is live, waiting
+  for GPU-0 geometry completion, then checks all four datasets for budget
+  exhaustion below 64 total rounds. Each eligible run archives its old
+  checkpoint, method, fusion, completion and metrics before resuming; GT is
+  not an eligibility input. Receipt: `budget_continuations.json`.
+- `comparison_protocol.json` verifies identical old/new input-partial hashes
+  for all 146 cases and records each baseline trace: all use GPT-6 Sol.
+  The updated experiment changes controller/actions/budget as well as model,
+  and changes KITTI plus 11 Waymo priors. Therefore report full-route effects,
+  not an isolated Astra-versus-Sol causal ablation. Nine Custom, four KITTI
+  and eight Waymo outputs passed the artifact audit; Aircraft inference has
+  started. Full evaluation and budget continuations remain pending.
+- [x] Custom10 first tranche: all ten 100k results passed the artifact audit.
+  Frozen first-pass table and hashes are in
+  `workspace/refinement_updated/offline_evaluation/custom10_first_pass.{csv,json}`.
+  Old/new final CD/EMD x100 means: 2.007229/2.754905 -> 1.893382/2.712598;
+  CD improves in 6/10 and EMD in 5/10 cases. Wolf stopped on the 32-round
+  budget and remains queued for continuation; this is not a final full-goal
+  completion claim. Aircraft inference is now running on both Custom-freed GPUs.
+- Added an experiment-root `README.md` with stage paths, point-count/color
+  meanings, evaluation scope and continuation records. The archive audit found
+  that nested source provenance had not been copied by the consolidation
+  helper. The runner now retains it under `provenance/upstream/`; all 50
+  prepared Custom/Aircraft cases were backfilled and hash-verified in
+  `upstream_provenance_copy_audit.json`. Artifact verification now checks these
+  original pipeline/finalization records as well as the geometric outputs.
+- Aircraft's first case (`J-15_view00`) completed and passed the same artifact
+  and offline evaluation protocol. Old/new fused CD/EMD x100:
+  1.396145/2.505877 -> 1.311500/2.352304. This is one case, not a dataset claim.
+- Queue scheduling follow-up: the original 39-case Waymo keep batch is longer
+  than its 18- and 8-case peers. When a shorter queue frees a GPU, redistribute
+  unfinished cases after letting the current child finish; preserve active
+  inference and existing completion/continuation records. No rebalance has
+  been performed yet.
+- [x] All 31 rebuilt-prior geometry chains are complete and verified in
+  `validated_rebuilt_geometry.json`: 20 KITTI + 11 Waymo, input fingerprints,
+  nonempty stage outputs and 100k carriers. The cached-GPU recovery finished
+  successfully. The common 64-round continuation queue is now live on GPU 0,
+  starting with wolf at round 33. Its 32-round selected/fused hashes and
+  archived metrics were verified under `custom/wolf/budget_tranches/round_32/`.
+- [x] Custom10 final evaluation for this experiment is complete. Wolf accepted
+  one further update at round 33 and stopped after independent review at round
+  35, with paw/hidden-surface uncertainty still explicit. Final dataset files:
+  `workspace/refinement_updated/custom/metrics.csv` and `custom/summary.json`.
+  Old/new fused CD/EMD x100 means: 2.007229/2.754905 -> 1.892556/2.712018;
+  CD improves in 6/10, EMD in 5/10 cases. All ten finalized carriers and their
+  provenance passed the artifact audit. Other datasets and their extensions
+  remain active; the four-dataset objective is not complete.
+- 2026-11-05 21:58 UTC artifact audit: Custom 10, KITTI 8, Waymo 14,
+  Aircraft 2 verified; 112 inputs remain pending. The first Waymo CAR budget
+  extension finished at round 34 with unresolved residuals explicitly retained,
+  rather than claiming geometric convergence. Its original round-32 outputs
+  remain under `budget_tranches/round_32/`. The continuation watcher and all
+  dataset queues remain active; refreshed offline evaluation is running.
+- 2026-11-05 22:02 UTC: Aircraft now has three verified/evaluated cases;
+  current complete scope is 35/146 (Custom 10, KITTI 8, Waymo 14, Aircraft 3).
+  `offline_evaluation/summary.json` records the matching partial report.
+  Newly completed samples' final red/blue overlay links were backfilled into
+  `artifacts.json`; the original seven dataset workers and budget watcher
+  remain live. No whole-dataset Aircraft improvement is claimed yet.
+- Added `scripts/summarize_updated_dataset_suite.py` to export dataset-local
+  CSV/JSON tables from frozen offline evaluations, with expected counts,
+  budget-extension status, selected/accepted action counts, and explicit
+  no-GT limitations for KITTI/Waymo. It excludes withdrawn/replaced runs by
+  completion hash and round count. Current tables cover 10/8/14/3 cases;
+  Custom means agree with the previous complete table.
+- Started experiment-only `workspace/refinement_updated/rebalance_waymo.py`
+  (`queue_waymo_rebalance.json`). After the eight-case GPU-7 batch succeeds,
+  it suspends only the long GPU-5 scheduling parent, lets its active child
+  finish, then assigns the unfinished long-batch cases to GPUs 5 and 7.
+  Completed and budget-continuation cases are excluded; unexpected live or
+  unfinalized case ownership fails visibly. Original manifests/rounds remain
+  intact. This changes scheduling only, not prompts, budgets or geometry.
+- KITTI finished 20/20 with verified artifacts and frozen observed-support
+  evaluation. Its final 11-case queue succeeded. Aircraft handoff finished draining
+  its workers; old scheduling parent 2806524 was replaced by 1540665.
+  `suite_aircraft_rebalanced.json` owns the remaining 21-case tranche,
+  including fusion of the two drained cases. Four workers use GPUs 1/2/3/4.
+  `suite.json` retains an explicit handoff link; do not restart the old queue.
+- Aircraft scheduling handoff: `workspace/refinement_updated/rebalance_aircraft.py`
+  waits for the remaining KITTI batch to finish successfully, drains the two
+  current Aircraft workers, then assigns all unfinished Aircraft cases to
+  GPUs 1/2/3/4. It excludes completed and budget-continuation cases and checks
+  for conflicting ownership. No inference settings or method changes.
+- Waymo 18-case GPU-6 batch completed successfully (`suite_waymo_second.json`).
+  Parent 3064218 exited normally; remaining Waymo work belongs to the
+  rebalanced queue on GPUs 5/7. GPU 6 is now available.
+- Aircraft J-36_view03 reached the initial 32-round budget and automatically
+  resumed under the shared 64-round policy and finished at round 43.
+  Round-32 artifacts remain archived; extended fusion and frozen offline
+  evaluation are complete. Uncertain terminal correspondences remain explicit.
+- Aircraft J-36_view08 reached the 32-round budget and automatically resumed
+  under the shared 64-round policy; round 33 is running. Round-32 outputs
+  are archived, and its current completion receipt is withdrawn until finish.
+- Final verified/evaluated scope is 156/156: Redwood 10, Custom 10, KITTI 20,
+  Waymo 76, Aircraft 40. Budget continuations can temporarily withdraw receipts;
+  dataset-local tables filter to currently finalized evaluated cases. Dataset-local tables include all current finalized cases.
+  All active inference children advanced; no failed job was found.
+- The eight-case Waymo GPU-7 batch finished successfully. Rebalancer PID
+  1295347 let child 2621543 finish, then replaced scheduling parent 2925798.
+  New parent 3071275 runs the remaining 31-case tranche on GPUs 5/7 using
+  `suite_waymo_rebalanced.json` (including fusion of the drained case).
+  All original 39 cases are accounted for by finalized receipts, preserved
+  budget tranches or this new queue. `suite_waymo_first.json` retains its old
+  results plus an explicit handoff link; its incomplete batch count is not
+  a failed or missing run. Do not restart the old parent.
+- The 18-case ready-prior batch finished successfully. Dispatcher 3854296
+  started the remaining 11 KITTI cases on GPUs 1/4, suite parent PID 3018278,
+  manifest `suite_lidar_remaining.json`. The original 3895312 ready-batch
+  parent has finished; it should not be restarted.
+- Waymo `CAR_1006130543087548_1552933157019682_f_z2h8bug3T2gY5LSZkElQ`
+  exhausted 32 rounds and automatically entered the common 64-round extension.
+  Its round-32 selected/fused archive hashes were verified. This case is not
+  counted as finalized while its extension ran. It has now stopped after
+  independent review at round 34 with terminal-panel/roof-corner uncertainty
+  retained; its new fusion and provenance passed the artifact audit and are
+  included in the current 23-case Waymo offline support table.
+- Aircraft `J-15_view09` exhausted the 32-round budget and completed the shared
+  extension at round 47 after independent review, retaining rear-shape
+  uncertainty. Original selected/fused hashes were verified under
+  `aircraft/J-15_view09/budget_tranches/round_32/`. New fusion/provenance passed
+  verification and entered the current Aircraft table. Old/new final CD/EMD
+  x100: 2.131895/3.751948 -> 1.494855/2.870346. No GT or score was used for
+  extension eligibility, decisions or stopping.
+
 ## Autonomous semantic refinement and Custom transfer (2026-11-05, active)
 
 - User approved the final fox local correction and red/blue overlay. Exact
@@ -44,6 +368,12 @@
   prompts, model and reasoning policy remain unchanged. Eleven controller tests
   pass, including bounded retry and stale-answer rejection. An interrupted
   wolf review is explicitly unreviewed, not a rejected or accepted candidate.
+- 2026-11-06 (Asia/Shanghai): all four first recovery attempts exhausted
+  model timeout retries. They are interrupted runs, not converged results;
+  preserve their checkpoints under `transport_interruptions/attempt_02/`.
+  A fresh Astra-medium text probe succeeded; resume actual visual inference
+  before drawing conclusions about transport recovery. Offline evaluation
+  excludes interrupted statuses even if an older tranche left `artifacts.json`.
 
 ## Same-part correspondence (2026-11-05, local candidate verified)
 
@@ -1236,3 +1566,34 @@ released object-completion route and its immediate maintenance work.
   the actual input carriers, frozen offline-only CD-L1/EMD x100 changes from
   `2.2173/2.7825` to `2.1928/2.7633`; CD improves on 12/12 samples and EMD on
   11/12. GT was not available to fusion, line search, or stopping.
+
+- 2026-11-06: Offline evaluator now skips receipts withdrawn between listing
+  and reading, and filters publication against current final hashes/rounds.
+  Verified by a successful full evaluator rerun after the observed race.
+  J-36_view08 completed 64 rounds and fusion; remaining residuals are explicit.
+
+- Redwood 01184 finalized autonomously after 8 rounds. Offline old/new
+  fusion CD-L1 x100 / EMD x100: 1.041444/1.844156 -> 1.151346/1.978593.
+  Both regress; retained as an honest result, not fed to inference. Original
+  accepted outputs remain preserved. Dataset comparison is still pending.
+
+- Aircraft main batch finished all 21 scheduled cases successfully; only
+  运-20_view07 budget extension remains on GPU 0. Redwood rebalancer
+  4063280 suspended scheduler 3983101 while its current 05117 child drains.
+  This is an intentional handoff, not a stalled inference process.
+
+- Aircraft40 is fully finalized, artifact-verified and evaluated including all
+  budget continuations. Dataset means and improvements are in
+  workspace/refinement_updated/aircraft/summary.json; no GT informed decisions.
+
+- Redwood handoff completed: queue_redwood_rebalance.json runs nine remaining
+  cases (including 05117 fusion-only completion) on GPUs 1/2/3/4. Original
+  suite_redwood.json records the handoff; stopping its scheduler was intentional.
+
+- Last Waymo pedestrian reached round 32 and automatically resumed under
+  the shared 64-round policy. Its round-32 artifacts are archived; final
+  completion is pending. Redwood 07136 remains active independently.
+
+- Redwood10 completed all fresh Astra-low runs and fusion; all ten verified
+  and evaluated. Final summary: workspace/refinement_updated/redwood/summary.json.
+  Only the last Waymo budget continuation remains active.

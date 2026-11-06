@@ -1,9 +1,37 @@
 import numpy as np
 from scipy import sparse
 
-from src.refinement_evidence import candidate_audit, carrier_digest, residual_regions,observed_support_audit,semantic_part_evidence,discover_residual_windows
+from src.refinement_evidence import candidate_audit, carrier_digest, residual_regions,observed_support_audit,semantic_part_evidence,discover_residual_windows,rejection_evidence
 from src.multiview_partial_evidence import PoseProjector
 from src.multiview_diagnostics import look_at_pose
+
+
+def test_rejection_summary_exposes_numerical_failure_even_when_integrity_passes():
+    geometry = {'operator':'baseline_fine_observation_field', 'fraction':1.,
+                'hard_passed':False, 'mean_before':.1, 'mean_after':.0995,
+                'criteria':{'required_relative_mean_improvement':.01},
+                'gate_checks':{'solver_integrity':True,'observed_mean_improvement':False,'connectivity':True},
+                'connectivity':{'passed':True}, 'integrity_audit':{'passed':True},
+                'current_regional_support':{'passed':True,'regions':[{'large':'surface table'}]},
+                'initial_regional_support':{'passed':True}, 'field':{'large':'solver state'}}
+    summary=rejection_evidence(geometry)
+    assert summary['failed_checks']==['observed_mean_improvement']
+    assert summary['criteria']=={'required_relative_mean_improvement':.01}
+    assert summary['mean_before']==.1 and summary['mean_after']==.0995
+    assert summary['connectivity']=={'passed':True}
+    assert summary['hard_passed'] is False
+    assert 'regions' not in summary['current_regional_support'] and 'field' not in summary
+
+
+def test_rejection_summary_preserves_local_and_regional_failures():
+    geometry={'hard_passed':False,'gate_checks':{'positive_jacobian':False,'connectivity':False},
+              'minimum_full_rank_jacobian_determinant':-.3,'connectivity':{'passed':False},
+              'current_regional_support':{'passed':False,'regions':[]},
+              'observation_mean_before':.2,'observation_mean_after':.19}
+    summary=rejection_evidence(geometry)
+    assert set(summary['failed_checks'])=={'positive_jacobian','connectivity','current_regional_support'}
+    assert summary['minimum_full_rank_jacobian_determinant']==-.3
+    assert summary['observation_mean_before']==.2
 
 
 def test_cumulative_strain_is_recorded_without_universal_rejection_ratio():

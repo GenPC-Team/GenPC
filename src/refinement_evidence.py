@@ -19,6 +19,23 @@ def carrier_digest(points):
     return hashlib.sha256(np.asarray(points, dtype='<f8').tobytes()).hexdigest()
 
 
+def rejection_evidence(geometry):
+    """Retain numerical rejection criteria, omitting only bulky surface rows."""
+    keys = {'operator', 'fraction', 'strain', 'hard_passed', 'gate_checks', 'criteria',
+            'mean_before', 'mean_after', 'observation_mean_before', 'observation_mean_after',
+            'connectivity', 'minimum_full_rank_jacobian_determinant', 'accepted', 'reason',
+            'integrity_audit', 'current_regional_support', 'initial_regional_support',
+            'solver_integrity_passed'}
+    result = {key: ({k: v for k, v in value.items() if k != 'regions'}
+                    if key.endswith('regional_support') else value)
+              for key, value in geometry.items() if key in keys}
+    failed = [key for key, passed in geometry.get('gate_checks', {}).items() if not passed]
+    failed += [key for key in ['integrity_audit', 'current_regional_support', 'initial_regional_support']
+               if geometry.get(key, {}).get('passed') is False]
+    result['failed_checks'] = failed
+    return result
+
+
 def candidate_audit(rest, current, candidate, rest_graph, protected_ids=()):
     """Report cumulative strain; only finite data and explicit locks gate here.
 

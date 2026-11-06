@@ -43,7 +43,7 @@ $PY scripts/run_prior_generation_agent.py prepare \
   --sample 01184 \
   --partial data/redwood/partial/01184.ply \
   --object "带轮垃圾桶" \
-  --camera-source workspace/redwood10_final/01184/inputs/camera/01184 \
+  --camera-source workspace/astra_final/redwood/01184/inputs/camera/01184 \
   --output-root "$RUN"
 ```
 
@@ -87,23 +87,41 @@ case (no annotations, previous plan or per-case feedback):
 ```bash
 CUDA_VISIBLE_DEVICES=0 /home/chenrui/miniconda3/envs/genpc/bin/python \
   scripts/run_semantic_refinement_continuation.py \
-  --case-dir workspace/refinement_final/custom10/wolf \
+  --case-dir workspace/astra_final/custom/wolf \
   --output-dir workspace/autonomous_refinement/custom10/wolf \
   --autonomous --views 6 --rounds 32
 ```
 
 Use a fresh output directory; `--resume` continues the same run from its own
 saved state. `--rounds` is the total round ceiling, including completed rounds,
-not an additional number of rounds. The current pilot allows 32 rounds and
-can stop earlier after an evidence-based completion audit. A budget stop does
+not an additional number of rounds. The current dataset suite allows 32 rounds and
+can stop earlier after an evidence-based completion audit. In the current
+experiment, budget-exhausted runs receive a common continuation to 64 total
+rounds after their first checkpoint is archived under `budget_tranches/`.
+Eligibility uses the recorded stop reason, never GT or metrics. A budget stop does
 not mean convergence. The agent discovers mismatched parts, validates
 cross-view correspondence, reviews local and global effects, and audits its
 stopping decision. Outputs include `selected_100k.ply`,
 `visualization/refined_red_partial_blue.ply`, before/after boards and the full
 decision trace. `scripts/run_autonomous_refinement_batch.py` applies the same
-policy to multiple archived cases. This experimental mode is being evaluated;
-the accepted fox reference was human assisted. See the
+policy to multiple archived cases. The five-dataset autonomous results are accepted;
+the earlier fox reference was human assisted. See the
 [method and limitations](docs/core_registration_pipeline.md#autonomous-refinement-mode).
+
+The accepted Redwood10, Custom10, KITTI20, Waymo76 and Aircraft40 results
+(156 cases) are packaged under `workspace/astra_final/<dataset>/<sample>/`. Each completed
+sample has `completion.json`, `artifacts.json`, all upstream stages, the
+refinement trace and fusion outputs. `fusion/final_red_partial_blue.ply`
+combines the final carrier (red) with the observed partial (blue).
+`scripts/run_updated_dataset_suite.py --rounds 32` runs this shared policy;
+KITTI and Waymo additionally require the saved Astra prior audit and any
+required accepted rebuild before dispatch. Offline metrics are in
+`workspace/astra_final/offline_evaluation/`; all five dataset summaries are complete. KITTI/Waymo have no matched
+complete object GT in this dataset package, so CD/EMD are unavailable there.
+For those two datasets, `observed_support.csv` reports one-way distances from
+observed points to each 100k carrier, normalized by the observed bounding-box
+diagonal. These diagnostics measure observed fit and cannot establish the
+accuracy of unobserved completion. They are computed offline after finalization.
 
 The recommended `--planned-local-motion` mode adds GPT-6 Astra region planning,
 bounded local translations, matched depth crops and cumulative attachment/core
@@ -115,22 +133,21 @@ Use a new run directory when changing the mode. `--coherent-local-motion`
 is the mutually exclusive single-step ablation; omitting both options retains
 the original refinement for reproducibility. No GT is used for inference.
 
-## Redwood10 experiment
+## Accepted five-dataset experiment
 
-The validated ten-case result package is the local directory
-`workspace/redwood10_final/`. Each numbered directory contains the full
-sample chain. The directory root also contains ten quick-access fused PLYs,
-`metrics.csv`, `copy_manifest.json`, and `SHA256SUMS`. Copied JSON manifests
-retain inference-time absolute paths from the original runs; use
-`copy_manifest.json` for paths inside this package. Model weights and ground
-truth are external. The result package is an experiment artifact and is not
-part of the Git source push.
+All 156 samples are complete and accepted in `workspace/astra_final/`.
+Every sample retains the full input, prior, registration, refinement and fusion
+chain. `README.md`, `sample_index.csv`, `RESULTS.md`, `copy_manifest.json` and
+`SHA256SUMS` provide navigation and verification. Historical JSON paths remain
+unchanged; the manifest maps them to local archive files. Model weights and
+original datasets are external, and the result package is not pushed to Git.
 
-Offline 16,384-point FPS evaluation with seed 6145 gives mean CD-L1 ×100
-**1.537036** and EMD ×100 **2.472180**. The same-run previous result means
-were 1.918897 and 2.935511, respectively. Two individual samples, 05117 and
-05452, regressed despite the aggregate improvement. Full per-sample scores
-are in the package's `metrics.csv`.
+Offline 16,384-point FPS, seed-6145 evaluation gives the following final means
+(CD-L1 / approximate EMD, both ×100): Redwood **1.520061 / 2.452078**,
+Custom **1.892556 / 2.712018**, Aircraft **3.859079 / 6.392941**.
+KITTI and Waymo have no matched complete-object GT; their tables report
+observed support instead. Individual regressions are retained. Medium/low
+reasoning and method changes are mixed, so this is not an Astra-only ablation.
 
 See the [method and artifact contract](docs/core_registration_pipeline.md).
 Project code is under the [MIT License](LICENSE); external models, datasets
@@ -170,3 +187,37 @@ The four STL aircraft models in `data/型号飞机模型.rar` have 10 synthetic 
 views each under [data/aircraft](data/aircraft/README.md): 40 matched
 2,048-point partial and 16,384-point GT pairs. Each view also has a viewable
 depth PNG, numeric depth NPZ, and camera metadata.
+
+### Accepted paper archive
+
+`workspace/astra_final/README.md` indexes all five datasets and their stages.
+`copy_manifest.json` maps original paths to archived files, preserving historical
+metadata verbatim. Old experiment directories and old baseline geometry are not
+required to inspect the archive. Saved comparison metrics retain the old scores.
+Verify the copied files and all 156 final carriers with:
+
+```bash
+/home/chenrui/miniconda3/envs/genpc/bin/python scripts/verify_experiment_archive.py workspace/astra_final
+```
+
+To package a newly completed suite into a fresh directory:
+
+```bash
+/home/chenrui/miniconda3/envs/genpc/bin/python scripts/package_updated_dataset_suite.py \
+  --source workspace/my_completed_run --destination workspace/my_archive
+```
+
+Large experiment files and model weights are local assets, excluded from Git.
+
+Start a fresh autonomous run from the accepted saved upstream stages (never
+write experiments into the accepted archive):
+
+```bash
+/home/chenrui/miniconda3/envs/genpc/bin/python scripts/run_updated_dataset_suite.py \
+  --source-root workspace/astra_final --output-root workspace/new_experiment \
+  --datasets redwood custom kitti waymo aircraft --rounds 64 --gpus 0
+```
+
+The historical offline comparison runner requires its old baseline geometry.
+After cleanup, use the preserved per-case comparison tables; the old point clouds
+are intentionally not retained. New inference never reads those metrics.

@@ -7,6 +7,7 @@ depth-hole fill. Qwen remains callable only as a local comparison baseline.
 from __future__ import annotations
 
 import math
+import json
 from typing import TYPE_CHECKING
 
 import cv2
@@ -62,22 +63,31 @@ class DepthPrompting:
         self.depth2image = None
 
     @staticmethod
-    def _up_for_viewpoint(viewpoint: np.ndarray) -> np.ndarray:
-        """Match the historical Fibonacci-camera convention exactly."""
+    def _up_for_viewpoint(viewpoint: np.ndarray, world_up=None) -> np.ndarray:
+        """Use declared coordinate metadata, preserving the historical default."""
         eye = np.asarray(viewpoint, dtype=np.float32)
         gaze = -eye
-        world_up = np.array([0.0, 1.0, 0.0], dtype=np.float32)
+        world_up = np.asarray([0.0, 1.0, 0.0] if world_up is None else world_up, dtype=np.float32)
+        if world_up.shape != (3,) or not np.isfinite(world_up).all() or np.linalg.norm(world_up) < 1e-8:
+            raise ValueError('world_up must be a finite nonzero 3-vector')
+        world_up = world_up / np.linalg.norm(world_up)
         if np.allclose(np.cross(gaze, world_up), 0):
-            return np.array([0.0, 0.0, 1.0], dtype=np.float32)
+            # At a pole, use the least parallel coordinate axis. The legacy
+            # Y-pole keeps its historical +Z fallback exactly.
+            fallback = np.array([0.0, 0.0, 1.0], dtype=np.float32)
+            if np.allclose(np.cross(gaze, fallback), 0):
+                fallback = np.array([1.0, 0.0, 0.0], dtype=np.float32)
+            world_up = fallback
         side = np.cross(gaze, world_up)
         up = np.cross(side, gaze)
         return up / max(np.linalg.norm(up), 1e-8)
 
     def _camera_for_viewpoint(self, viewpoint: np.ndarray):
+        target = np.asarray(getattr(self.cfg, 'camera_target', [0., 0., 0.]), dtype=np.float32)
         return kal.render.camera.Camera.from_args(
             eye=torch.as_tensor(viewpoint, dtype=torch.float32, device=self.device),
-            at=torch.zeros(3, dtype=torch.float32, device=self.device),
-            up=torch.as_tensor(self._up_for_viewpoint(viewpoint), dtype=torch.float32, device=self.device),
+            at=torch.as_tensor(target, dtype=torch.float32, device=self.device),
+            up=torch.as_tensor(self._up_for_viewpoint(np.asarray(viewpoint)-target, getattr(self.cfg, 'camera_world_up', None)), dtype=torch.float32, device=self.device),
             fov=math.pi * float(self.cfg.fovy) / 180.0,
             width=int(self.cfg.cam_res),
             height=int(self.cfg.cam_res),
@@ -98,7 +108,28 @@ class DepthPrompting:
                 y * distance,
                 math.sin(theta) * horizontal_radius * distance,
             ))
-        return np.asarray(viewpoints, dtype=np.float32)
+        return np.asarray(viewpoints, dtype=np.float32) + np.asarray(getattr(self.cfg, 'camera_target', [0.,0.,0.]), dtype=np.float32)
+
+    def frame_observed_bounds(self, points: np.ndarray) -> dict:
+        """Place synthetic observers outside a partial-only bounding sphere.
+
+        Distance follows the declared field of view; no category, GT or
+        metric scale is assumed. Existing fixed cameras never call this.
+        """
+        xyz=np.asarray(points,dtype=np.float64)
+        if xyz.ndim!=2 or xyz.shape[1]!=3 or not len(xyz) or not np.isfinite(xyz).all():
+            raise ValueError('finite nonempty Nx3 partial required')
+        lower,upper=xyz.min(0),xyz.max(0);center=(lower+upper)/2
+        radius=float(np.linalg.norm(upper-lower)/2)
+        half_fov=math.radians(float(self.cfg.fovy))/2
+        if radius<=0 or not 0<half_fov<math.pi/2:
+            raise ValueError('nondegenerate partial and perspective FOV required')
+        self.cfg.camera_target=center.tolist()
+        self.cfg.distance=radius/math.sin(half_fov)
+        return {'target':center.tolist(),'observed_bounding_radius':radius,
+                'distance':self.cfg.distance,'fovy_degrees':float(self.cfg.fovy),
+                'rule':'distance = observed_bbox_sphere_radius / sin(vertical_fov/2)',
+                'ground_truth_used':False}
 
     @staticmethod
     def _visible_indices(points: torch.Tensor, viewpoints: np.ndarray, radius: float) -> torch.Tensor:
@@ -141,7 +172,7 @@ class DepthPrompting:
 
         # Preserve the old front/back decision.  It only resolves a view
         # ambiguity from the partial itself, before any image or prior is used.
-        opposite = -chosen
+        opposite = 2 * np.asarray(getattr(self.cfg, 'camera_target', [0.,0.,0.]), dtype=np.float32) - chosen
         cameras = (self._camera_for_viewpoint(chosen), self._camera_for_viewpoint(opposite))
         depth_sums = []
         for camera, viewpoint in zip(cameras, (chosen, opposite)):
@@ -237,6 +268,18 @@ class DepthPrompting:
         np.save(sample_file(self.cfg, flag, "point_uv.npy"), uv.detach().cpu().numpy())
         np.save(sample_file(self.cfg, flag, "viewpoint.npy"), viewpoint)
         torch.save(camera, sample_file(self.cfg, flag, "camera.pth"))
+        if getattr(self.cfg, 'camera_world_up', None) is not None or getattr(self.cfg,'camera_target',None) is not None:
+            target=np.asarray(getattr(self.cfg,'camera_target',[0.,0.,0.]),dtype=np.float32)
+            world_up=getattr(self.cfg,'camera_world_up',None)
+            metadata = {'schema':'compagent.normalized_camera_context.v1',
+                        'projection_model':'normalized_saved_camera',
+                        'eye':viewpoint.tolist(),'target':target.tolist(),
+                        'world_up':list(world_up) if world_up is not None else None,
+                        'camera_up':self._up_for_viewpoint(viewpoint-target,world_up).tolist(),
+                        'image_size':int(self.cfg.res),
+                        'image_axes':'x right, y down',
+                        'world_up_source':'explicit dataset coordinate metadata; not inferred from GT' if world_up is not None else 'UNKNOWN: legacy rendering up is a convention, not physical gravity'}
+            sample_file(self.cfg,flag,'camera.json').write_text(json.dumps(metadata,indent=2)+'\n')
         return raw_depth
 
     def getImage(

@@ -32,7 +32,7 @@ def main():
     stages = []; cases = []
     for path in sorted(args.runs_root.glob('*/report.json')):
         report = json.loads(path.read_text())
-        if report['status'] == 'running' or not (path.parent/'artifacts.json').exists():
+        if report['status'] not in {'pilot_stopped_with_trace', 'agent_stopped_no_actionable_issue'} or not (path.parent/'artifacts.json').exists():
             continue
         sample = path.parent.name; case = args.case_root/sample
         gt = args.data_root/sample/'gt_data'/f'{sample}_gt.ply'

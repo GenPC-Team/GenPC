@@ -265,7 +265,7 @@ class GPTRefineAgent:
             command = [
                 "codex", "exec", "--model", self.model,
                 "--sandbox", "read-only", "--ephemeral", "--skip-git-repo-check",
-                "--ignore-user-config", "--json", "--config", "model_reasoning_effort=medium",
+                "--ignore-user-config", "--json", "--config", "model_reasoning_effort=low",
                 "--output-schema", str(schema_path),
                 "--output-last-message", str(answer_path), "-C", str(root),
             ]
@@ -343,7 +343,7 @@ class GPTRefineAgent:
                            for path in images)
             response = self.client.responses.create(
                 model=self.model,
-                reasoning={"effort": "medium"},
+                reasoning={"effort": "low"},
                 instructions=instructions or INSTRUCTIONS,
                 input=[{"role": "user", "content": content}],
                 text={"format": {"type": "json_schema", "name": name,
@@ -365,7 +365,7 @@ class GPTRefineAgent:
         ):
             raise ValueError("GPT evidence must be a list of strings")
         return {"decision": decision, "response_id": raw["response_id"],
-                "model": self.model, "reasoning_effort": "medium", "provider": self.provider, "usage": raw["usage"],
+                "model": self.model, "reasoning_effort": "low", "provider": self.provider, "usage": raw["usage"],
                 "transport": raw.get("transport"),
                 "prompt_version": PROMPT_VERSION}
 
