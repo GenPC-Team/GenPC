@@ -1,6 +1,6 @@
 # Active plan
 
-## 2026-11-06 — accepted Astra archive and source push (archive verified; push pending)
+## 2026-11-06 — accepted Astra archive and source push (complete)
 
 - Completed: packaged all 156 accepted cases and intermediate evidence in workspace/astra_final.
   141,796 copied files (49,297,122,787 bytes) passed independent SHA-256 checks.
@@ -8,8 +8,9 @@
   no old baseline archive was retained, as requested. Cleanup manifest is in the archive.
   50 targeted tests and post-cleanup archive-only preparation passed.
 - Preserve historical absolute-path provenance and verify file hashes.
-- Review source changes, update usage documentation, test relevant paths,
-  commit source/docs/tests and push the current branch. Large artifacts remain local.
+- Completed source review, documentation and targeted tests. Commit 71a6b74
+  was pushed to origin/codex/gpt-refine-v7-20261031 as Tumb1eweed.
+  Large artifacts remain local; archive method/source contains the code snapshot.
 
 
 ## 2026-11-06 — five-dataset goal complete
