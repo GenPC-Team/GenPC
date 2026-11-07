@@ -42,6 +42,21 @@ def test_codex_refinement_retries_transient_error_event(monkeypatch):
     assert len(calls) == 2
 
 
+def test_codex_refinement_medium_is_sent_to_transport(monkeypatch):
+    monkeypatch.setattr(refine_module.shutil, "which", lambda _: "/usr/bin/codex")
+
+    def fake_run(command, **kwargs):
+        assert "model_reasoning_effort=medium" in command
+        assert command[command.index("--model") + 1] == "gpt-6-sol"
+        Path(command[command.index("--output-last-message") + 1]).write_text('{"action":"STOP"}')
+        return SimpleNamespace(returncode=0, stderr="", stdout=json.dumps(
+            {"type": "turn.completed", "usage": {"input_tokens": 19, "output_tokens": 4}}))
+
+    monkeypatch.setattr(refine_module.subprocess, "run", fake_run)
+    agent = GPTRefineAgent("gpt-6-sol", provider="codex", reasoning_effort="medium")
+    assert agent._request_codex({}, {}, [])["usage"] == {"input_tokens": 19, "output_tokens": 4}
+
+
 def test_codex_timeout_discards_partial_answer_and_retries(monkeypatch):
     calls = []
 

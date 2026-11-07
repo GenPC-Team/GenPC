@@ -16,7 +16,7 @@ from tempfile import TemporaryDirectory
 import time
 
 
-PROMPT_VERSION = "prior_mining_v24_image_plane_orientation"
+PROMPT_VERSION = "prior_mining_v25_complete_structure"
 
 
 def compose_depth_edit_prompt(*, object_description: str,
@@ -246,6 +246,16 @@ INSTRUCTIONS = (
     "Independently judge whether the result is a complete, naturally built "
     "object of the requested category: coherent materials, connected parts, "
     "functional proportions, and plausible repeated supports or wheels. "
+    "The depth is a partial scan, not a depiction of the whole object: "
+    "complete missing but functionally necessary structure in unobserved areas. "
+    "For repeated structural parts, account for each support implied by the "
+    "object's construction and the confident depth interpretation in this "
+    "view. Check attachment, direction and plausible endpoint; a stretcher, "
+    "trim strip or image-plane overlap cannot substitute for a missing leg. "
+    "An occluded support need not be visible, but its hidden placement must "
+    "be geometrically plausible and the completed object must remain stable. "
+    "Set natural_construction and complete_object false if a needed support "
+    "is absent, disconnected or too short, even when the observed pixels fit. "
     "Reject a generated object that changes the observed viewpoint or visible "
     "part structure, or has missing/impossible construction, even if its "
     "foreground covers the depth mask. Do not use GT, CD, EMD, or sample-specific "
@@ -253,10 +263,11 @@ INSTRUCTIONS = (
 )
 
 class PriorGenerationAgent:
-    def __init__(self, model: str = "gpt-6-astra") -> None:
+    def __init__(self, model: str = "gpt-6-astra", *, reasoning_effort: str = "low") -> None:
         if shutil.which("codex") is None:
             raise RuntimeError("the logged-in Codex CLI is required")
         self.model = model
+        self.reasoning_effort = reasoning_effort
 
     def _decide(self, schema: dict, payload: dict, images: list[Path]) -> dict:
         with TemporaryDirectory(prefix="compagent-prior-agent-") as directory:
@@ -267,7 +278,7 @@ class PriorGenerationAgent:
             command = [
                 "codex", "exec", "--model", self.model, "--sandbox", "read-only",
                 "--ephemeral", "--skip-git-repo-check", "--ignore-user-config",
-                "--json", "--config", "model_reasoning_effort=low",
+                "--json", "--config", f"model_reasoning_effort={getattr(self, 'reasoning_effort', 'low')}",
                 "--output-schema", str(schema_path),
                 "--output-last-message", str(answer_path), "-C", str(root),
             ]
@@ -330,9 +341,12 @@ class PriorGenerationAgent:
                     raise ValueError(f"invalid prior decision field: {name}")
             thread = next((e.get("thread_id") for e in events
                            if e.get("type") == "thread.started"), None)
+            usage = next((e.get("usage") for e in events
+                          if e.get("type") == "turn.completed"), None)
             return {"decision": decision, "model": self.model,
-                    "reasoning_effort": "low",
+                    "reasoning_effort": getattr(self, 'reasoning_effort', 'low'),
                     "provider": "codex", "thread_id": thread,
+                    "usage": usage,
                     "transport": {"attempts": attempt + 1, "timeouts": timeouts,
                                   "timeout_seconds": timeout},
                     "prompt_version": PROMPT_VERSION}

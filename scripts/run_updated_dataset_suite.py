@@ -124,6 +124,62 @@ def prepare_case(source, out):
                          'historical_model_metadata_preserved': True, 'ground_truth_used': False})
 
 
+def install_registration_override(out, candidate_root, *, environment):
+    """Install a frozen sparse-audit selection before any new refinement."""
+    candidate_root = candidate_root.resolve()
+    selected = candidate_root/'registered_100k.ply'
+    report_path = candidate_root/'report.json'
+    report = json.loads(report_path.read_text())
+    if report.get('ground_truth_used') is not False or report.get('status') != 'complete':
+        raise ValueError('registration override must be a completed no-GT audit')
+    sid = out.name
+    partial = out/'inputs/partial'/f'{sid}.ply'
+    source_partial = [digest for path,digest in report['input_sha256'].items()
+                      if path.endswith('/inputs/partial/'+sid+'.ply')]
+    if source_partial != [sha(partial)]:
+        raise ValueError('registration override partial mismatch')
+    for path,digest in report['input_sha256'].items():
+        if sha(Path(path)) != digest:
+            raise ValueError('registration audit input changed: '+path)
+    signature = {'candidate':str(selected),'sha256':sha(selected),'report_sha256':sha(report_path)}
+    receipt = out/'registration_override.json'
+    final = out/'registration/final/camera1_amplified_registered_100k.ply'
+    if receipt.exists():
+        previous = json.loads(receipt.read_text())
+        if previous['signature'] != signature:
+            raise ValueError('registration override changed; use a fresh output root')
+        if previous['status']=='complete':
+            if sha(final)!=signature['sha256']:
+                raise ValueError('installed registration changed')
+            if not (out/'diagnostics/render/render_manifest.json').is_file():
+                raise ValueError('override diagnostics missing')
+            return
+    elif (out/'refinement').exists() or (out/'fusion').exists():
+        raise ValueError('cannot change registration after refinement/fusion starts')
+    if ply_count(selected)!=100000:
+        raise ValueError('registration override must retain 100000 points')
+    write_json(receipt, {'status':'preparing','signature':signature})
+    archive = out/'provenance/original_registration'
+    if not archive.exists():
+        shutil.move(str(out/'registration'),str(archive))
+    archive_views = out/'provenance/original_diagnostics'
+    if not archive_views.exists():
+        shutil.move(str(out/'diagnostics'),str(archive_views))
+    shutil.copytree(candidate_root,out/'registration/sparse_audit',dirs_exist_ok=True)
+    final.parent.mkdir(parents=True,exist_ok=True)
+    shutil.copy2(selected,final)
+    write_json(final.parent/'sparse_observation.json',report)
+    (out/'logs').mkdir(exist_ok=True)
+    command=[sys.executable,str(ROOT/'scripts/run_multiview_diagnostics.py'),
+             '--registered-prior',str(final.resolve()),'--partial',str(partial.resolve()),
+             '--camera',str((out/'inputs/camera'/sid/'camera.pth').resolve()),
+             '--output-dir',str((out/'diagnostics').resolve())]
+    with (out/'logs/registration_diagnostics.log').open('w') as log:
+        subprocess.run(command,cwd=ROOT,env=environment,stdout=log,stderr=subprocess.STDOUT,check=True)
+    write_json(receipt,{'status':'complete','signature':signature,'command':command,
+                       'selected_route':report['selected_route'],'ground_truth_used':False})
+
+
 def ply_count(path):
     with path.open('rb') as stream:
         for _ in range(100):
@@ -156,6 +212,8 @@ def main():
     parser.add_argument('--output-root', type=Path, default=ROOT/'workspace/refinement_updated')
     parser.add_argument('--source-root', type=Path,
                         help='Reuse a completed dataset/sample archive, e.g. workspace/astra_final, in a fresh output root.')
+    parser.add_argument('--registration-root', type=Path,
+                        help='Explicit frozen audit selections at dataset/sample/registered_100k.ply; regenerate diagnostics before refinement.')
     parser.add_argument('--datasets', nargs='+', choices=list(DATASETS), default=['custom','aircraft'])
     parser.add_argument('--gpus', nargs='+', default=['1', '2', '3', '5'])
     parser.add_argument('--rounds', type=int, default=32)
@@ -200,6 +258,8 @@ def main():
              'model': 'gpt-6-astra', 'reasoning_effort': 'low', 'ground_truth_used': False,
              'counts': {d: sum(c['dataset']==d for c in cases) for d in args.datasets},
              'results': []}
+    if args.registration_root:
+        state['registration_root'] = str(args.registration_root.resolve())
     manifest = args.output_root/args.manifest_name
     write_json(manifest, state)
     devices = queue.Queue()
@@ -211,6 +271,13 @@ def main():
         try:
             out = case['output']; sid = case['sample']
             prepare_case(case['source'], out)
+            if args.registration_root:
+                environment = {**os.environ, 'CUDA_VISIBLE_DEVICES':gpu,
+                               'OPENBLAS_NUM_THREADS':'1', 'OMP_NUM_THREADS':'1'}
+                install_registration_override(out,args.registration_root/case['dataset']/sid,
+                                              environment=environment)
+            elif (out/'registration_override.json').exists():
+                raise ValueError('resume must explicitly retain --registration-root')
             if args.prepare_only:
                 return {'dataset': case['dataset'], 'sample': sid, 'status': 'prepared'}
             refinement = out/'refinement'

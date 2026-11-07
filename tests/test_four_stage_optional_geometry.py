@@ -41,8 +41,9 @@ def test_completed_stage_reuse_preserves_device_provenance(tmp_path, monkeypatch
                             tmp_path / "state.json", **kwargs)
 
 
+@pytest.mark.parametrize("sparse", [False, True])
 @pytest.mark.parametrize("local_flag", ["--coherent-local-motion", "--planned-local-motion"])
-def test_optional_geometry_flows_through_refinement_and_fusion(tmp_path, monkeypatch, local_flag):
+def test_optional_geometry_flows_through_refinement_and_fusion(tmp_path, monkeypatch, local_flag, sparse):
     sample = "object"
     camera = tmp_path / "inputs/camera" / sample
     pixal = tmp_path / "inputs/pixal" / sample
@@ -74,8 +75,14 @@ def test_optional_geometry_flows_through_refinement_and_fusion(tmp_path, monkeyp
     monkeypatch.setattr(pipeline, "_stage", capture)
     arguments = ["pipeline", "--output-root", str(tmp_path), "--dry-run",
                  local_flag, "--residual-registration"]
+    if sparse:
+        arguments.append("--sparse-observation")
     monkeypatch.setattr(sys, "argv", arguments)
     pipeline.main()
+    assert ("--sparse-observation" in calls["registration"]) == sparse
+    assert states[0]["options"].get("sparse_observation", False) == sparse
+    if not sparse:
+        assert "sparse_observation" not in states[0]["options"]
     assert list(calls)[-2:] == ["refinement", "fusion"]
     refine = calls["refinement"]
     assert local_flag in refine

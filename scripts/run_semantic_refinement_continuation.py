@@ -23,6 +23,7 @@ POLICY_VERSION='autonomous_inventory_v10'
 
 def main():
     ap=argparse.ArgumentParser(description=__doc__);ap.add_argument('--case-dir',type=Path,required=True);ap.add_argument('--output-dir',type=Path,required=True);ap.add_argument('--feedback',default='');ap.add_argument('--gpt-model',default='gpt-6-astra');ap.add_argument('--rounds',type=int,default=3)
+    ap.add_argument('--reasoning-effort',choices=['low','medium','high'],default='low')
     ap.add_argument('--initial-plan',type=Path)
     ap.add_argument('--start-carrier',type=Path)
     ap.add_argument('--previous-plan',type=Path)
@@ -68,11 +69,11 @@ def main():
     rest_graph,_,_=local_surface_graph(initial,neighbours=12,edge_ratio=1.85)
     if a.protected_indices:shutil.copy2(a.protected_indices,out/'protected_indices.npy')
     views=load_manifest_projectors(out/'render_manifest.json');camera=SavedCameraProjector.from_partial(partial,out/'inputs/camera'/sid/'camera.pth',padding=.15,image_shape=(512,512),device='cpu')
-    agent=GPTRefineAgent(a.gpt_model,provider='codex');history=[]
+    agent=GPTRefineAgent(a.gpt_model,provider='codex',reasoning_effort=a.reasoning_effort);history=[]
     last_region=json.loads(a.previous_plan.read_text())['decision'] if a.previous_plan else {}
     instructions,plan_schema=planning_contract(observation_field=a.allow_observation_field,posterior=a.allow_posterior,autonomous=a.autonomous)
     stalled=0
-    report={'model':a.gpt_model,'reasoning_effort':'low','ground_truth_used':False,'feedback':a.feedback,'initial_path':str(prior_path.resolve()),'initial_sha256':hashlib.sha256(prior_path.read_bytes()).hexdigest(),'trace':history,'status':'running','instructions':instructions,'view_count':a.views,'protected_indices':str(a.protected_indices) if a.protected_indices else None,'evidence_policy':POLICY_VERSION,'autonomous':a.autonomous}
+    report={'model':a.gpt_model,'reasoning_effort':a.reasoning_effort,'ground_truth_used':False,'feedback':a.feedback,'initial_path':str(prior_path.resolve()),'initial_sha256':hashlib.sha256(prior_path.read_bytes()).hexdigest(),'trace':history,'status':'running','instructions':instructions,'view_count':a.views,'protected_indices':str(a.protected_indices) if a.protected_indices else None,'evidence_policy':POLICY_VERSION,'autonomous':a.autonomous}
     if a.resume and (out/'report.json').exists():
         report=json.loads((out/'report.json').read_text());history=report['trace'];current=load_points(out/'selected_100k.ply')
         if a.autonomous and not report.get('autonomous',False):raise ValueError('cannot label an assisted history autonomous')
@@ -81,8 +82,8 @@ def main():
         report['status']='running';report.pop('stop_reason',None)
         report.setdefault('reasoning_revisions', []).append({
             'from_round': len(history)+1, 'model': a.gpt_model,
-            'reasoning_effort': 'low', 'previous_report_effort': report['reasoning_effort']})
-        report['current_reasoning_effort']='low'
+            'reasoning_effort': a.reasoning_effort, 'previous_report_effort': report['reasoning_effort']})
+        report['current_reasoning_effort']=a.reasoning_effort
         report.setdefault('policy_revisions',[]).append({'from_round':len(history)+1,'change':'fixed-rest audit, repeat detection, and available-action update','available_actions':plan_schema['properties']['action']['enum'],'instructions':instructions,'feedback':a.feedback})
         for t in reversed(history):
             if t.get('plan',{}).get('decision',{}).get('windows'):

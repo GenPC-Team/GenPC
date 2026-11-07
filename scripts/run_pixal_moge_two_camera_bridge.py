@@ -139,7 +139,11 @@ def main() -> None:
                         help="Deterministic Camera-1 partial subset for the local residual score.")
     parser.add_argument("--padding", type=float, default=.15)
     parser.add_argument("--device", default="cuda")
+    parser.add_argument("--sparse-observation", action="store_true",
+                        help="Opt-in camera-anchored sparse bridge; disables dense-mask residual search.")
     args = parser.parse_args()
+    if args.sparse_observation:
+        args.refine = False
 
     partial = _load_points(args.partial)
     prior = _load_points(args.pixal_prior)
@@ -175,13 +179,20 @@ def main() -> None:
     # The dense mapped pixel lattice is used only for a PNG diagnostic below;
     # never serialize 96k coordinates into the compact experiment record.
     match_info.pop("mapped_partial_pixels", None)
-    if len(matches) < 96:
+    if len(matches) < (6 if args.sparse_observation else 96):
         raise RuntimeError("two-camera bridge produced too few pixel correspondences")
     fit_matches = _subsample_matches(matches, args.fit_max_matches)
     diagonal = max(float(np.linalg.norm(np.ptp(partial, axis=0))), 1e-8)
-    moge_to_partial, fit = robust_indexed_sim3(
-        moge, partial, fit_matches, diagonal=diagonal,
-    )
+    if args.sparse_observation:
+        from src.sparse_observation_registration import camera_bridge_rotation, fit_sparse_bridge
+        saved = SavedCameraProjector.from_partial(
+            partial, args.partial_camera, padding=args.padding, image_shape=source_mask.shape, device="cpu")
+        moge_to_partial, fit = fit_sparse_bridge(
+            moge, partial, matches, point_uv, camera_bridge_rotation(saved))
+    else:
+        moge_to_partial, fit = robust_indexed_sim3(
+            moge, partial, fit_matches, diagonal=diagonal,
+        )
     aligned_moge = apply_transform(moge, moge_to_partial)
     pixal_to_moge = np.asarray(native_info["prior_to_native_moge"], dtype=np.float64)
     pixal_to_partial = moge_to_partial @ pixal_to_moge
@@ -211,6 +222,13 @@ def main() -> None:
     native_before = pixal_moge_render_score(moge, prior_native_moge, projector)
     partial_before = visible_score(partial, registered_bridge, saved_projector, diagonal, pixel_radius=5.)
     registered, residual_partial = registered_bridge, np.eye(4, dtype=np.float64)
+    sparse_surface_fit = None
+    if args.sparse_observation:
+        from src.sparse_observation_registration import refine_sparse_scale_translation
+        registered, sparse_surface_fit = refine_sparse_scale_translation(
+            partial, registered_bridge, point_uv, saved_projector)
+        residual_partial = np.asarray(sparse_surface_fit.get("transform", np.eye(4)))
+        pixal_to_partial = residual_partial @ pixal_to_partial
     refinement = {
         "enabled": bool(args.refine), "applied": False, "reason": "disabled",
         "partial_before": _compact_visible_score(partial_before),
@@ -251,6 +269,8 @@ def main() -> None:
         }
         registered = candidate
         pixal_to_partial = moge_to_partial @ residual_native @ pixal_to_moge
+    if sparse_surface_fit is not None:
+        refinement["sparse_positive_surface_fit"] = sparse_surface_fit
     np.save(Path(f"{stem}_pixal_to_partial_bridge.npy"), moge_to_partial @ pixal_to_moge)
     np.save(Path(f"{stem}_pixal_to_partial.npy"), pixal_to_partial)
     write_points(Path(f"{stem}_bridge_registered_100k.ply"), registered_bridge)
@@ -262,7 +282,8 @@ def main() -> None:
     )
     singular = np.linalg.svd(pixal_to_partial[:3, :3], compute_uv=False)
     record = {
-        "method": "two_camera_pixel_bridge_plus_analytic_pixal_native_moge_sim3",
+        "method": ("sparse_observation_v1" if args.sparse_observation else
+                   "two_camera_pixel_bridge_plus_analytic_pixal_native_moge_sim3"),
         "strict_zero_shot": True,
         "ground_truth_cd_emd_used": False,
         "fusion_run": False,

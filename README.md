@@ -30,6 +30,17 @@ category identity and structural plausibility. A coverage score alone cannot
 accept an image. RMBG-2.0 makes the accepted image transparent **before** it
 is sent to Pixal3D. MoGe-2 observes Pixal3D's saved preprocessed input.
 
+## Optional sparse-input registration
+
+For LiDAR fragments, explicitly add `--sparse-observation` to
+`run_four_stage_pipeline.py` or `run_fixed_pixal_moge_registration.py` in a new
+run directory. It adds a camera-anchored, spatially validated sparse candidate
+and retains the original registration unless observed evidence supports the
+change. It is **off by default**, independent of dataset names, and does not
+change prior generation, refinement or fusion. See
+[sparse registration](docs/sparse_observation_registration.md) for commands,
+selection details, validation and limitations.
+
 ## Run one object
 
 Use the `genpc` interpreter and installed model assets from

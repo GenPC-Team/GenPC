@@ -199,7 +199,8 @@ def prepare(args: argparse.Namespace) -> None:
         view_candidates = {selected: str(board)}
         result = {"decision": {"view_id": selected,
                                "reason": "Use the supplied saved acquisition camera"},
-                  "model": args.model, "provider": "fixed_saved_camera",
+                  "model": args.model, "reasoning_effort": args.reasoning_effort,
+                  "provider": "fixed_saved_camera",
                   "prompt_version": PROMPT_VERSION}
         camera_source = {"directory": str(source_camera),
                          "depth_sha256": _hash(source_camera / "depth.png"),
@@ -291,7 +292,7 @@ def prepare(args: argparse.Namespace) -> None:
                 editor.close()
             board = agent_dir / "candidate_depth_board.png"
             _board(candidates, view_ids, board)
-        result = PriorGenerationAgent(args.model).select_view(
+        result = PriorGenerationAgent(args.model, reasoning_effort=args.reasoning_effort).select_view(
             board=board, view_ids=view_ids, object_description=args.object_description,
             base_prompt=base_prompt,
             camera_geometry=camera_geometry,
@@ -411,7 +412,7 @@ def review(args: argparse.Namespace) -> None:
     if depth_run.returncode != 0:
         raise RuntimeError(f"ordinal depth audit failed: {review_dir / 'ordinal_depth_audit.log'}")
     depth_audit = json.loads(depth_audit_path.read_text(encoding="utf-8"))
-    result = PriorGenerationAgent(args.model).review(
+    result = PriorGenerationAgent(args.model, reasoning_effort=args.reasoning_effort).review(
         depth=review_dir / "comparison_depth.png", candidate=review_dir / "img.png",
         audit_overlay=review_dir / "semantic_depth_audit.png", audit=audit,
         prompt=prompt_path.read_text(encoding="utf-8"),
@@ -521,7 +522,8 @@ def enrich(args: argparse.Namespace) -> None:
                               ('depth_landmark_order', 'reason', 'repair_hint', 'uncertainty')}
             review_context['source_audit_sha256'] = _hash(source_audit)
     interpretation_inputs = {'depth_sha256': _hash(Path(state['selected_depth'])),
-                             'model': args.model, 'prompt_version': PROMPT_VERSION,
+                             'model': args.model, 'reasoning_effort': args.reasoning_effort,
+                             'prompt_version': PROMPT_VERSION,
                              'feedback': args.feedback, 'camera_context': camera_context,
                              'same_view_machine_review': review_context,
                              'object_description': state['object_description']}
@@ -529,7 +531,7 @@ def enrich(args: argparse.Namespace) -> None:
     if cached.get('inputs') == interpretation_inputs:
         result = cached['result']
     else:
-        result = PriorGenerationAgent(args.model).interpret_depth(
+        result = PriorGenerationAgent(args.model, reasoning_effort=args.reasoning_effort).interpret_depth(
             depth=Path(state["selected_depth"]),
             object_description=state["object_description"],
             feedback=args.feedback,
@@ -587,7 +589,7 @@ def enrich(args: argparse.Namespace) -> None:
         compact_payload = {'task':'express_supported_depth_constraints_concisely',
                            'depth_interpretation':result['decision'],
                            'policy':'Write one or two complete Chinese sentences, at most 200 characters. Preserve supported image-plane orientation, near/far order, salient part directions and connections. Omit uncertain identities. Do not repeat the base prompt or canvas framing; do not invent new constraints.'}
-        compact = PriorGenerationAgent(args.model)._decide(compact_schema,compact_payload,[Path(state['selected_depth'])])
+        compact = PriorGenerationAgent(args.model, reasoning_effort=args.reasoning_effort)._decide(compact_schema,compact_payload,[Path(state['selected_depth'])])
         _write(root/'prior_agent/depth_hint_compaction.json',{'payload':compact_payload,'result':compact})
         hint = compact['decision']['hint'].strip()
         if not hint:
@@ -631,7 +633,7 @@ def reselect(args: argparse.Namespace) -> None:
     ranking_path = agent_dir / 'view_ranking.json'
     camera_geometry = (json.loads(ranking_path.read_text()).get('camera_geometry', {})
                        if ranking_path.exists() else {})
-    result = PriorGenerationAgent(args.model).select_view(
+    result = PriorGenerationAgent(args.model, reasoning_effort=args.reasoning_effort).select_view(
         board=[Path(path) for path in board] if isinstance(board, list) else Path(board),
         view_ids=view_ids, object_description=state["object_description"],
         camera_geometry={key: value for key, value in camera_geometry.items() if key in view_ids},
@@ -765,6 +767,8 @@ def main() -> None:
     refresh.add_argument('--config', type=Path, default=ROOT / 'configs/mainline_redwood.yaml')
     refresh.add_argument('--models-root', type=Path, default=ROOT / 'models')
     refresh.add_argument('--model', default='gpt-6-astra')
+    for command_parser in (prep, rev, insight, retry_view, refresh):
+        command_parser.add_argument('--reasoning-effort', choices=('low', 'medium', 'high'), default='low')
     args = parser.parse_args()
     {"prepare": prepare, "review": review, "enrich": enrich,
      "reselect": reselect, 'refresh-views': refresh_views}[args.command](args)

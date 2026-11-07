@@ -102,6 +102,13 @@ depth pixels approximately (default floor 0.65 for the partial-scan review);
 image center, box size and IoU are diagnostics.
 The GPT-6 Astra reviewer separately checks front/back orientation, visible
 structure, depth ordering, category identity and natural completeness. It
+also checks that the completed object contains the functionally necessary
+supports implied by its category and confident depth interpretation. A
+horizontal stretcher or overlap does not stand in for a missing leg; a truly
+occluded leg need not be drawn if its 3D placement is plausible. Missing,
+disconnected or short necessary supports fail natural construction and whole
+object completeness even when the observed partial contour aligns.
+It
 has a separate front/rear-axis check that rejects a reversed head, lens or
 nose direction even when those parts occupy the right locations. It
 receives the saved part interpretation and any explicit human candidate
@@ -194,6 +201,18 @@ intrinsics, extrinsics, raster size and point UV convention are reused, so a
 view or crop change cannot silently alter the registration target. A bounded
 Camera-1 continuation refines the placement without changing the complete
 carrier's point order.
+
+### Explicit sparse-observation option
+
+`--sparse-observation` adds an independent sparse camera bridge candidate.
+Spatial balancing, robust fitting and spatial holdouts determine how much
+rotation evidence supports beyond the saved camera orientation. Positive
+visible-surface fitting adjusts scale/translation without changing that
+rotation. Empty scan pixels incur no penalty in this candidate. The unchanged
+mainline result remains a candidate; conservative observed-support checks
+choose between them before diagnostics/refinement. Default-off behavior,
+archive results and downstream policies are preserved. Full method, command
+and evidence limitations: [sparse observation registration](sparse_observation_registration.md).
 
 ## 3. Geometric Refinement Agent
 

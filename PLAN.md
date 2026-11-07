@@ -1,5 +1,121 @@
 # Active plan
 
+## 2026-11-07 — Redwood 01184 paired agent model comparison (stopped at user request)
+
+- Compare full fixed-camera prior generation, Image Gen, transparent Pixal/MoGe,
+  registration, autonomous six-view refinement and continuous fusion with
+  gpt-6-astra/low versus gpt-6-sol/medium. Both arms use the same partial,
+  saved camera, geometry settings and frozen offline evaluation. GT is never
+  available to inference or candidate selection.
+- Keep both arms under `workspace/agent_model_comparison_redwood01184/` and
+  preserve accepted `workspace/astra_final/` unchanged. Record exact prompts,
+  image hashes, all decisions, usage events, stage outputs and logs.
+- Add explicit effort arguments to both agents. Check logs for actual model and
+  effort before interpreting quality or token counts. Image Gen randomness is a
+  limitation of this one-case paired pilot.
+- Both fixed-camera depth interpretations and one Image Gen candidate per arm
+  were saved under the comparison directory. User preferred the Astra-guided
+  image and explicitly stopped the experiment before prior review, Pixal,
+  registration, refinement, fusion or CD/EMD. No full-flow or cost conclusion.
+  Accepted `workspace/astra_final/` remains unchanged. The tested effort
+  argument plumbing stays in source (25 targeted tests passed).
+
+## 2026-11-06 — ScanNet50 full Astra-Light rerun (active)
+
+- User authorized all 50 ScanNet/ScanSalon samples and reiterated Astra Light.
+- Prior view selection/interpretation/review and refinement use gpt-6-astra low.
+- Rebuild missing upstream assets from data/scannet/partial only. Built-in
+  Image Gen uses the existing short depth-grounded prompt; RMBG before Pixal.
+- Default registration (sparse option OFF), autonomous six-view refinement up
+  to 64 rounds, continuous fusion. GT only for frozen offline CD/EMD.
+- All stages: workspace/scannet50_astra/scannet/<sample>/. Preparation on GPU4
+  avoids active KITTI/Waymo GPUs1,2,5,7 and unrelated GPU0 work.
+- Inventory: workspace/scannet50_astra/inventory.json. As checked 2026-11-07,
+  all 50 view selections and prompts are ready, but zero semantic candidates
+  were generated or accepted; no refinement/fusion outputs exist. Preparation
+  process exited normally. Interactive Image Gen remains outstanding.
+- Resumed 2026-11-07 at user request. All 50 first candidates generated under
+  `workspace/scannet50_astra/scannet/<sample>/`; Astra-low first-pass review is
+  in progress and rejected candidates are being regenerated from saved depth.
+  `car_132` entered Pixal/registration and autonomous refinement. User found
+  a structurally incomplete regenerated table candidate
+  `table_scene0043_00_6`; its first candidate had already failed observed
+  support placement. Prior reviewer policy v25 now explicitly checks necessary
+  supports, attachment, endpoints and stable whole-object completion rather
+  than mistaking partial-scan absence for an absent object part. Re-review
+  existing accepted candidates before releasing them to geometry.
+- ScanNet `car_200` registration failure diagnosed before refinement using an
+  isolated no-GT sparse-bridge replay. The default unrestricted pixel Sim(3)
+  flips 173.6 degrees from saved-camera orientation on uneven horizontal scan
+  bands; 92.3% 2D pixel matches conceal only 44.0% 3D bridge inliers. The
+  existing opt-in sparse route selects camera orientation and reduces observed
+  mean/p95 distance from 12.538/51.209% to 2.221/5.081% of partial diagonal.
+  Frozen offline registration CD-L1/EMD x100 changes 30.845/34.563 to
+  3.878/4.284. Evidence and overlays are in
+  `workspace/scannet50_astra/diagnostics/car_200_sparse_bridge/DIAGNOSIS.md`.
+  User explicitly enabled the same sparse option used for KITTI/Waymo for
+  ScanNet `car_*` on 2026-11-07. The ten cars now use
+  `--sparse-observation`; all other ScanNet categories remain sparse-OFF.
+  Five interrupted/default car chains were moved intact to
+  `workspace/scannet50_astra/diagnostics/default_car_runs/` for controlled
+  comparison. The scheduler was restarted with cars re-entering registration
+  and autonomous refinement/fusion; the offline evaluator was restarted so
+  superseded metrics cannot be reused. No GT enters inference.
+- All 50/50 ScanNet priors passed the Astra-Light review after the v25
+  completeness audit. `table_scene0655_00_16` exhausted 11 candidates from
+  `view_217` because of repeated near/far reversal; the existing no-GT
+  `reselect` action chose saved `view_030`, and its first depth-only candidate
+  passed review. The previous attempts/camera were archived in that case's
+  `prior_agent/selection_revisions/`. Downstream remains active.
+- The user-enabled sparse run for `car_200` completed registration, 16-round
+  Astra-Light refinement and continuous fusion (100k). The no-GT selector
+  chose the sparse candidate. Its new offline final CD-L1/EMD x100 is
+  3.809647/4.112972, versus superseded default final 30.875215/33.896536.
+  New overlay: `workspace/scannet50_astra/scannet/car_200/residuals/car_200/evidence/partial_positive_overlay_front_side_back_right.png`.
+
+## 2026-11-06 — sparse KITTI20/Waymo76 downstream rerun (complete)
+
+- Verified 2026-11-07: all 96 refinement/fusion cases completed; independent
+  verification.json passed 96/96 including 100k carriers, hashes and overlays.
+  Suite finished 2026-11-07 03:23:54 Asia/Shanghai. Mean observed distance (%)
+  KITTI 1.689636→1.276130; Waymo 1.000633→0.970728. These are not CD/EMD.
+- User authorized fresh autonomous refinement and continuous fusion for all
+  96 selected registrations in sparse_observation_validation/guarded.
+- Outputs: workspace/sparse_observation_final/{kitti,waymo}/<sample>/.
+  Preserve astra_final and the registration validation inputs unchanged.
+- Reuse accepted prior/camera/Pixal assets, install selected registration with
+  input-hash validation, regenerate diagnostics, then Astra low / six views /
+  up to 64 rounds and continuous 100k fusion. No GT enters inference.
+- Launched scheduler PID 1200002; command in sparse_observation_final/launch.json.
+  Three override/resume tests passed; real frame_005860_car_1 preparation passed.
+  Supervisor PID 1213477 retries unfinished cases up to twice after the initial
+  queue, then verifies carrier hashes/counts, start registration identity,
+  model/effort and overlays, and writes verification.json with observed-only
+  comparisons. First saved plans confirm gpt-6-astra/low and actual actions.
+- Use free GPUs 1,2,5,7; avoid existing GPU 0/4 workloads. Verify selected
+  input hashes, per-case completion receipts, finite 100k outputs and overlays.
+
+## 2026-11-06 — opt-in sparse observation registration (complete)
+
+- Implemented explicit --sparse-observation for the four-stage and fixed
+  registration runners. The main candidate is unchanged; a camera-anchored,
+  spatially balanced robust sparse bridge and positive-surface scale/translation
+  fit are compared using observed-only uncertainty/nonregression checks.
+- Default remains off. Mode/source/code resume guards prevent mixing runs.
+  No dataset-specific activation, GT use or changes to agent/fusion policies.
+- Verified 96 KITTI/Waymo cases under workspace/sparse_observation_validation/.
+  guarded/ is current; earlier candidate ablations retain all regressions.
+  Selected sparse 7/20 KITTI and 10/76 Waymo; other cases keep mainline.
+  Mean observed distances (%) 3.070801→2.746071 and 2.338762→2.193958.
+  These selection-related metrics are not independent accuracy or CD/EMD.
+- 31 tests passed. Real runner and resume passed; its default candidate is
+  byte-identical to archived frame_005860_car_1 registration. Rechecked all
+  96 input hash lists unchanged. Accepted astra_final was not modified.
+- Docs: docs/sparse_observation_registration.md; experiment README lists all
+  stages and limitations. No downstream refinement/fusion rerun or semantic
+  correctness claim. Original initialization failures still need explicit
+  handling; the conservative gate may retain a poor original candidate.
+
 ## 2026-11-06 — accepted Astra archive and source push (complete)
 
 - Completed: packaged all 156 accepted cases and intermediate evidence in workspace/astra_final.

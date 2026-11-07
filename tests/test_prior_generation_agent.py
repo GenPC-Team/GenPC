@@ -4,7 +4,7 @@ import json
 
 import src.prior_generation_agent as prior_module
 
-from src.prior_generation_agent import PriorGenerationAgent, compose_depth_edit_prompt
+from src.prior_generation_agent import PriorGenerationAgent, compose_depth_edit_prompt, INSTRUCTIONS
 
 
 def test_codex_prior_retries_transient_error_event(monkeypatch):
@@ -31,6 +31,29 @@ def test_codex_prior_retries_transient_error_event(monkeypatch):
     )
     assert result["decision"] == {"choice": "ok"}
     assert len(calls) == 2
+
+
+def test_codex_prior_medium_records_effort_and_usage(monkeypatch):
+    monkeypatch.setattr(prior_module.shutil, "which", lambda _: "/usr/bin/codex")
+
+    def fake_run(command, **kwargs):
+        assert "model_reasoning_effort=medium" in command
+        assert command[command.index("--model") + 1] == "gpt-6-sol"
+        Path(command[command.index("--output-last-message") + 1]).write_text('{"choice":"ok"}')
+        return SimpleNamespace(returncode=0, stderr="", stdout=json.dumps(
+            {"type": "turn.completed", "usage": {"input_tokens": 17, "output_tokens": 3}}))
+
+    monkeypatch.setattr(prior_module.subprocess, "run", fake_run)
+    result = PriorGenerationAgent("gpt-6-sol", reasoning_effort="medium")._decide(
+        {"required": ["choice"], "properties": {"choice": {"type": "string"}}}, {}, [])
+    assert result["reasoning_effort"] == "medium"
+    assert result["usage"] == {"input_tokens": 17, "output_tokens": 3}
+
+
+def test_review_requires_complete_support_structure_from_partial_scan():
+    assert "The depth is a partial scan" in INSTRUCTIONS
+    assert "a stretcher, trim strip or image-plane overlap cannot substitute for a missing leg" in INSTRUCTIONS
+    assert "Set natural_construction and complete_object false" in INSTRUCTIONS
 
 
 def test_fixed_camera_prompt_uses_approved_short_depth_sentence():

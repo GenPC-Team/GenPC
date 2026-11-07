@@ -228,12 +228,14 @@ def _data_uri(path: Path) -> str:
 class GPTRefineAgent:
     """A real GPT caller through Codex login or the API; no rule fallback."""
 
-    def __init__(self, model: str, *, provider: str = "api", client=None):
+    def __init__(self, model: str, *, provider: str = "api", client=None,
+                 reasoning_effort: str = "low"):
         if not model:
             raise ValueError("a GPT model name is required")
         if provider not in {"api", "codex"}:
             raise ValueError("provider must be api or codex")
         self.model = model
+        self.reasoning_effort = reasoning_effort
         self.provider = provider
         if provider == "codex":
             if client is not None:
@@ -265,7 +267,7 @@ class GPTRefineAgent:
             command = [
                 "codex", "exec", "--model", self.model,
                 "--sandbox", "read-only", "--ephemeral", "--skip-git-repo-check",
-                "--ignore-user-config", "--json", "--config", "model_reasoning_effort=low",
+                "--ignore-user-config", "--json", "--config", f"model_reasoning_effort={getattr(self, 'reasoning_effort', 'low')}",
                 "--output-schema", str(schema_path),
                 "--output-last-message", str(answer_path), "-C", str(root),
             ]
@@ -343,7 +345,7 @@ class GPTRefineAgent:
                            for path in images)
             response = self.client.responses.create(
                 model=self.model,
-                reasoning={"effort": "low"},
+                reasoning={"effort": getattr(self, 'reasoning_effort', 'low')},
                 instructions=instructions or INSTRUCTIONS,
                 input=[{"role": "user", "content": content}],
                 text={"format": {"type": "json_schema", "name": name,
@@ -365,7 +367,7 @@ class GPTRefineAgent:
         ):
             raise ValueError("GPT evidence must be a list of strings")
         return {"decision": decision, "response_id": raw["response_id"],
-                "model": self.model, "reasoning_effort": "low", "provider": self.provider, "usage": raw["usage"],
+                "model": self.model, "reasoning_effort": getattr(self, 'reasoning_effort', 'low'), "provider": self.provider, "usage": raw["usage"],
                 "transport": raw.get("transport"),
                 "prompt_version": PROMPT_VERSION}
 

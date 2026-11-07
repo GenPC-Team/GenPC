@@ -17,11 +17,13 @@ from __future__ import annotations
 
 import argparse
 import contextlib
+import hashlib
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
 import os
 from pathlib import Path
 import runpy
+import shutil
 import subprocess
 import sys
 from typing import Iterable
@@ -105,7 +107,7 @@ def _exists(path: Path, *, resume: bool) -> bool:
 
 def _manifest(args: argparse.Namespace) -> dict[str, object]:
     """Build the deterministic, GT-free registration record."""
-    return {
+    result = {
         "method": "fixed_pixal_moge_two_camera_pixel_sim3_camera1_continuation",
         "strict_zero_shot": True, "ground_truth_cd_emd_used": False,
         "samples": list(args.samples), "status": {},
@@ -126,6 +128,11 @@ def _manifest(args: argparse.Namespace) -> dict[str, object]:
             "bridge_only": bool(args.bridge_only),
         },
     }
+
+    if getattr(args, "sparse_observation", False):
+        result["method"] = "sparse_observation_v1"
+        result["parameters"]["sparse_observation"] = True
+    return result
 
 
 def _write_json(path: Path, contents: object) -> None:
@@ -155,6 +162,8 @@ def _parallel_child_command(args: argparse.Namespace, *, sample: str, status: Pa
         command.append("--no-coarse-basin-recovery")
     if args.bridge_only:
         command.append("--bridge-only")
+    if getattr(args, "sparse_observation", False):
+        command.append("--sparse-observation")
     if not args.resume:
         command.append("--no-resume")
     if not args.in_process:
@@ -246,7 +255,11 @@ def main() -> None:
     parser.add_argument("--write-batch-manifest", action=argparse.BooleanOptionalAction, default=True,
                         help=argparse.SUPPRESS)
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--sparse-observation", action="store_true",
+                        help="Add a sparse camera-anchored candidate and conservative observed-only selection.")
     args = parser.parse_args()
+    if args.sparse_observation and args.bridge_only:
+        raise ValueError("--sparse-observation is an object registration option; incompatible with --bridge-only")
     if args.camera1_search_points < 3:
         raise ValueError("--camera1-search-points must be at least three")
     if min(args.camera1_wide_tilt_degrees, args.camera1_final_tilt_degrees) <= 0.:
@@ -280,7 +293,23 @@ def main() -> None:
                        partial_root=args.partial_root,
                        output_root=args.output_root)
         try:
+            final_dir = paths["final"]
+            sparse_marker = final_dir / "sparse_observation.json"
+            final_file = final_dir / REGISTERED_PRIOR_FILENAME
+            if final_file.exists() and bool(sparse_marker.exists()) != args.sparse_observation:
+                raise ValueError("registration mode changed; use a separate output root")
             _require(paths, ("partial", "prior", "pixal_input", "pixal_metadata", "camera", "point_uv", "source_mask", "semantic"))
+            if args.sparse_observation and not args.dry_run:
+                signature_paths = [paths[k] for k in ("partial", "prior", "camera", "point_uv", "source_mask", "pixal_input", "pixal_metadata")]
+                sidecar = paths["camera"].with_name("camera.json")
+                if sidecar.is_file():
+                    signature_paths.append(sidecar)
+                signature_paths += [ROOT / "src/sparse_observation_registration.py", ROOT / "scripts/run_pixal_moge_two_camera_bridge.py"]
+                signature = {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in signature_paths}
+                receipt = final_dir.parent / "sparse_configuration.json"
+                if receipt.is_file() and json.loads(receipt.read_text()) != signature:
+                    raise ValueError("sparse inputs or implementation changed; use a new output root")
+                _write_json(receipt, signature)
             native_ply = paths["native"] / "pixal_native_moge_points.ply"
             native_info = paths["native"] / "pixal_native_moge_info.json"
             native_registered = paths["native"] / "pixal_native_moge_registered_100k.ply"
@@ -390,6 +419,55 @@ def main() -> None:
                     "--device", "cpu",
                 ], cwd=ROOT, log=paths["final"] / "stage.log", dry_run=args.dry_run,
                      in_process=args.in_process)
+            if args.sparse_observation:
+                sparse_dir = final_dir.parent / "sparse_bridge"
+                sparse_prior = sparse_dir / "two_camera_pixal_moge_registered_100k.ply"
+                if not _exists(sparse_prior, resume=args.resume):
+                    _run([python, "scripts/run_pixal_moge_two_camera_bridge.py",
+                          "--partial", str(paths["partial"]), "--point-uv", str(paths["point_uv"]),
+                          "--source-mask", str(paths["source_mask"]), "--target-mask", str(target_mask),
+                          "--native-moge", str(native_ply), "--native-moge-info", str(native_info),
+                          "--pixal-prior", str(paths["prior"]), "--partial-camera", str(paths["camera"]),
+                          "--saved-view-image", str(paths["semantic"]), "--output-dir", str(sparse_dir),
+                          "--device", "cpu", "--sparse-observation"],
+                         cwd=ROOT, log=sparse_dir / "stage.log", dry_run=args.dry_run, in_process=args.in_process)
+                if not args.dry_run:
+                    import numpy as np
+                    from src.pointcloud_io import load_points, write_compare
+                    from src.sparse_observation_registration import select_sparse_candidate
+                    from src.saved_camera import SavedCameraProjector, draw_projection_overlay
+                    baseline_file = final_dir / "mainline_registered_100k.ply"
+                    if not baseline_file.exists():
+                        shutil.copy2(final_prior, baseline_file)
+                    observed = load_points(paths["partial"])
+                    baseline, candidate = load_points(baseline_file), load_points(sparse_prior)
+                    accepted, selection = select_sparse_candidate(observed, baseline, candidate, np.load(paths["point_uv"]))
+                    selection.update(method="sparse_observation_v1", baseline_path=str(baseline_file), candidate_path=str(sparse_prior))
+                    # Write the mode marker before publishing its corresponding carrier.
+                    _write_json(sparse_marker, selection)
+                    shutil.copy2(sparse_prior if accepted else baseline_file, final_prior)
+                    selected = candidate if accepted else baseline
+                    info_file = final_dir / "camera1_amplified_info.json"
+                    original_info = final_dir / "mainline_info.json"
+                    if info_file.exists() and not original_info.exists():
+                        shutil.copy2(info_file, original_info)
+                    residual_file = final_dir / "camera1_amplified_residual.npy"
+                    original_residual = final_dir / "mainline_residual.npy"
+                    if residual_file.exists() and not original_residual.exists():
+                        shutil.copy2(residual_file, original_residual)
+                    if accepted:
+                        _write_json(info_file, {"method": "sparse_observation_v1", "selection": selection,
+                            "pixal_to_partial_transform": str(sparse_dir / "two_camera_pixal_moge_pixal_to_partial.npy"),
+                            "original_mainline_info": str(original_info)})
+                        # The old incremental residual is not the selected sparse transform.
+                        residual_file.unlink(missing_ok=True)
+                    elif original_info.exists():
+                        shutil.copy2(original_info, info_file)
+                        if original_residual.exists():
+                            shutil.copy2(original_residual, residual_file)
+                    write_compare(final_dir / "camera1_amplified_partial_gray_pixal_red.ply", observed, selected)
+                    projector = SavedCameraProjector.from_partial(observed, paths["camera"], padding=.15, image_shape=(512,512), device="cpu")
+                    draw_projection_overlay(final_dir / "camera1_amplified_saved_view_projection.png", paths["semantic"], observed, selected, projector)
             manifest["status"][sample] = {"state": "complete", "final": str(final_prior.resolve())}
         except Exception as exc:  # keep the remaining shared samples running
             manifest["status"][sample] = {"state": "failed", "error": str(exc)}

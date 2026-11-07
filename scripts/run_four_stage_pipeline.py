@@ -112,6 +112,8 @@ def main() -> None:
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--stop-after", choices=("diagnostics", "fusion"), default="fusion",
                         help="Stop after fixed registration diagnostics when a separate refinement runner follows.")
+    parser.add_argument("--sparse-observation", action="store_true",
+                        help="Explicit sparse-input registration branch; default pipeline is unchanged.")
     args = parser.parse_args()
     root = args.output_root.resolve()
     model_root = args.models_root.resolve()
@@ -155,6 +157,8 @@ def main() -> None:
     # Omit the disabled new option to preserve existing single-step resumes.
     if args.planned_local_motion:
         options["planned_local_motion"] = True
+    if args.sparse_observation:
+        options["sparse_observation"] = True
     state_path = root / "four_stage_pipeline.json"
     if state_path.is_file():
         state = json.loads(state_path.read_text(encoding="utf-8"))
@@ -195,7 +199,8 @@ def main() -> None:
            "--partial-root", str(root / "inputs" / "partial"),
            "--output-root", str(root / "registration"),
            "--moge-model", str(model_root / "moge-2-vitl" / "model.pt"),
-           "--rmbg-model", str(model_root / "RMBG-2.0")], [registration],
+           "--rmbg-model", str(model_root / "RMBG-2.0")]
+           + (["--sparse-observation"] if args.sparse_observation else []), [registration],
            state, state_path, dry_run=args.dry_run, env=env)
     manifest = root / "residuals" / sample / "render" / "render_manifest.json"
     _stage("diagnostics", [python, str(ROOT / "scripts" / "run_multiview_diagnostics.py"),

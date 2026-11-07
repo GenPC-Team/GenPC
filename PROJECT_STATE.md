@@ -11926,3 +11926,19 @@ and declined old baseline point clouds. Thirteen directories were removed;
 cleanup_manifest.json records exact targets. Original prior approval entries
 above are historical and do not imply those old paths still exist.
 Current Astra outputs must be preserved unchanged without further approval.
+
+
+## 2026-11-06 — optional sparse registration validation (not user-approved)
+
+Implemented default-off --sparse-observation without replacing accepted
+workspace/astra_final outputs. Registration-only inputs reuse those archived
+KITTI20/Waymo76 priors, cameras and native MoGe correspondences. New outputs:
+workspace/sparse_observation_validation/guarded/{kitti,waymo}/<sample>/.
+All prompts/model parameters remain the historical upstream provenance; no
+new MLLM or image generation calls occurred. Exact input hashes, raw sparse
+candidates, selected 100k carriers and selection decisions are saved per case.
+No GT was used. Selection-related observed distances are not CD/EMD or
+independent semantic quality evidence. 7 KITTI and 10 Waymo sparse proposals
+were selected; others retain their mainline registration. Earlier candidate
+regressions are kept as ablations. No refinement/fusion rerun was performed.
+This is implementation validation, not a newly user-approved baseline.
